@@ -1294,34 +1294,37 @@ function ttsPreprocess(text) {
     .replace(/\bMRSA\b/g,'multiresistente Staphylokokken').replace(/\s+/g,' ').trim();
 }
 
-function elSpeakWS(text) {
-  return new Promise((resolve, reject) => {
-    const key=elApiKey(), vid=elVoiceId();
-    if(!key||!vid){reject(new Error('noconfig'));return;}
-    const url=`wss://api.elevenlabs.io/v1/text-to-speech/${vid}/stream-input?model_id=${EL_MODEL}&xi-api-key=${encodeURIComponent(key)}`;
-    let ws, chunks=[];
-    const t=setTimeout(()=>{try{ws.close();}catch(_){}reject(new Error('Timeout'));},20000);
-    try{ws=new WebSocket(url);}catch(e){clearTimeout(t);reject(e);return;}
-    ws.onopen=()=>{
-      ws.send(JSON.stringify({text:' ',xi_api_key:key,voice_settings:{stability:.87,similarity_boost:.87}}));
-      ws.send(JSON.stringify({text:ttsPreprocess(text)+' '}));
-      ws.send(JSON.stringify({text:''}));
-    };
-    ws.onmessage=evt=>{
-      try{const m=JSON.parse(evt.data);
-        if(m.audio){const r=atob(m.audio),b=new Uint8Array(r.length);for(let i=0;i<r.length;i++)b[i]=r.charCodeAt(i);chunks.push(b);}
-        if(m.isFinal||m.is_final){clearTimeout(t);ws.close();}
-      }catch(_){}
-    };
-    ws.onclose=()=>{
-      clearTimeout(t);
-      if(!chunks.length){reject(new Error('empty'));return;}
-      const tot=chunks.reduce((a,c)=>a+c.length,0),merged=new Uint8Array(tot);
-      let off=0;chunks.forEach(c=>{merged.set(c,off);off+=c.length;});
-      resolve(URL.createObjectURL(new Blob([merged],{type:'audio/mpeg'})));
-    };
-    ws.onerror=()=>{clearTimeout(t);reject(new Error(location.protocol==='http:'?'HTTPS erforderlich':'WS-Fehler'));};
-  });
+async function elSpeak(text) {
+  const key = elApiKey(), vid = elVoiceId();
+  if (!key || !vid) throw new Error('noconfig');
+
+  // Fetch-Ansatz (funktioniert auf HTTPS ohne CORS-Probleme)
+  const resp = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${vid}?output_format=mp3_44100_128`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'xi-api-key': key,
+        'Accept': 'audio/mpeg',
+      },
+      body: JSON.stringify({
+        text: ttsPreprocess(text),
+        model_id: EL_MODEL,
+        voice_settings: { stability: 0.87, similarity_boost: 0.87 }
+      })
+    }
+  );
+
+  if (resp.status === 401 || resp.status === 403) throw new Error('401');
+  if (!resp.ok) {
+    let msg = '';
+    try { const j = await resp.json(); msg = j?.detail?.message || j?.detail || ''; } catch(_) {}
+    throw new Error(`HTTP ${resp.status}${msg ? ': '+msg : ''}`);
+  }
+
+  const blob = await resp.blob();
+  return URL.createObjectURL(blob);
 }
 
 function ttsFindVoice() {
@@ -1405,7 +1408,7 @@ async function ttsSpeak(idx) {
   // ElevenLabs nur auf HTTPS möglich
   if(location.protocol==='https:' && elApiKey() && elVoiceId()){
     try {
-      const blobUrl = await elSpeakWS(text);
+      const blobUrl = await elSpeak(text);
       if (!TTS.audioEl) TTS.audioEl = new Audio();
       const a = TTS.audioEl;
       a.onended = next;
