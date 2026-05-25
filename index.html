@@ -413,7 +413,7 @@ body{
 }
 
 /* ── TTS PLAYER ── */
-#tts-player{position:fixed;bottom:0;left:0;right:0;background:var(--ink);padding:.65rem 1rem;display:none;flex-direction:column;gap:.35rem;z-index:9000;border-top:3px solid var(--accent);box-shadow:0 -4px 20px rgba(0,0,0,.5)}
+#tts-player{position:fixed;bottom:0;left:0;right:0;background:var(--ink);padding:.65rem 1rem calc(.65rem + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:.35rem;z-index:9000;border-top:3px solid var(--accent);box-shadow:0 -4px 20px rgba(0,0,0,.5)}
 #tts-player.active{display:flex}
 .tts-btn{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.05em;border:1px solid #333;background:#1a1a16;color:#888;cursor:pointer;min-height:36px;min-width:36px;display:inline-flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s;padding:.3rem .6rem}
 .tts-btn:hover,.tts-btn:active{background:#333;color:#fff}
@@ -533,17 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- TTS PLAYER (minimaler Bar) -->
 <div id="tts-player">
-  <!-- Key-Eingabe (nur wenn kein Key gespeichert) -->
-  <div id="tts-key-bar" style="display:none;align-items:center;gap:.5rem;padding-bottom:.4rem;border-bottom:1px solid #252520;margin-bottom:.4rem">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:#555;white-space:nowrap">EL-KEY</span>
-    <input id="tts-key-inp" type="password" placeholder="ElevenLabs API-Key (sk_…)"
-      autocomplete="off" spellcheck="false"
-      onkeydown="if(event.key==='Enter'){const k=this.value.trim();if(k.length>10){elSave(k);ttsToggle();}}"
-      style="flex:1;font-family:'JetBrains Mono',monospace;font-size:.65rem;padding:.3rem .5rem;
-             background:#111;border:1px solid #444;color:#c8bfa8;min-height:32px"/>
-    <button onclick="const k=document.getElementById('tts-key-inp').value.trim();if(k.length>10){elSave(k);ttsToggle();}"
-      class="tts-btn primary" style="white-space:nowrap;font-size:.62rem;padding:.3rem .65rem;min-height:32px">✓</button>
-  </div>
+
   <div style="display:flex;align-items:center;gap:.6rem;min-width:0">
     <button id="tts-play" onclick="ttsPlayPause()" class="tts-btn primary"
       style="min-width:44px;min-height:36px;flex-shrink:0;font-size:1rem;padding:.3rem .7rem">▶</button>
@@ -1283,14 +1273,14 @@ document.addEventListener('DOMContentLoaded', () => {
    Fallback: Web Speech API
 ════════════════════════════════════════════════════════ */
 
-const EL_STORAGE_KEY = 'apf_el_api_key';
-const EL_STORAGE_VID = 'apf_el_voice_id';
-const EL_MODEL       = 'eleven_multilingual_v2';
+const EL_API_KEY = '5ae72d32e6b2a5ee9ca27dd267df1808c0d3cd580c099b575fca5e06234b8ca6';
+const EL_VOICE_ID = 'K8bIZwDsGMHreGKTIVHN';
+const EL_MODEL    = 'eleven_multilingual_v2';
 
-const TTS = { utterances:[], idx:0, active:false, paused:false, voice:null, audioEl:null };
+const TTS = { utterances:[], idx:0, active:false, paused:false, voice:null, audioEl:null, unlocked:false };
 
-const elApiKey  = () => localStorage.getItem(EL_STORAGE_KEY) || '';
-const elVoiceId = () => localStorage.getItem(EL_STORAGE_VID) || '';
+const elApiKey  = () => EL_API_KEY;
+const elVoiceId = () => EL_VOICE_ID;
 
 function ttsPreprocess(text) {
   return text
@@ -1373,16 +1363,7 @@ function ttsShowSetup() {
   document.body.appendChild(m);
 }
 
-function ttsSaveSetup() {
-  const key=(document.getElementById('tts-s-key').value||'').trim();
-  const vid=(document.getElementById('tts-s-vid').value||'').trim();
-  const st=document.getElementById('tts-s-status');
-  if(key.length<10){st.textContent='API-Key zu kurz';st.style.color='#e05a4a';return;}
-  if(vid.length<5){st.textContent='Voice ID fehlt';st.style.color='#e05a4a';return;}
-  localStorage.setItem(EL_STORAGE_KEY,key);localStorage.setItem(EL_STORAGE_VID,vid);
-  st.textContent='✓ Gespeichert';st.style.color='#4caf77';
-  setTimeout(()=>{document.getElementById('tts-setup-modal').style.display='none';ttsToggle();},500);
-}
+function ttsSaveSetup() {} // Keys sind eingebettet
 
 function ttsBuildQueue() {
   TTS.utterances=[];
@@ -1413,7 +1394,8 @@ function ttsUpdateUI() {
 }
 
 async function ttsSpeak(idx) {
-  if(TTS.audioEl){TTS.audioEl.pause();TTS.audioEl.src='';TTS.audioEl=null;}
+  // audioEl NICHT nullen — das entsperrte Element für alle Artikel wiederverwenden
+  if(TTS.audioEl){ TTS.audioEl.pause(); try{TTS.audioEl.src='';}catch(_){} }
   window.speechSynthesis.cancel();
   if(!TTS.utterances.length)return;
   TTS.idx=Math.max(0,Math.min(idx,TTS.utterances.length-1));
@@ -1422,13 +1404,38 @@ async function ttsSpeak(idx) {
   const next=()=>{if(!TTS.active||TTS.paused)return;TTS.idx<TTS.utterances.length-1?setTimeout(()=>ttsSpeak(TTS.idx+1),350):ttsStop();};
   // ElevenLabs nur auf HTTPS möglich
   if(location.protocol==='https:' && elApiKey() && elVoiceId()){
-    try{const url=await elSpeakWS(text);const a=new Audio(url);TTS.audioEl=a;a.onended=next;a.onerror=()=>wsFallback(text,next);await a.play();return;}
-    catch(e){if(e.message.includes('401')||e.message.includes('403')){localStorage.removeItem(EL_STORAGE_KEY);notify('Key ungültig','Bitte neu einrichten.','warn',4000);}
-      else if(e.message!=='noconfig'){console.warn('EL:',e.message);}}
+    try {
+      const blobUrl = await elSpeakWS(text);
+      if (!TTS.audioEl) TTS.audioEl = new Audio();
+      const a = TTS.audioEl;
+      a.onended = next;
+      a.onerror = () => { wsFallback(text, next); };
+      a.src = blobUrl;
+      const p = a.play();
+      if (p && p.catch) {
+        p.catch(err => {
+          console.warn('play() err:', err.name, err.message);
+          wsFallback(text, next);
+        });
+      }
+      return;
+    } catch(e) {
+      if(e.message.includes('401')||e.message.includes('403')) {
+        notify('ElevenLabs Key ungültig','Datei neu herunterladen.','warn',5000);
+      } else {
+        notify('ElevenLabs: '+e.message,'Gerätestimme.','warn',4000);
+        console.warn('EL:', e.message);
+      }
+    }
   }
-  wsFallback(text,next);
+  wsFallback(text, next);
 }
 
+function ttsUnlock(){
+  if(TTS.unlocked) return;
+  try{const C=window.AudioContext||window.webkitAudioContext;if(C){const c=new C(),b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0);setTimeout(()=>c.close(),200);}}catch(_){}
+  TTS.unlocked=true;
+}
 function ttsToggle(){
   if(!document.getElementById('journal-content').classList.contains('active')){notify('Kein Inhalt','Protokoll zuerst generieren.','warn',3000);return;}
   if(TTS.active){ttsStop();return;}
@@ -1445,16 +1452,31 @@ function ttsToggle(){
   if(!elApiKey()||!elVoiceId()){ttsShowSetup();return;}
   ttsBuildQueue();if(!TTS.utterances.length)return;
   document.getElementById('tts-player').classList.add('active');document.body.classList.add('tts-active');
-  if(!TTS.voice)TTS.voice=ttsFindVoice();ttsSpeak(0);
+  if(!TTS.voice)TTS.voice=ttsFindVoice();
+
+  // Audio-Element JETZT entsperren (synchron in User-Geste)
+  // Dann beim async WS-Response einfach src setzen + play()
+  TTS.audioEl = new Audio();
+  TTS.audioEl.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAA==';
+  TTS.audioEl.play().catch(()=>{});
+  TTS.audioEl.onended = null;
+
+  ttsSpeak(0);
 }
 function ttsPlayPause(){
+  ttsUnlock();
   if(!TTS.active){ttsToggle();return;}
   if(TTS.paused){TTS.paused=false;if(TTS.audioEl)TTS.audioEl.play();else window.speechSynthesis.resume();document.getElementById('tts-play').textContent='⏸';}
   else{TTS.paused=true;if(TTS.audioEl)TTS.audioEl.pause();else window.speechSynthesis.pause();document.getElementById('tts-play').textContent='▶';}
 }
 function ttsNext(){TTS.idx<TTS.utterances.length-1?ttsSpeak(TTS.idx+1):ttsStop();}
 function ttsStop(){
-  if(TTS.audioEl){TTS.audioEl.pause();TTS.audioEl.src='';TTS.audioEl=null;}
+  if(TTS.audioEl){
+    TTS.audioEl.pause();
+    try{TTS.audioEl.src='';}catch(_){}
+    TTS.audioEl=null;
+    TTS.unlocked=false;
+  }
   window.speechSynthesis.cancel();TTS.active=false;TTS.paused=false;
   document.querySelectorAll('.reading-now').forEach(e=>e.classList.remove('reading-now'));
   document.getElementById('tts-player').classList.remove('active');document.body.classList.remove('tts-active');
