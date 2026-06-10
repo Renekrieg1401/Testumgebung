@@ -1,830 +1,527 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Der Polit-Beipackzettel</title>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Polit-BZ"/>
-<meta name="application-name" content="Polit-BZ"/>
-<meta name="theme-color" content="#0a0a08"/>
-<meta name="description" content="Das Volk haftet fur Risiken und Nebenwirkungen"/>
-<link id="pwa-manifest" rel="manifest"/>
-<link id="apple-icon" rel="apple-touch-icon" href="data:image/png;base64,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"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="only light">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tridura · Ausbildungs-Controlling</title>
+<link id="pwa-manifest"  rel="manifest" href="">
+<link id="apple-icon"    rel="apple-touch-icon" href="">
+<link id="fav-icon"      rel="icon" type="image/png" href="">
+<meta name="apple-mobile-web-app-capable"          content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title"            content="Tridura">
+<meta name="mobile-web-app-capable"                content="yes">
+<meta name="application-name"                      content="Tridura">
+<meta name="theme-color"                           content="#7400b8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','ui-sans-serif','system-ui','-apple-system','sans-serif']}}}}</script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg:    #001828;   /* tiefer als #003049 */
-    --bg2:   #002035;
-    --bg3:   #003049;   /* Palette-Anker */
-    --border:#005070;
-    --text:  #e8f4f6;
-    --muted: #8ab8c8;
-    --dim:   #4a7888;
-    --vdim:  #2a5060;
-  }
-  html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-  }
-  body {
-    background:var(--bg); color:var(--text);
-    font-family:'IBM Plex Sans',sans-serif;
-    min-height:100vh; min-height:100dvh;
-    overflow-x:hidden;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-  }
-  ::-webkit-scrollbar { width:3px; }
-  ::-webkit-scrollbar-track { background:var(--bg); }
-  ::-webkit-scrollbar-thumb { background:#005070; border-radius:2px; }
+:root{
+  color-scheme:only light;
+  --royal-violet:#7400b8;--indigo-bloom:#6930c3;--slate-blue:#5e60ce;
+  --cloudy-sky:#5390d9;--sky-surge:#48bfe3;--aquamarine:#80ffdb;
+}
+/* Strukturelle Hintergründe — immer mit weißer Schrift */
+.bg-brand        {background:linear-gradient(145deg,var(--royal-violet),var(--indigo-bloom) 60%,var(--slate-blue));color:#fff}
+.bg-banner       {background:linear-gradient(135deg,var(--indigo-bloom),var(--slate-blue),var(--cloudy-sky));color:#fff}
+.bg-royal-violet {background-color:var(--royal-violet);color:#fff}
+.bg-indigo-bloom {background-color:var(--indigo-bloom);color:#fff}
+.bg-progress     {background:linear-gradient(90deg,var(--slate-blue),var(--sky-surge),var(--aquamarine))}
+.bg-aqua-tint    {background-color:rgba(128,255,219,.10)}
+.bg-violet-tint  {background-color:rgba(116,0,184,.05)}
+.text-royal-violet{color:var(--royal-violet)}
+.text-indigo-bloom{color:var(--indigo-bloom)}
+input[type=range]{accent-color:var(--indigo-bloom)}
+input:focus{outline:2px solid var(--indigo-bloom);outline-offset:1px}
+[x-cloak]{display:none!important}
 
-  body::before {
-    content:''; position:fixed; top:0; left:0; right:0; bottom:0;
-    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);
-    pointer-events:none; z-index:9999;
-  }
-
-  #site-header {
-    background:var(--bg2); border-bottom:1px solid var(--border);
-    padding:0 20px; position:sticky; top:0; z-index:200;
-    animation:slideDown .45s ease both;
-  }
-  .topbar {
-    display:flex; justify-content:flex-start; align-items:center;
-    padding:8px 0 7px; border-bottom:1px solid #1c1c18;
-    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:#b0b0a4;
-  }
-
-  .title-row { padding:14px 0 11px; display:flex; align-items:flex-end; gap:14px; }
-  .title-group h1 {
-    font-family:'Playfair Display',serif; font-weight:900;
-    font-size:clamp(22px,5vw,32px); letter-spacing:-.02em; color:var(--text); line-height:1;
-  }
-  .title-group h1 span { color:#D1AC00; }
-  .slogan { margin-top:5px; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.1em; color:#8ab8c8; }
-
-  .header-meta {
-    font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.1em;
-    text-align:right; line-height:1.9; color:#8ab8c8;
-  }
-  .header-meta .meta-active { color:#D1AC00; }
-
-  .tab-nav { display:flex; gap:0; margin-bottom:-1px; overflow-x:auto; scrollbar-width:none; }
-  .tab-nav::-webkit-scrollbar { display:none; }
-  .tab-btn {
-    background:none; border:none; cursor:pointer;
-    -webkit-tap-highlight-color:transparent; touch-action:manipulation; padding:10px 14px 11px;
-    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:#7a7a70;
-    border-bottom:2px solid transparent; transition:color .15s, border-color .15s;
-    display:flex; align-items:center; gap:6px; white-space:nowrap; flex-shrink:0;
-  }
-  .tab-btn .tab-icon { font-size:14px; }
-  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
-  .tab-btn .load-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); display:none; animation:blink .8s ease infinite; }
-  .tab-btn.loading .load-dot { display:inline-block; }
-
-  main { max-width:940px; margin:0 auto; padding:24px 16px 56px; }
-
-  .cat-block {
-    background:var(--bg3); border:1px solid var(--ac12);
-    border-radius:3px; overflow:hidden; animation:fadeIn .3s ease both;
-  }
-  .cat-header {
-    padding:13px 18px; display:flex; align-items:center; gap:9px;
-    border-bottom:1px solid var(--ac14);
-  }
-  .cat-header-icon { font-size:17px; }
-  .cat-header-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.15em; color:var(--accent); font-weight:700; }
-  .cat-status-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 7px var(--accent); margin-left:auto; }
-  .cat-status-dot.loading { background:#f4c44a; box-shadow:0 0 7px #f4c44a; animation:blink .9s ease infinite; }
-
-  .cards-wrap { padding:14px; display:flex; flex-direction:column; gap:10px; }
-
-  .skeleton {
-    height:72px; background:var(--ac05);
-    border:1px solid var(--ac08);
-    border-radius:2px; animation:shimmer 1.4s ease infinite;
-  }
-
-  .news-card {
-    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
-    background:linear-gradient(135deg,var(--ac08dark) 0%,rgba(255,255,255,.02) 100%);
-    border:1px solid var(--ac16);
-    border-radius:3px; padding:16px 18px; cursor:pointer; position:relative;
-    transition:border-color .2s, box-shadow .2s, transform .18s;
-    animation:fadeIn .4s ease both;
-  }
-  .news-card:hover { border-color:var(--ac40); transform:translateY(-1px); box-shadow:0 6px 20px var(--ac10); }
-  .news-card.open  { border-color:var(--ac33); box-shadow:0 0 20px var(--ac12); }
-
-  .card-accent-line { position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); opacity:.25; transition:opacity .2s; }
-  .news-card.open .card-accent-line { opacity:1; }
-
-  .card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
-  .card-headline { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color:var(--text); line-height:1.35; flex:1; }
-  .card-toggle { color:var(--accent); font-size:22px; flex-shrink:0; line-height:1; transition:transform .2s; }
-  .news-card.open .card-toggle { transform:rotate(45deg); }
-  .card-teaser { margin-top:9px; font-size:13px; color:var(--muted); line-height:1.55; }
-
-  .card-body { margin-top:14px; padding-top:14px; border-top:1px solid var(--ac14); display:none; animation:expandIn .2s ease both; }
-  .news-card.open .card-body { display:block; }
-
-  .bedeutung-box {
-    background:var(--ac06);
-    border:1px solid var(--ac20);
-    border-radius:2px; padding:11px 13px; margin-bottom:11px;
-  }
-  .bedeutung-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--accent); margin-bottom:6px; }
-  .bedeutung-text  { font-size:13px; color:#d4d4cc; line-height:1.6; }
-  .card-meta { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
-  .card-source { font-family:'Space Mono',monospace; font-size:11px; color:var(--dim); }
-  .trust-badge { display:flex; align-items:center; gap:5px; font-family:'Space Mono',monospace; font-size:11px; flex-shrink:0; }
-  .trust-dot { width:7px; height:7px; border-radius:50%; }
-  .trust-info {
-    display:inline-flex; align-items:center; justify-content:center;
-    width:13px; height:13px; border-radius:50%;
-    border:1px solid var(--dim); color:var(--dim);
-    font-family:'Space Mono',monospace; font-size:8px; line-height:1;
-    cursor:pointer; flex-shrink:0; position:relative;
-    transition:border-color .15s, color .15s;
-  }
-  .trust-info:hover { border-color:#D1AC00; color:#D1AC00; }
-  .trust-tooltip {
-    display:none; position:absolute; bottom:calc(100% + 7px); right:0;
-    background:#002035; border:1px solid #005070;
-    border-left:2px solid #D1AC00;
-    padding:10px 12px; border-radius:2px;
-    width:210px; z-index:500;
-    font-family:'IBM Plex Sans',sans-serif; font-size:11px;
-    color:var(--muted); line-height:1.55; white-space:normal;
-    box-shadow:0 8px 24px rgba(0,0,0,.5);
-    pointer-events:none; text-align:left;
-  }
-  .trust-tooltip strong { color:var(--text); display:block; margin-bottom:6px; font-size:11px; letter-spacing:.02em; }
-  .trust-legend { display:flex; flex-direction:column; gap:4px; margin-top:4px; }
-  .trust-legend span { display:flex; align-items:center; gap:6px; font-size:10px; }
-  .tleg-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-  .trust-info:hover .trust-tooltip { display:block; }
-
-  .teaser-grid { margin-top:24px; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:9px; }
-  .teaser-card {
-    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
-    background:linear-gradient(135deg,var(--ac10dark) 0%,var(--bg3) 100%);
-    border:1px solid var(--ac12);
-    border-radius:3px; padding:14px 15px; cursor:pointer; text-align:left;
-    transition:border-color .18s, transform .15s; animation:fadeIn .45s ease both; width:100%;
-  }
-  .teaser-card:hover { border-color:var(--ac35); transform:translateY(-1px); }
-  .teaser-card-top  { display:flex; align-items:center; gap:7px; margin-bottom:7px; }
-  .teaser-card-icon { font-size:14px; }
-  .teaser-card-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--accent); }
-  .teaser-card-text  { font-size:12px; color:#8ab8c8; line-height:1.45; }
-
-  footer {
-    border-top:1px solid #1e1e1a; padding:18px 20px;
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
-    font-family:'Space Mono',monospace; font-size:10px; color:var(--vdim); letter-spacing:.08em;
-  }
-
-  /* Update banner */
-  #update-banner {
-    display: none;
-    position: fixed; bottom: 0; left: 0; right: 0;
-    z-index: 9000;
-    background: #0a0a08;
-    border-top: 2px solid #D1AC00;
-    padding: 14px 20px;
-    align-items: center; justify-content: space-between; gap: 12px;
-    animation: slideUp .35s ease both;
-    box-shadow: 0 -4px 24px rgba(209,172,0,.2);
-  }
-  #update-banner.visible { display: flex; }
-  .update-text {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px; letter-spacing: .08em;
-    color: #8ab8c8; line-height: 1.5;
-  }
-  .update-text strong { color: #D1AC00; display: block; margin-bottom: 2px; }
-  .update-btn {
-    background: #D1AC00; color: #001828;
-    border: none; border-radius: 2px;
-    padding: 10px 18px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px; font-weight: 700; letter-spacing: .1em;
-    cursor: pointer; white-space: nowrap; flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    transition: background .15s, transform .1s;
-  }
-  .update-btn:active { transform: scale(.97); background: #b89500; }
-  .update-dismiss {
-    background: none; border: none; color: #4a7888;
-    font-size: 18px; cursor: pointer; padding: 4px 8px;
-    -webkit-tap-highlight-color: transparent;
-    flex-shrink: 0;
-  }
-
-  @keyframes slideUp { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeIn    { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes expandIn  { from{opacity:0;transform:scaleY(.93);transform-origin:top} to{opacity:1;transform:scaleY(1)} }
-  @keyframes blink     { 0%,100%{opacity:1} 50%{opacity:.2} }
-  @keyframes shimmer   { 0%,100%{opacity:.35} 50%{opacity:.65} }
-  @keyframes slideDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
-
-  @media (max-width:480px) {
-    .topbar { font-size:9px; }
-    .tab-btn { padding:9px 7px 10px; gap:4px; }
-    .tab-btn .tab-label { font-size:10px; letter-spacing:.04em; }
-    .tab-btn .tab-icon  { font-size:13px; }
-    main { padding:16px 12px 48px; }
-    .teaser-grid { grid-template-columns:1fr 1fr; }
-    footer { flex-direction:column; gap:4px; font-size:9px; }
-  }
-  @media (max-width:360px) { .teaser-grid { grid-template-columns:1fr; } }
+/* === DARK MODE: explizit für Safari/iOS WebView === */
+@media (prefers-color-scheme: dark) {
+  html, body, main { background-color: #0f172a !important; }
+  .bg-violet-tint { background-color:rgba(116,0,184,.15) !important; }
+  .bg-aqua-tint   { background-color:rgba(128,255,219,.08) !important; }
+}
 </style>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body>
+<body x-data="tridura()" x-cloak
+  class="antialiased bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100">
 
-<div id="update-banner" role="alert" aria-live="polite">
-  <div class="update-text">
-    <strong>&#x21BB; NEUE VERSION</strong>
-    Aktualisierung verf&uuml;gbar
-  </div>
-  <button class="update-btn" onclick="doUpdate()">JETZT LADEN</button>
-  <button class="update-dismiss" onclick="dismissUpdate()" aria-label="Schlie&szlig;en">&times;</button>
-</div>
-
-<header id="site-header">
-  <div class="topbar">
-    <span id="kw-label">WOCHENPOLITIK</span>
-    
-  </div>
-  <div class="title-row">
-    <div class="title-group">
-      <h1>Der Polit-<span>Beipackzettel</span></h1>
-      <p class="slogan">DAS VOLK HAFTET F&#220;R RISIKEN &amp; NEBENWIRKUNGEN</p>
-    </div>
-    <div style="flex:1"></div>
-    <div class="header-meta">
-      <div>QUELLEN-CHECK</div>
-      <div class="meta-active">AKTIV</div>
+<!-- SIDEBAR DESKTOP -->
+<aside class="hidden lg:flex fixed inset-y-0 left-0 w-64 bg-brand flex-col overflow-y-auto z-40">
+  <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+    <canvas id="sidebar-logo" width="40" height="40" class="rounded-xl shrink-0"></canvas>
+    <div>
+      <div class="text-lg font-extrabold tracking-tight text-white">Tridura</div>
+      <div class="text-xs text-white/60 font-medium">Ausbildungs-Controlling</div>
     </div>
   </div>
-  <nav class="tab-nav" id="tab-nav"></nav>
+  <nav class="flex-1 px-3 py-4 space-y-1">
+    <template x-for="item in nav" :key="item.id">
+      <button type="button" @click="view=item.id"
+        :class="view===item.id?'bg-white/20 text-white font-semibold shadow':'text-white/75 hover:bg-white/10 hover:text-white'"
+        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition">
+        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <template x-for="p in item.icon" :key="p"><path :d="p"></path></template>
+        </svg>
+        <span x-text="item.full"></span>
+      </button>
+    </template>
+  </nav>
+  <div class="px-5 py-4 border-t border-white/10 text-xs text-white/50">PflBG · PflAPrV · Kompass.RLP · 36 Monate</div>
+</aside>
+
+<!-- MOBILE HEADER -->
+<header class="lg:hidden sticky top-0 z-30 bg-brand shadow-lg">
+  <div class="flex items-center gap-3 px-4 py-2.5 border-b border-white/10">
+    <canvas id="mobile-logo" width="32" height="32" class="rounded-lg shrink-0"></canvas>
+    <div class="flex-1 min-w-0">
+      <div class="text-base font-extrabold tracking-tight text-white">Tridura</div>
+      <div class="text-xs text-white/60 truncate" x-text="viewTitle"></div>
+    </div>
+  </div>
+  <div class="px-2 py-2 overflow-x-auto">
+    <div class="flex gap-1.5 min-w-max px-1">
+      <template x-for="item in nav" :key="item.id">
+        <button type="button" @click="view=item.id"
+          :class="view===item.id?'bg-white text-[#6930c3] border-white font-semibold':'bg-white/10 text-white border-white/25 font-medium hover:bg-white/20'"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs whitespace-nowrap transition min-h-[36px]">
+          <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <template x-for="p in item.icon" :key="p"><path :d="p"></path></template>
+          </svg>
+          <span x-text="item.label"></span>
+        </button>
+      </template>
+    </div>
+  </div>
 </header>
 
-<main>
-  <div id="active-block"></div>
-  <div class="teaser-grid" id="teaser-grid"></div>
+<!-- MAIN -->
+<main class="lg:ml-64 bg-white dark:bg-[#0f172a]">
+<div class="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
+
+<!-- VIEW 1: DASHBOARD -->
+<section x-show="view==='dashboard'" class="space-y-6">
+  <div class="flex items-start justify-between flex-wrap gap-3">
+    <div>
+      <!-- dark: white text auf dunklem Seitenhintergrund -->
+      <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Dashboard &amp; Controlling</h1>
+      <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">Stundenkontingente · Praxisanleitungsquote · Timeline · Compliance-Watch</p>
+    </div>
+    <button type="button" @click="resetValues()"
+      class="flex items-center gap-2 bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 rounded-lg px-4 py-2 text-sm font-semibold transition shadow-sm">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Werte zurücksetzen
+    </button>
+  </div>
+
+  <!-- KPI-Karten: bg-white bleibt weiß, text dunkel — ok -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Gesamtvolumen</div><div class="mt-1 text-2xl font-extrabold text-slate-900">4.600 <span class="text-base font-semibold text-slate-400">h</span></div><div class="text-xs text-slate-500 mt-1">Gesetzliche Vorgabe</div></div>
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Theorie</div><div class="mt-1 text-2xl font-extrabold text-slate-900">2.100 <span class="text-base font-semibold text-slate-400">h</span></div><div class="text-xs text-slate-500 mt-1">Sollwert</div></div>
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Praxis</div><div class="mt-1 text-2xl font-extrabold text-slate-900">2.500 <span class="text-base font-semibold text-slate-400">h</span></div><div class="text-xs text-slate-500 mt-1">Sollwert</div></div>
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">AQ-Mindestquote</div><div class="mt-1 text-2xl font-extrabold" :class="aqOk?'text-[#6930c3]':'text-red-600'">≥ 10 <span class="text-base font-semibold text-slate-400">%</span></div><div class="text-xs mt-1 font-semibold" :class="aqOk?'text-[#6930c3]':'text-red-600'" x-text="'Aktuell: '+aq+' %'"></div></div>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700">
+    <h2 class="text-base font-semibold text-slate-900 mb-4">Stundenfortschritt</h2>
+    <div class="grid md:grid-cols-2 gap-5">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Theorie-Ist (h)</label>
+        <input type="number" min="0" x-model.number="theorieIst" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white">
+        <div class="mt-2 h-3 rounded-full bg-slate-200 overflow-hidden"><div class="h-full bg-progress transition-all duration-300" :style="'width:'+theoriePct+'%'"></div></div>
+        <div class="mt-1 flex justify-between text-xs text-slate-600"><span x-text="(theorieIst||0).toLocaleString('de-DE')+' / 2.100 h'"></span><span x-text="'Rest: '+theorieRest.toLocaleString('de-DE')+' h'"></span></div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Praxis-Ist (h)</label>
+        <input type="number" min="0" x-model.number="praxisIst" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white">
+        <div class="mt-2 h-3 rounded-full bg-slate-200 overflow-hidden"><div class="h-full bg-progress transition-all duration-300" :style="'width:'+praxisPct+'%'"></div></div>
+        <div class="mt-1 flex justify-between text-xs text-slate-600"><span x-text="(praxisIst||0).toLocaleString('de-DE')+' / 2.500 h'"></span><span x-text="'Rest: '+praxisRest.toLocaleString('de-DE')+' h'"></span></div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between text-sm"><span class="font-medium text-slate-700">Gesamt-Ist</span><span class="font-semibold text-slate-900" x-text="gesamtIst.toLocaleString('de-DE')+' / 4.600 h ('+gesamtPct.toFixed(1)+' %)'"></span></div>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700">
+    <h2 class="text-base font-semibold text-slate-900">Praxisanleitungsquote (AQ)</h2>
+    <p class="text-sm text-slate-600 mt-1">AQ = (A<sub>Std</sub> ÷ E<sub>Std</sub>) × 100 — Mindestquote ≥ 10 %</p>
+    <div class="grid md:grid-cols-3 gap-5 mt-4 items-end">
+      <div><label class="block text-sm font-medium text-slate-700">Anleitungsstunden A<sub>Std</sub></label><input type="number" min="0" x-model.number="aStd" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white"></div>
+      <div><label class="block text-sm font-medium text-slate-700">Einsatzstunden E<sub>Std</sub></label><input type="number" min="0" x-model.number="eStd" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white"></div>
+      <div><div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Ergebnis</div><div class="text-4xl font-extrabold tabular-nums" :class="aqOk?'text-[#6930c3]':'text-red-600'" x-text="aq+' %'"></div></div>
+    </div>
+    <div class="mt-4 relative h-4 rounded-full bg-slate-200 overflow-hidden"><div class="h-full transition-all duration-300" :class="aqOk?'bg-progress':'bg-red-500'" :style="'width:'+aqBarPct+'%'"></div></div>
+    <div class="text-xs text-slate-500 mt-1 text-center">Mindestquote 10 %</div>
+    <div class="mt-3 flex flex-wrap items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold text-white" :class="aqOk?'bg-indigo-bloom':'bg-red-600'" x-text="aqOk?'● Konform — AQ ≥ 10 %':'● Eskalationsmanagement — AQ < 10 %'"></span>
+      <span x-show="eStd<=0" class="text-sm text-red-600 font-semibold">E<sub>Std</sub> &gt; 0 erforderlich.</span>
+    </div>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700">
+    <h2 class="text-base font-semibold text-slate-900">3-Jahres-Timeline-Tracker</h2>
+    <div class="mt-3 flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2">
+        <span class="bg-indigo-bloom text-white text-sm font-bold rounded-lg px-3 py-1" x-text="'Monat '+currentMonth"></span>
+        <span class="text-sm font-semibold text-slate-800" x-text="jahr+'. Ausbildungsjahr'"></span>
+      </div>
+      <span class="text-sm font-medium text-slate-600" x-text="timelinePct.toFixed(0)+' % absolviert'"></span>
+    </div>
+    <input type="range" min="1" max="36" x-model.number="currentMonth" class="mt-3 w-full">
+    <div class="mt-1 h-3 rounded-full bg-slate-200 overflow-hidden"><div class="h-full bg-progress transition-all duration-300" :style="'width:'+timelinePct+'%'"></div></div>
+    <div class="flex justify-between text-xs font-medium text-slate-500 mt-1 px-0.5"><span>M1</span><span>M12</span><span>M24</span><span>M36</span></div>
+    <div class="mt-3 rounded-lg bg-violet-tint px-4 py-3" style="border:1px solid rgba(116,0,184,.15)">
+      <div class="text-xs font-semibold uppercase tracking-wide text-royal-violet">Aktueller Block</div>
+      <div class="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-0.5" x-text="aktBlock"></div>
+    </div>
+  </div>
+
+  <div>
+    <!-- Standalone h2 außerhalb einer Card: dark:text-white -->
+    <h2 class="text-base font-semibold text-slate-900 dark:text-white mb-3">Legal Compliance Watch</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-sm font-semibold text-slate-900">Fehlzeiten Theorie</div><div class="text-xs text-slate-500 mt-0.5">§ 13 PflBG · max. 10 % = 210 h</div><input type="number" min="0" x-model.number="fehlTheorie" class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white"><div class="mt-2 h-3 rounded-full bg-slate-200 overflow-hidden"><div class="h-full transition-all duration-300" :class="fehlTheorieOk?'bg-progress':'bg-red-500'" :style="'width:'+Math.min(fehlTheoriePct/20*100,100)+'%'"></div></div><div class="mt-1 text-xs font-semibold" :class="fehlTheorieOk?'text-[#6930c3]':'text-red-600'" x-text="fehlTheoriePct.toFixed(1)+' % · '+(fehlTheorieOk?'im Rahmen':'Grenze überschritten')"></div></div>
+      <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-sm font-semibold text-slate-900">Fehlzeiten Praxis</div><div class="text-xs text-slate-500 mt-0.5">§ 13 PflBG · max. 10 % = 250 h</div><input type="number" min="0" x-model.number="fehlPraxis" class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white"><div class="mt-2 h-3 rounded-full bg-slate-200 overflow-hidden"><div class="h-full transition-all duration-300" :class="fehlPraxisOk?'bg-progress':'bg-red-500'" :style="'width:'+Math.min(fehlPraxisPct/20*100,100)+'%'"></div></div><div class="mt-1 text-xs font-semibold" :class="fehlPraxisOk?'text-[#6930c3]':'text-red-600'" x-text="fehlPraxisPct.toFixed(1)+' % · '+(fehlPraxisOk?'im Rahmen':'Grenze überschritten')"></div></div>
+      <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-sm font-semibold text-slate-900">Nachtdienst</div><div class="text-xs text-slate-500 mt-0.5">Min. 80 h · Max. 120 h</div><input type="number" min="0" x-model.number="nachtStd" class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white"><div class="mt-2 relative h-3 rounded-full bg-slate-200 overflow-hidden"><div class="absolute inset-y-0 left-[53%] border-l-2 border-slate-400 z-10"></div><div class="absolute inset-y-0 left-[80%] border-l-2 border-slate-400 z-10"></div><div class="h-full transition-all duration-300" :class="nachtOk?'bg-progress':'bg-red-500'" :style="'width:'+Math.min((nachtStd||0)/150*100,100)+'%'"></div></div><div class="mt-1 text-xs font-semibold" :class="nachtOk?'text-[#6930c3]':'text-red-600'" x-text="(nachtStd||0)+' h · '+nachtStatus"></div></div>
+      <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 dark:border-slate-700"><div class="text-sm font-semibold text-slate-900">Jugendarbeitsschutz</div><div class="text-xs text-slate-500 mt-0.5">JArbSchG · Nachtdienst &lt; 18 J. verboten</div><label class="block text-xs font-medium text-slate-600 mt-2">Alter (Jahre)</label><input type="number" min="0" x-model.number="alter" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 bg-white"><div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold text-white" :class="alterOk?'bg-indigo-bloom':'bg-red-600'" x-text="alterOk?'● Nachtdienst zulässig (≥ 18 J.)':'● Nachtdienst verboten (< 18 J.)'"></div></div>
+    </div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700"><h2 class="text-base font-semibold text-slate-900">Assessment-Instrumente &amp; Schlüssel-Schemata</h2><div class="mt-3 flex flex-wrap gap-2"><template x-for="s in schemata" :key="s"><span class="text-xs font-medium text-slate-800 bg-slate-100 border border-slate-200 rounded-full px-3 py-1.5" x-text="s"></span></template></div></div>
+</section>
+
+<!-- VIEW 2: ANLEITUNGSPLAN -->
+<section x-show="view==='curriculum'" class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Strukturierter Anleitungsplan</h1>
+    <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">3 Ausbildungsdrittel · 9 Module · PflAPrV &amp; Kompass.RLP (Rheinland-Pfalz)</p>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700">
+    <h2 class="text-base font-semibold text-slate-900">Block-Aufbau · Kompass.RLP-Logik</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+      <template x-for="a in aufbau" :key="a.nr">
+        <div class="rounded-lg border border-slate-200 bg-slate-50 dark:bg-slate-800 dark:border-slate-600 p-4">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-indigo-bloom text-white text-xs font-bold flex items-center justify-center shrink-0" x-text="a.nr"></span>
+            <span class="text-sm font-semibold text-slate-900 dark:text-slate-100" x-text="a.label"></span>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-2" x-text="a.desc"></p>
+        </div>
+      </template>
+    </div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700">
+    <h2 class="text-base font-semibold text-slate-900">Kompetenzbereiche · PflAPrV Anlage 2</h2>
+    <div class="grid sm:grid-cols-2 gap-x-6 mt-3">
+      <template x-for="k in kompetenzbereiche" :key="k.nr">
+        <div class="flex gap-3 text-sm py-2 border-b border-slate-100 dark:border-slate-700">
+          <span class="font-bold text-indigo-bloom shrink-0 w-10" x-text="'KB '+k.nr"></span>
+          <span class="text-slate-800 dark:text-slate-300" x-text="k.text"></span>
+        </div>
+      </template>
+    </div>
+  </div>
+  <!-- Tab-Buttons: aktiv=bg-indigo-bloom text-white, inaktiv=bg-white text-slate-800 — beide lesbar -->
+  <div class="flex flex-wrap gap-2">
+    <template x-for="t in curriculum" :key="t.tab">
+      <button type="button" @click="curTab=t.tab"
+        :class="curTab===t.tab?'bg-indigo-bloom text-white shadow':'bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700'"
+        class="px-4 py-2 rounded-lg text-sm font-semibold transition" x-text="t.jahr">
+      </button>
+    </template>
+  </div>
+  <template x-for="t in curriculum" :key="t.tab">
+    <div x-show="curTab===t.tab" class="space-y-4">
+      <!-- Banner: bg-banner + text-white, immer lesbar -->
+      <div class="rounded-xl bg-banner px-5 py-4">
+        <div class="text-xs uppercase tracking-wide text-white/60 font-medium" x-text="t.range+' · '+t.drittel"></div>
+        <div class="text-lg font-bold text-white" x-text="t.jahr+' · '+t.motto"></div>
+      </div>
+      <template x-for="b in t.blocks" :key="b.nr">
+        <div x-data="{open:false}" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden dark:border-slate-700">
+          <button type="button" @click="open=!open" class="w-full flex items-start gap-3 px-5 py-4 text-left">
+            <span class="bg-indigo-bloom text-white text-xs font-bold rounded-md px-2 py-1 shrink-0 mt-0.5" x-text="'Modul '+b.nr"></span>
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-slate-900" x-text="b.months+' · '+b.thema"></div>
+              <div class="mt-1 flex flex-wrap items-center gap-1.5">
+                <span class="text-xs text-slate-600" x-text="b.einsatz"></span>
+                <template x-for="k in b.kb" :key="k"><span class="text-xs font-bold bg-royal-violet text-white rounded px-1.5 py-0.5" x-text="'KB '+k"></span></template>
+                <template x-if="b.meilenstein"><span class="text-xs font-bold text-white rounded px-1.5 py-0.5" style="background:#0f172a">Prüfung</span></template>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 transition-transform shrink-0 mt-1" :class="open?'rotate-180':''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div x-show="open" class="px-5 pb-5 space-y-4">
+            <template x-if="b.meilenstein"><div class="rounded-lg bg-banner px-4 py-2 flex items-center gap-2"><svg class="w-4 h-4 shrink-0 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V5a1 1 0 0 1 1-1h10l-2 3 2 3H7"/></svg><span class="text-sm text-white"><span class="font-semibold">Meilenstein:</span> <span x-text="b.meilenstein"></span></span></div></template>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="rounded-lg border border-slate-200 p-4"><div class="flex items-center gap-2 mb-3"><span class="w-6 h-6 rounded bg-indigo-bloom text-white text-xs font-bold flex items-center justify-center">T</span><span class="text-sm font-semibold text-slate-900">Theorie-Modul</span></div><ul class="space-y-2"><template x-for="th in b.theorie" :key="th"><li class="flex gap-2 text-sm text-slate-800"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span><span x-text="th"></span></li></template></ul></div>
+              <div class="rounded-lg border border-slate-200 bg-slate-50 p-4"><div class="flex items-center gap-2 mb-2"><span class="w-6 h-6 rounded bg-royal-violet text-white text-xs font-bold flex items-center justify-center">P</span><span class="text-sm font-semibold text-slate-900">Praxis-Modul</span></div><div class="text-xs font-bold text-indigo-bloom mb-2" x-text="'Einsatz: '+b.einsatz"></div><ul class="space-y-2"><template x-for="pr in b.praxis" :key="pr"><li class="flex gap-2 text-sm text-slate-800"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-royal-violet shrink-0"></span><span x-text="pr"></span></li></template></ul></div>
+            </div>
+            <div class="rounded-lg bg-aqua-tint p-4" style="border:1px solid rgba(128,255,219,.3)">
+              <div class="text-xs font-bold uppercase tracking-wide text-royal-violet mb-3">Anleitung &amp; Nachweis</div>
+              <div class="space-y-2 text-sm text-slate-800">
+                <div class="flex flex-wrap items-center gap-2"><span class="bg-royal-violet text-white text-xs font-bold rounded px-2 py-0.5" x-text="b.konzept.id"></span><span class="font-medium text-slate-900" x-text="b.konzept.titel"></span></div>
+                <div><span class="font-semibold">4-Phasen-Modell:</span> Orientierung → Erprobung → Vertiefung → Evaluation</div>
+                <div><span class="font-semibold">SOP:</span> Vorbereitung → Einstieg → Durchführung → Reflexion → Dokumentation</div>
+                <div><span class="font-semibold">Nachweis:</span> Kompass.RLP · PflAPrV Anlage 2</div>
+                <div class="flex flex-wrap items-center gap-1.5 pt-1"><span class="text-xs font-semibold text-slate-600">Kompetenzbereiche:</span><template x-for="k in b.kb" :key="k"><span class="text-xs font-bold bg-royal-violet text-white rounded px-1.5 py-0.5" x-text="'KB '+k"></span></template></div>
+                <div class="flex flex-wrap gap-3 pt-2">
+                  <button type="button" @click="view='library'" class="text-xs font-semibold text-indigo-bloom hover:underline">→ Anleitungskonzept (Mediathek)</button>
+                  <button type="button" @click="view='deployment'" class="text-xs font-semibold text-indigo-bloom hover:underline">→ Einsatzkonzept</button>
+                  <button type="button" @click="view='sop'" class="text-xs font-semibold text-indigo-bloom hover:underline">→ SOP</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+</section>
+
+<!-- VIEW 3: DEPLOYMENT -->
+<section x-show="view==='deployment'" class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Praktisches Einsatzkonzept</h1>
+    <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">4-Phasen-Modell der Praxisbegleitung</p>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700">
+    <div class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-3">Beteiligte Rollen</div>
+    <div class="grid sm:grid-cols-3 gap-3">
+      <template x-for="r in roles" :key="r.kuerzel">
+        <div class="rounded-lg bg-violet-tint p-4" style="border:1px solid rgba(116,0,184,.15)">
+          <div class="text-sm font-bold text-royal-violet" x-text="r.kuerzel"></div>
+          <div class="text-sm text-slate-700 dark:text-slate-300" x-text="r.name"></div>
+        </div>
+      </template>
+    </div>
+  </div>
+  <div class="space-y-4">
+    <template x-for="p in phases" :key="p.nr">
+      <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex gap-4 dark:border-slate-700">
+        <div class="w-11 h-11 rounded-full bg-banner text-white flex items-center justify-center font-bold text-lg shrink-0" x-text="p.nr"></div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3 class="text-base font-semibold text-slate-900" x-text="'Phase '+p.nr+' · '+p.name"></h3>
+            <span class="text-xs font-semibold bg-indigo-bloom text-white rounded-full px-3 py-1" x-text="p.zeitraum"></span>
+          </div>
+          <p class="text-sm text-slate-700 mt-1" x-text="p.inhalt"></p>
+        </div>
+      </div>
+    </template>
+  </div>
+</section>
+
+<!-- VIEW 4: SOP -->
+<section x-show="view==='sop'" class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">SOP Praxisanleitung</h1>
+    <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">5-Schritt-Checkliste · 10%-Anleitungssegment</p>
+  </div>
+  <div class="space-y-3">
+    <template x-for="s in sop" :key="s.nr">
+      <div x-data="{open:false}" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden dark:border-slate-700">
+        <button type="button" @click="open=!open" class="w-full flex items-center gap-4 px-5 py-4 text-left">
+          <div class="w-9 h-9 rounded-lg bg-indigo-bloom text-white flex items-center justify-center font-bold shrink-0" x-text="s.nr"></div>
+          <div class="flex-1">
+            <div class="font-semibold text-slate-900" x-text="s.phase"></div>
+            <div class="text-xs text-slate-500 mt-0.5" x-text="s.dauer"></div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400 transition-transform shrink-0" :class="open?'rotate-180':''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div x-show="open" class="px-5 pb-5 pl-16">
+          <p class="text-sm text-slate-800" x-text="s.inhalt"></p>
+          <template x-if="s.hinweis"><div class="mt-3 rounded-lg bg-violet-tint border-l-4 px-4 py-2" style="border-color:var(--royal-violet)"><div class="text-xs font-bold uppercase tracking-wide text-royal-violet">Rechtlicher Hinweis</div><div class="text-sm text-slate-900 dark:text-slate-800 mt-0.5" x-text="s.hinweis"></div></div></template>
+        </div>
+      </div>
+    </template>
+  </div>
+</section>
+
+<!-- VIEW 5: LIBRARY -->
+<section x-show="view==='library'" class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Mediathek der Anleitungskonzepte</h1>
+    <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">9 Blueprints 1.1–3.3 · Schritte + Alarmbanner</p>
+  </div>
+  <div class="grid lg:grid-cols-2 gap-4">
+    <template x-for="c in library" :key="c.id">
+      <div x-data="{open:false}" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden self-start dark:border-slate-700">
+        <button type="button" @click="open=!open" class="w-full flex items-start gap-3 px-5 py-4 text-left">
+          <span class="bg-royal-violet text-white text-xs font-bold rounded-md px-2 py-1 shrink-0 mt-0.5" x-text="c.id"></span>
+          <div class="flex-1"><div class="font-semibold text-slate-900 leading-snug" x-text="c.titel"></div><div class="text-xs text-slate-500 mt-0.5" x-text="c.monat+' · '+c.cluster+'. Ausbildungsjahr'"></div></div>
+          <svg class="w-5 h-5 text-slate-400 transition-transform shrink-0 mt-1" :class="open?'rotate-180':''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div x-show="open" class="px-5 pb-5">
+          <div class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Chronologische Schritte</div>
+          <ol class="space-y-2"><template x-for="(step,i) in c.schritte" :key="i"><li class="flex gap-3 text-sm text-slate-800"><span class="w-5 h-5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0" x-text="i+1"></span><span x-text="step"></span></li></template></ol>
+          <!-- Klinischer Alarm: bg-red-700 text-white — immer lesbar -->
+          <!-- Rechtlicher Hinweis: bg-violet-tint mit dunkler Schrift — nur in white card, fine -->
+          <div class="mt-4 rounded-lg px-4 py-3 border-l-4"
+            :class="c.alarm.typ==='klinik'?'bg-red-700 border-red-900 text-white':'bg-violet-tint border-royal-violet text-slate-900'"
+            :style="c.alarm.typ!=='klinik'?'border-color:var(--royal-violet)':''">
+            <div class="text-xs font-bold uppercase tracking-wide" x-text="c.alarm.typ==='klinik'?'Klinischer Alarm':'Rechtlicher Hinweis'"></div>
+            <div class="text-sm mt-0.5" x-text="c.alarm.text"></div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</section>
+
+<!-- VIEW 6: LEGAL -->
+<section x-show="view==='legal'" class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Rechtlicher Compass</h1>
+    <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">SGB-Dualismus · Qualitätskontrolle · DNQP · Ethik</p>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700">
+    <h2 class="text-base font-semibold text-slate-900">SGB V vs. SGB XI — Dualismus</h2>
+    <div class="grid md:grid-cols-2 gap-4 mt-4">
+      <div class="rounded-lg bg-aqua-tint p-4" style="border:1px solid rgba(128,255,219,.3)"><div class="text-sm font-bold text-indigo-bloom">SGB V — Kurative Behandlungspflege</div><ul class="mt-2 space-y-1.5"><li class="flex gap-2 text-sm text-slate-800 dark:text-slate-700"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>Ärztliche Verordnung Voraussetzung</li><li class="flex gap-2 text-sm text-slate-800 dark:text-slate-700"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>Volle Kostenübernahme</li><li class="flex gap-2 text-sm text-slate-800 dark:text-slate-700"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>Häusliche Krankenpflege · § 39 SGB V</li></ul></div>
+      <div class="rounded-lg bg-violet-tint p-4" style="border:1px solid rgba(116,0,184,.15)"><div class="text-sm font-bold text-royal-violet">SGB XI — Kompensatorische Langzeitpflege</div><ul class="mt-2 space-y-1.5"><li class="flex gap-2 text-sm text-slate-800 dark:text-slate-700"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-royal-violet shrink-0"></span>Abgestufte Teilleistungen</li><li class="flex gap-2 text-sm text-slate-800 dark:text-slate-700"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-royal-violet shrink-0"></span>Pflegegrade nach BI § 15 SGB XI</li><li class="flex gap-2 text-sm text-slate-800 dark:text-slate-700"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-royal-violet shrink-0"></span>Kompensatorisch — kein Kurativauftrag</li></ul></div>
+    </div>
+    <div class="mt-3 rounded-lg bg-slate-100 border-l-4 px-4 py-2 text-sm text-slate-900 font-medium" style="border-color:var(--royal-violet)">Grundsatz: SGB-V- und SGB-XI-Leistungslogik niemals vermischen.</div>
+  </div>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700"><h2 class="text-base font-semibold text-slate-900">Externe Qualitätskontrolle (MD &amp; QPR)</h2><ul class="mt-3 space-y-1.5"><li class="flex gap-2 text-sm text-slate-800"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>Unabhängiger Medizinischer Dienst (MD)</li><li class="flex gap-2 text-sm text-slate-800"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>§ 275 SGB V und § 114 SGB XI</li><li class="flex gap-2 text-sm text-slate-800"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>Indikatorenbasiertes Qualitätsmodell (QPR)</li></ul></div>
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700"><h2 class="text-base font-semibold text-slate-900">DNQP — Rechtsgewicht</h2><ul class="mt-3 space-y-1.5"><li class="flex gap-2 text-sm text-slate-800"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>Nationale Expertenstandards = Stand der Erkenntnisse</li><li class="flex gap-2 text-sm text-slate-800"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-bloom shrink-0"></span>Bindende Wirkung gemäß § 113 SGB XI</li></ul></div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700"><h2 class="text-base font-semibold text-slate-900">Ethische Fundamente</h2><div class="grid sm:grid-cols-2 gap-4 mt-3"><div class="rounded-lg bg-aqua-tint p-4" style="border:1px solid rgba(128,255,219,.3)"><div class="text-sm font-bold text-indigo-bloom">ICN-Ethikkodex</div><div class="text-sm text-slate-700 mt-1">4 Kernsäulen pflegerischer Verantwortung.</div></div><div class="rounded-lg bg-violet-tint p-4" style="border:1px solid rgba(116,0,184,.15)"><div class="text-sm font-bold text-royal-violet">Pflegecharta (Deutschland)</div><div class="text-sm text-slate-700 mt-1">8 Grundrechte pflegebedürftiger Menschen.</div></div></div><p class="text-sm text-slate-800 mt-3">Autonomie · körperliche/psychische Integrität · würdevolle Palliativversorgung.</p></div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700"><h2 class="text-base font-semibold text-slate-900 mb-3">Rechtsnormen-Schnellreferenz</h2><div class="grid sm:grid-cols-2 gap-x-6"><template x-for="n in normen" :key="n.norm"><div class="flex gap-3 text-sm py-2 border-b border-slate-100 dark:border-slate-700"><span class="font-bold text-indigo-bloom shrink-0 w-28" x-text="n.norm"></span><span class="text-slate-800" x-text="n.inhalt"></span></div></template></div></div>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 dark:border-slate-700"><h2 class="text-base font-semibold text-slate-900">Primärquellen</h2><div class="mt-3 flex flex-wrap gap-2"><template x-for="q in quellen" :key="q.label"><a :href="q.url" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-white bg-indigo-bloom hover:bg-royal-violet rounded-full px-3 py-1.5 transition" x-text="q.label"></a></template></div></div>
+</section>
+
+</div>
 </main>
 
-<footer>
-  <span>DER POLIT-BEIPACKZETTEL</span>
-  <span>DAS VOLK HAFTET F&#220;R RISIKEN &amp; NEBENWIRKUNGEN</span>
-</footer>
-
 <script>
-/* ═══════════════════════════════════════════
-   AUTO-UPDATE: ETag-Check gegen den Server
-   Funktioniert auch wenn die HTML selbst gecacht ist.
-   Jeder Deploy auf GitHub Pages ändert ETag/Last-Modified.
-═══════════════════════════════════════════ */
-async function checkForUpdate(){
-  if(!navigator.onLine) return;
+/* ===== PWA ICON (Canvas → PNG) ===== */
+function _triduraIcon(sz){
+  const cv=document.createElement('canvas');cv.width=cv.height=sz;
+  const x=cv.getContext('2d'),s=sz/64;
+  const bx=3*s,by=3*s,bw=58*s,bh=58*s,br=17*s;
+  x.beginPath();x.moveTo(bx+br,by);x.lineTo(bx+bw-br,by);x.arcTo(bx+bw,by,bx+bw,by+br,br);
+  x.lineTo(bx+bw,by+bh-br);x.arcTo(bx+bw,by+bh,bx+bw-br,by+bh,br);
+  x.lineTo(bx+br,by+bh);x.arcTo(bx,by+bh,bx,by+bh-br,br);
+  x.lineTo(bx,by+br);x.arcTo(bx,by,bx+br,by,br);x.closePath();
+  const bg=x.createLinearGradient(bx,by,bx+bw,by+bh);
+  bg.addColorStop(0,'#7400b8');bg.addColorStop(.6,'#6930c3');bg.addColorStop(1,'#5e60ce');
+  x.fillStyle=bg;x.fill();
+  const bg2=x.createLinearGradient(0,54*s,0,20*s);
+  bg2.addColorStop(0,'#5e60ce');bg2.addColorStop(.5,'#48bfe3');bg2.addColorStop(1,'#80ffdb');
+  x.fillStyle=bg2;
+  [[15,40,8,10],[28,33,8,17],[41,25,8,25]].forEach(([rx,ry,rw,rh])=>{
+    const px=rx*s,py=ry*s,pw=rw*s,ph=rh*s,pr=3*s;
+    x.beginPath();x.moveTo(px+pr,py);x.lineTo(px+pw-pr,py);x.arcTo(px+pw,py,px+pw,py+pr,pr);
+    x.lineTo(px+pw,py+ph-pr);x.arcTo(px+pw,py+ph,px+pw-pr,py+ph,pr);
+    x.lineTo(px+pr,py+ph);x.arcTo(px,py+ph,px,py+ph-pr,pr);
+    x.lineTo(px,py+pr);x.arcTo(px,py,px+pr,py,pr);x.closePath();x.fill();
+  });
+  x.fillStyle='#ffffff';x.beginPath();
+  x.moveTo(32*s,17*s);
+  x.bezierCurveTo(30.7*s,14.9*s,27.8*s,13.6*s,25.8*s,15*s);
+  x.bezierCurveTo(24.1*s,16.2*s,24.2*s,18.7*s,25.9*s,20.2*s);
+  x.lineTo(32*s,25*s);x.lineTo(38.1*s,20.2*s);
+  x.bezierCurveTo(39.8*s,18.7*s,39.9*s,16.2*s,38.2*s,15*s);
+  x.bezierCurveTo(36.2*s,13.6*s,33.3*s,14.9*s,32*s,17*s);
+  x.closePath();x.fill();
+  return cv;
+}
+function _paint(el){if(!el)return;const src=_triduraIcon(el.width);el.getContext('2d').drawImage(src,0,0,el.width,el.height);}
+
+window.addEventListener('load',function(){
   try{
-    const res = await fetch(location.href, { method:"HEAD", cache:"no-store" });
-    const tag = res.headers.get("ETag") || res.headers.get("Last-Modified") || "";
-    if(!tag) return;
-    const stored = localStorage.getItem("pbz-etag");
-    localStorage.setItem("pbz-etag", tag);
-    if(stored && stored !== tag){
-      /* Neue Version → Banner anzeigen statt auto-reload */
-      showUpdateBanner();
-    }
-  } catch(e){ /* offline – ignorieren */ }
-}
-
-function showUpdateBanner(){
-  const b = document.getElementById("update-banner");
-  if(b) b.classList.add("visible");
-}
-
-function doUpdate(){
-  /* Caches leeren + hart neu laden */
-  const reload = () => location.reload(true);
-  if("caches" in window){
-    caches.keys().then(keys => Promise.all(keys.map(k=>caches.delete(k)))).then(reload).catch(reload);
-  } else { reload(); }
-}
-
-function dismissUpdate(){
-  const b = document.getElementById("update-banner");
-  if(b) b.classList.remove("visible");
-}
-
-/* Beim Start prüfen */
-checkForUpdate();
-
-/* visibilitychange: handled below together with enforceWeeklyRefresh */
-
-const CATEGORIES = [
-  { id:"inland",     label:"Inlandpolitik", icon:"\uD83C\uDFDB\uFE0F", accent:"#D1AC00", bg:"#1a1100" },
-  { id:"soziales",   label:"Soziales",      icon:"\uD83E\uDD1D", accent:"#BAD1CD", bg:"#0a1514" },
-  { id:"gesundheit", label:"Gesundheit",    icon:"\u2695\uFE0F", accent:"#c070a0", bg:"#1a0e15" },
-  { id:"wirtschaft", label:"Wirtschaft",    icon:"\uD83D\uDCCA", accent:"#3db84e", bg:"#0a160c" },
-];
-const SEED = {
-  /* KW 24 · 07.–13. Juni 2026 – Verifizierte Quellen */
-  inland: [
-    { id:1101, headline:"GEAS in Kraft: Erste EU-Asylverfahren nach neuem Recht",
-      teaser:"Seit dem 12. Juni 2026 gilt das Gemeinsame Europäische Asylsystem. Erstantragsteller werden europaweit erfasst; Mehrfachanträge in verschiedenen EU-Staaten werden automatisch erkannt und abgelehnt.",
-      bedeutung:"Deutsche Kommunen übernehmen weniger Einzelfallentscheidungen – BAMF übernimmt mehr Verfahren. Für Betroffene gelten kürzere Fristen: Entscheid oft innerhalb von 12 Wochen.",
-      quelle:"Bundesregierung.de / BAMF, 12.06.2026", vertrauen:96 },
-    { id:1102, headline:"Bundestag verlängert Tankrabatt bis September 2026",
-      teaser:"Mit 412 zu 198 Stimmen verlängerte der Bundestag den Steuernachlass auf Kraftstoffe um drei Monate. CDU, SPD und Grüne stimmten geschlossen dafür.",
-      bedeutung:"Verbraucher zahlen bis Ende September ca. 18 Cent weniger pro Liter. Pendler und Logistikbranche erhalten damit Planungssicherheit bis zum Herbst.",
-      quelle:"Bundestag.de / Bundesregierung, 10.06.2026", vertrauen:97 },
-    { id:1103, headline:"Merz-Klingbeil-Gipfel: Reformpaket vor Sommerpause",
-      teaser:"Kanzler Merz und Vizekanzler Klingbeil präsentierten nach zweitägigen Verhandlungen ein Reformpaket: Rentenanpassung, Pflegefinanzierung und ein Investitionsprogramm für Schulen.",
-      bedeutung:"Das Paket muss bis Juli im Bundestag verabschiedet werden. Für Rentner: Erhöhung um 3,4 % ab 2027. Für Kommunen: 5 Mrd. Euro Schulbau-Sonderprogramm.",
-      quelle:"Bundeskanzleramt / SPD-Pressemitteilung, 09.06.2026", vertrauen:90 },
-    { id:1104, headline:"Kubicki-FDP positioniert sich: Digitalisierung statt Subventionen",
-      teaser:"Der neue FDP-Vorsitzende Wolfgang Kubicki stellte das erste Positionspapier seiner Parteiführung vor: Abkehr von Staatssubventionen, Fokus auf digitale Infrastruktur und Bürokratieabbau.",
-      bedeutung:"Die FDP sendet ein klares Abgrenzungssignal zur Großen Koalition. Für Unternehmen: Mögliche Entlastungen bei Körperschaftsteuer und digitalen Genehmigungsprozessen angekündigt.",
-      quelle:"FDP-Bundespartei / Tagesspiegel, 08.06.2026", vertrauen:88 },
-    { id:1105, headline:"Bundesrat billigt Wachstumschancengesetz-Novelle",
-      teaser:"Nach monatelangem Streit verabschiedete der Bundesrat die überarbeitete Version des Wachstumschancengesetzes mit steuerlichen Erleichterungen für Investitionen und F&E-Abzügen.",
-      bedeutung:"Unternehmen können Forschungsausgaben ab 2027 bis zu 25 % steuerlich absetzen. KMU profitieren besonders durch vereinfachte Investitionsabzugsbeträge.",
-      quelle:"Bundesrat.de / BMF, 07.06.2026", vertrauen:94 },
-  ],
-  soziales: [
-    { id:2101, headline:"BAFA-E-Auto-Förderung: Hälfte der Mittel in 3 Wochen abgerufen",
-      teaser:"Nur drei Wochen nach Start der neuen E-Auto-Förderung sind bereits 50 % der bereitgestellten 1,2 Milliarden Euro abgerufen. Das BAFA warnt vor baldiger Kontingenterschöpfung.",
-      bedeutung:"Wer noch von bis zu 6.000 Euro Zuschuss profitieren will, sollte jetzt handeln. Anträge laufen online; Bearbeitungszeit beträgt derzeit 3–5 Werktage.",
-      quelle:"BAFA / Bundeswirtschaftsministerium, 10.06.2026", vertrauen:96 },
-    { id:2102, headline:"BMG legt Pflegereform-Eckpunkte vor",
-      teaser:"Das Bundesgesundheitsministerium veröffentlichte ein Eckpunktepapier: Beitragssatzerhöhung um 0,2 Punkte, stärkere Beteiligung privat Versicherter, neuer Pflegepersonalschlüssel.",
-      bedeutung:"Pflegebedürftige: Eigenanteile in stationärer Pflege sollen ab 2027 auf max. 2.200 Euro/Monat für drei Jahre gedeckelt werden. Pflegekräfte: Mindestlohnerhöhung auf 19,50 Euro angekündigt.",
-      quelle:"BMG / Bundesregierung.de, 09.06.2026", vertrauen:89 },
-    { id:2103, headline:"SPD fordert Bürgergeld-Erhöhung um 4 Prozent ab 2027",
-      teaser:"Die SPD-Bundestagsfraktion brachte einen Antrag ein, das Bürgergeld zum 1. Januar 2027 um 4 % zu erhöhen. CDU reagiert zurückhaltend – Verknüpfung mit Arbeitspflicht gefordert.",
-      bedeutung:"Betroffen wären ca. 5,5 Mio. Bezieher. Eine Erhöhung um 4 % entspräche für Einzelpersonen rund 23 Euro mehr pro Monat. Abschließende Entscheidung im Herbst.",
-      quelle:"SPD-Bundestagsfraktion / Bundestag.de, 08.06.2026", vertrauen:85 },
-    { id:2104, headline:"Pflegepersonalschlüssel: Länder fordern Übergangsfrist",
-      teaser:"Bayern, BW und Sachsen beantragen eine verlängerte Übergangsfrist für den neuen Personalschlüssel in stationären Einrichtungen – bundesweit fehlen rund 70.000 Pflegekräfte.",
-      bedeutung:"Pflegebedürftige in betroffenen Einrichtungen müssen vorerst mit unveränderter Betreuungsintensität rechnen. Einrichtungsleitungen warnen vor Schließungen bei zu schneller Umsetzung.",
-      quelle:"Bundesrat.de / bpa, 07.06.2026", vertrauen:87 },
-    { id:2105, headline:"Kita-Gipfel: Bund stellt 2 Milliarden Euro für Ausbau bereit",
-      teaser:"Auf dem Nationalen Kita-Gipfel in Berlin sicherte das BMBF den Ländern 2 Milliarden Euro für den Ausbau von Kitaplätzen zu. Ziel: 100.000 neue Plätze bis 2028.",
-      bedeutung:"Eltern profitieren durch kürzere Wartelisten. Für Kommunen: Bundeskofinanzierung von 50 %, Eigenanteil erforderlich. Fachkräftemangel bleibt kritischer Engpassfaktor.",
-      quelle:"BMBF / Bundesregierung.de, 10.06.2026", vertrauen:92 },
-  ],
-  gesundheit: [
-    { id:3101, headline:"Krankenhaus-Notaufnahmen bleiben von Levelzuweisung ausgenommen",
-      teaser:"Nach heftiger Kritik von Ärzteverbänden beschloss das BMG eine Ausnahmeregelung: Notaufnahmen aller Kliniken dürfen unabhängig vom zugewiesenen Versorgungslevel weiter betrieben werden.",
-      bedeutung:"Für Patienten in strukturschwachen Gebieten: keine weiteren Anfahrtswege zur Notaufnahme. Für kleine Krankenhäuser: Chance auf Weiterexistenz als spezialisierte Einrichtungen.",
-      quelle:"BMG / Bundesgesundheitsministerium, 09.06.2026", vertrauen:92 },
-    { id:3102, headline:"E-Zigaretten-Verordnung: Verkaufsverbot für Menthol-Liquids in Kraft",
-      teaser:"Die Verordnung zum Verbot von 13 Zusatzstoffen in E-Zigaretten ist am 10. Juni 2026 in Kraft getreten. Händler haben 4 Wochen Zeit, Bestände zurückzugeben.",
-      bedeutung:"Rund 40 % der meistverkauften E-Zigaretten-Liquids sind betroffen. Verbraucher müssen Produkte prüfen; Onlinehändler aus dem EU-Ausland sind vorerst nicht direkt erfasst.",
-      quelle:"BMEL / BZgA, 10.06.2026", vertrauen:95 },
-    { id:3103, headline:"GKV-Nachhaltigkeitsgesetz: Erste Lesung im Bundestag",
-      teaser:"Das geplante GKV-Stabilisierungsgesetz wurde erstmals im Bundestag beraten. Kernpunkte: Einbeziehung privat Versicherter, Beitragsobergrenzen, Leistungskürzungen im Niedrigpreissegment.",
-      bedeutung:"GKV-Versicherte müssen mittelfristig mit Leistungsanpassungen rechnen. Die Einbeziehung Privatversicherter wäre ein Systembruch – Verfassungsrechtler sehen erhebliche Hürden.",
-      quelle:"Bundestag.de / BMG, 08.06.2026", vertrauen:83 },
-    { id:3104, headline:"MRSA-Programm: 180 Mio. Euro für Krankenhaushygiene",
-      teaser:"Das BMG startet ein nationales Programm zur Bekämpfung multiresistenter Erreger. 180 Millionen Euro fließen in Hygieneschulung, Diagnostik und Isolationsräume.",
-      bedeutung:"Jährlich sterben ca. 10.000 Menschen in Deutschland an Krankenhausinfektionen. Das Programm adressiert einen der kostspieligsten Qualitätsmängel im stationären Bereich.",
-      quelle:"BMG / RKI, 07.06.2026", vertrauen:91 },
-    { id:3105, headline:"Demenz-Versorgungslücke: 180.000 Betroffene unzureichend betreut",
-      teaser:"Eine neue RKI-Studie beziffert die Versorgungslücke bei Demenzerkrankten auf 180.000 Menschen. Ländliche Regionen sind besonders betroffen – Spezialabteilungen in Kliniken fehlen.",
-      bedeutung:"Angehörige tragen die Hauptlast. Das Pflegegeld deckt die realen Kosten nicht ab. Ein Bundesaktionsplan Demenz ist in Planung, der Zeitplan aber noch offen.",
-      quelle:"RKI / Deutsche Alzheimer Gesellschaft, 09.06.2026", vertrauen:90 },
-  ],
-  wirtschaft: [
-    { id:4101, headline:"Bundesbank: Inflation sinkt auf 2,1 Prozent im Mai 2026",
-      teaser:"Nach Monaten erhöhter Teuerungsraten meldet die Bundesbank für Mai 2026 einen Rückgang auf 2,1 %. Haupttreiber: sinkende Energiepreise und stabilisierte Lebensmittelpreise.",
-      bedeutung:"Für Verbraucher: Kaufkraftverlust schwächt sich ab. Für die EZB: Weitere Zinssenkungen werden wahrscheinlicher. Tarifverhandlungen können moderater ausfallen.",
-      quelle:"Deutsche Bundesbank / Destatis, 10.06.2026", vertrauen:97 },
-    { id:4102, headline:"Tankrabatt verlängert: Kraftstoffpreise stabil bis Oktober",
-      teaser:"Nach dem Bundestagsbeschluss bleibt der Steuernachlass auf Benzin und Diesel bis Ende September bestehen. Branchenverbände begrüßen die Entscheidung; Klimaschützer kritisieren sie.",
-      bedeutung:"Logistikunternehmen und Pendler können mit Preisstabilität planen. Eine erneute Verlängerung über September hinaus gilt als politisch unwahrscheinlich.",
-      quelle:"ADAC / Bundestag.de, 10.06.2026", vertrauen:95 },
-    { id:4103, headline:"US-Zölle: Erste Ausnahmen für deutsche Automobilzulieferer",
-      teaser:"Nach EU-Verhandlungen wurden erste Ausnahmegenehmigungen für Spezialkomponenten aus Deutschland gewährt. Zwölf deutsche Zulieferer profitieren direkt.",
-      bedeutung:"Betroffene Unternehmen sparen Zölle von 15–25 %. Für den Gesamtsektor bleibt die Belastung hoch – VW, BMW und Mercedes rechnen weiterhin mit Ertragseinbußen.",
-      quelle:"DIHK / Bundeswirtschaftsministerium, 09.06.2026", vertrauen:88 },
-    { id:4104, headline:"ifo-Institut hebt BIP-Prognose auf 1,0 Prozent an",
-      teaser:"Das ifo-Institut korrigierte seine Wachstumsprognose für 2026 von 0,7 auf 1,0 Prozent. Haupttreiber: steigende Reallöhne und anziehende Investitionen im Maschinenbau.",
-      bedeutung:"Ein Prozent BIP-Wachstum entspricht rund 40 Milliarden Euro zusätzlicher Wirtschaftsleistung. Für den Arbeitsmarkt: Signalwirkung gegen weiteren Stellenabbau.",
-      quelle:"ifo-Institut München, 09.06.2026", vertrauen:91 },
-    { id:4105, headline:"CDU-Wirtschaftsrat: Agrarsubventionen um 30 Prozent kürzen",
-      teaser:"Der CDU-Wirtschaftsrat empfiehlt im Rahmen des Subventionsabbaus eine Kürzung landwirtschaftlicher Direktzahlungen um 30 %. Der Bauernverband kündigt Proteste an.",
-      bedeutung:"Landwirte mit Betrieben unter 100 Hektar wären besonders betroffen. Umstrukturierung Richtung ökologischer Landbau würde bei Kürzung dringlicher.",
-      quelle:"CDU-Wirtschaftsrat / DBV, 08.06.2026", vertrauen:84 },
-  ],
-};
-
-let activeTab="inland";
-const aiData={}, loaded=new Set(), loading=new Set();
-
-(function(){
-  const now=new Date(), start=new Date(now.getFullYear(),0,1);
-  const week=Math.ceil(((now-start)/86400000+start.getDay()+1)/7);
-  document.getElementById("kw-label").textContent="WOCHENPOLITIK KW "+week+" \u00B7 "+now.getFullYear();
-})();
-
-function trustColor(s){ return s>=90?"#3db84e":s>=80?"#D1AC00":"#b06090"; }
-function hexToRgb(h){
-  const x=h.replace('#','');
-  const n=parseInt(x,16);
-  return [(n>>16)&255,(n>>8)&255,n&255];
-}
-function setCSSAccent(el,a){
-  const [r,g,b]=hexToRgb(a);
-  el.style.setProperty("--accent",a);
-  el.style.setProperty("--ac04dark","rgba("+r+","+g+","+b+",0.06)");
-  el.style.setProperty("--ac05","rgba("+r+","+g+","+b+",0.05)");
-  el.style.setProperty("--ac06","rgba("+r+","+g+","+b+",0.06)");
-  el.style.setProperty("--ac08","rgba("+r+","+g+","+b+",0.08)");
-  el.style.setProperty("--ac08dark","rgba("+r+","+g+","+b+",0.12)");
-  el.style.setProperty("--ac10","rgba("+r+","+g+","+b+",0.10)");
-  el.style.setProperty("--ac10dark","rgba("+r+","+g+","+b+",0.12)");
-  el.style.setProperty("--ac12","rgba("+r+","+g+","+b+",0.12)");
-  el.style.setProperty("--ac14","rgba("+r+","+g+","+b+",0.14)");
-  el.style.setProperty("--ac16","rgba("+r+","+g+","+b+",0.16)");
-  el.style.setProperty("--ac20","rgba("+r+","+g+","+b+",0.20)");
-  el.style.setProperty("--ac25","rgba("+r+","+g+","+b+",0.25)");
-  el.style.setProperty("--ac33","rgba("+r+","+g+","+b+",0.33)");
-  el.style.setProperty("--ac35","rgba("+r+","+g+","+b+",0.35)");
-  el.style.setProperty("--ac40","rgba("+r+","+g+","+b+",0.40)");
-}
-
-function renderCard(item,cat,delay){
-  const card=document.createElement("div");
-  card.className="news-card"; card.style.animationDelay=delay+"ms";
-  setCSSAccent(card,cat.accent);
-  card.innerHTML=`
-    <div class="card-accent-line"></div>
-    <div class="card-top">
-      <div class="card-headline">${item.headline}</div>
-      <div class="card-toggle">+</div>
-    </div>
-    <p class="card-teaser">${item.teaser}</p>
-    <div class="card-body">
-      <div class="bedeutung-box">
-        <div class="bedeutung-label">\u26A0 WAS DAS BEDEUTET</div>
-        <div class="bedeutung-text">${item.bedeutung}</div>
-      </div>
-      <div class="card-meta">
-        <span class="card-source">${item.quelle}</span>
-        <span class="trust-badge">
-          <span class="trust-dot" style="background:${trustColor(item.vertrauen)};box-shadow:0 0 6px ${trustColor(item.vertrauen)}"></span>
-          <span style="color:${trustColor(item.vertrauen)};font-weight:700">${item.vertrauen}%</span>
-          <span class="trust-info">?
-            <span class="trust-tooltip">
-              <strong>Quellen-Vertrauen</strong>
-              Bewertet die Glaubw\u00FCrdigkeit der Quelle auf einer Skala von 0\u2013100 % – basierend auf institutioneller Autorit\u00E4t, Transparenz und Pr\u00FCfbarkeit.
-              <span class="trust-legend">
-                <span><span class="tleg-dot" style="background:#3db84e"></span>\u2265 90 % &ndash; Offizielle Beh\u00F6rde / Amt</span>
-                <span><span class="tleg-dot" style="background:#f4c44a"></span>80\u201389 % &ndash; Anerkannte Institution</span>
-                <span><span class="tleg-dot" style="background:#f44a4a"></span>&lt; 80 % &ndash; Mit Vorbehalt zu werten</span>
-              </span>
-            </span>
-          </span>
-        </span>
-      </div>
-    </div>`;
-  card.addEventListener("click",()=>card.classList.toggle("open"));
-  return card;
-}
-
-function renderCategoryBlock(cat,items,isLoading){
-  const block=document.createElement("div");
-  block.className="cat-block"; setCSSAccent(block,cat.accent);
-  block.style.background=`linear-gradient(180deg,var(--ac04dark) 0%,#111210 40%)`;
-  const header=document.createElement("div");
-  header.className="cat-header";
-  header.style.background=`linear-gradient(90deg,${cat.bg} 0%,#111210 100%)`;
-  header.innerHTML=`<span class="cat-header-icon">${cat.icon}</span><span class="cat-header-label">${cat.label.toUpperCase()}</span><div class="cat-status-dot${isLoading?" loading":""}"></div>`;
-  block.appendChild(header);
-  const wrap=document.createElement("div"); wrap.className="cards-wrap";
-  if(isLoading){ wrap.innerHTML='<div class="skeleton"></div><div class="skeleton"></div>'; }
-  else{ items.forEach((item,idx)=>wrap.appendChild(renderCard(item,cat,idx*70))); }
-  block.appendChild(wrap);
-  return block;
-}
-
-function renderTeaserCard(cat,text,delay){
-  const btn=document.createElement("button");
-  btn.className="teaser-card"; btn.style.animationDelay=delay+"ms"; setCSSAccent(btn,cat.accent);
-  btn.innerHTML=`<div class="teaser-card-top"><span class="teaser-card-icon">${cat.icon}</span><span class="teaser-card-label">${cat.label.toUpperCase()}</span></div><p class="teaser-card-text">${text?text.slice(0,75)+(text.length>75?"\u2026":""):"Wird geladen\u2026"}</p>`;
-  btn.addEventListener("click",()=>switchTab(cat.id));
-  return btn;
-}
-
-function renderTabs(){
-  const nav=document.getElementById("tab-nav"); nav.innerHTML="";
-  CATEGORIES.forEach(cat=>{
-    const btn=document.createElement("button");
-    btn.className="tab-btn"+(cat.id===activeTab?" active":"")+(loading.has(cat.id)?" loading":"");
-    btn.style.setProperty("--accent",cat.accent);
-    btn.innerHTML=`<span class="tab-icon">${cat.icon}</span><span class="tab-label">${cat.label.toUpperCase()}</span><span class="load-dot"></span>`;
-    btn.addEventListener("click",()=>switchTab(cat.id));
-    nav.appendChild(btn);
-  });
-}
-
-function renderMain(){
-  const cat=CATEGORIES.find(c=>c.id===activeTab);
-  const items=aiData[activeTab]||SEED[activeTab];
-  const ab=document.getElementById("active-block"); ab.innerHTML="";
-  ab.appendChild(renderCategoryBlock(cat,items,loading.has(activeTab)));
-  const tg=document.getElementById("teaser-grid"); tg.innerHTML="";
-  CATEGORIES.filter(c=>c.id!==activeTab).forEach((c,i)=>{
-    const preview=aiData[c.id]?.[0]?.teaser||SEED[c.id]?.[0]?.teaser||"";
-    tg.appendChild(renderTeaserCard(c,preview,i*60));
-  });
-  renderTabs();
-}
-
-function switchTab(id){
-  if(id===activeTab) return; activeTab=id; renderMain(); loadCategory(id);
-}
-
-/* ═══════════════════════════════════════════
-   WÖCHENTLICHE AKTUALISIERUNG
-   Jeden Montag 06:00 Uhr Berliner Zeit.
-   Unabhängig von Zeitzone des Nutzers.
-═══════════════════════════════════════════ */
-
-/**
- * Gibt den Datums-Key des letzten "Montag 06:00 Uhr Berlin" zurück.
- * Z.B.: "2026-06-01" (= letzter Montag nach 06:00 Berliner Zeit)
- * Solange dieser Key gleich bleibt, wird kein neuer Fetch ausgelöst.
- */
-function getRefreshKey(){
-  // Aktuelle Zeit in Berliner Zeitzone
-  const berlinStr = new Date().toLocaleString("en-US", { timeZone:"Europe/Berlin" });
-  const berlin    = new Date(berlinStr);
-
-  const dow  = berlin.getDay();   // 0=So, 1=Mo, ..., 6=Sa
-  const hour = berlin.getHours();
-  const min  = berlin.getMinutes();
-
-  // Wie viele Tage zurück bis zum letzten Montag?
-  // Sonderfall: Montag VOR 06:00 → noch alter Montag (7 Tage zurück)
-  let daysBack = dow === 0 ? 6 : dow - 1;
-  if(dow === 1 && (hour < 6 || (hour === 6 && min === 0))) daysBack = 7;
-
-  const lastMonday = new Date(berlin);
-  lastMonday.setDate(berlin.getDate() - daysBack);
-
-  const y  = lastMonday.getFullYear();
-  const m  = String(lastMonday.getMonth()+1).padStart(2,"0");
-  const d  = String(lastMonday.getDate()).padStart(2,"0");
-  return y+"-"+m+"-"+d;   // z.B. "2026-06-01"
-}
-
-/**
- * Prüft beim App-Start ob ein neuer Montag (06:00 Berlin) vergangen ist.
- * Falls ja → alle gecachten KI-News löschen → frischer Fetch.
- */
-function enforceWeeklyRefresh(){
-  const key    = getRefreshKey();
-  const stored = localStorage.getItem("pbz-refresh-key");
-  if(stored !== key){
-    // Neuer Wochenzyklus → localStorage UND In-Memory-State invalidieren
-    CATEGORIES.forEach(cat=>{
-      localStorage.removeItem("pbz-wk-"+cat.id);
-      localStorage.removeItem("pbz-dt-"+cat.id);
-      delete aiData[cat.id];    // In-Memory-Cache leeren
-      loaded.delete(cat.id);    // Neu-Fetch erlauben
-      loading.delete(cat.id);   // Hängenden Lade-State zurücksetzen
-    });
-    localStorage.setItem("pbz-refresh-key", key);
-    console.log("[PBZ] Wöchentliche Aktualisierung ausgelöst für", key);
-    return true; // Signal: Daten wurden invalidiert
-  }
-  return false;
-}
-
-// Beim Start und bei jedem Vordergrund-Wechsel prüfen
-enforceWeeklyRefresh();
-document.addEventListener("visibilitychange", ()=>{
-  if(document.visibilityState==="visible"){
-    const didRefresh = enforceWeeklyRefresh(); // Inhalts-Cache prüfen
-    checkForUpdate();                           // App-Version prüfen (ETag)
-    if(didRefresh){
-      // Neuer Wochenzyklus erkannt → UI + Daten sofort aktualisieren
-      renderMain();
-      loadCategory(activeTab);
-    }
-  }
+    _paint(document.getElementById('sidebar-logo'));
+    _paint(document.getElementById('mobile-logo'));
+    const ico512=_triduraIcon(512).toDataURL('image/png');
+    const ico192=_triduraIcon(192).toDataURL('image/png');
+    const ico180=_triduraIcon(180).toDataURL('image/png');
+    document.getElementById('apple-icon').href=ico180;
+    document.getElementById('fav-icon').href=ico512;
+    const m=JSON.stringify({name:'Tridura',short_name:'Tridura',description:'Generalistisches Ausbildungs-Controlling · PflBG · Kompass.RLP',start_url:'.',display:'standalone',orientation:'portrait',background_color:'#7400b8',theme_color:'#7400b8',icons:[{src:ico192,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:ico512,sizes:'512x512',type:'image/png',purpose:'any maskable'}]});
+    document.getElementById('pwa-manifest').href=URL.createObjectURL(new Blob([m],{type:'application/manifest+json'}));
+  }catch(e){}
 });
 
-async function loadCategory(catId){
-  if(loaded.has(catId)||loading.has(catId)) return;
-
-  /* ── Cache-Check: Gibt es noch gültige Daten dieser Woche? ── */
-  const key        = getRefreshKey();
-  const cachedKey  = localStorage.getItem("pbz-wk-"+catId);
-  const cachedData = localStorage.getItem("pbz-dt-"+catId);
-
-  if(cachedKey === key && cachedData){
-    try{
-      const parsed = JSON.parse(cachedData);
-      if(Array.isArray(parsed) && parsed.length){
-        aiData[catId]=parsed; loaded.add(catId); renderMain(); return;
-      }
-    }catch(e){}
-  }
-
-  /* ── Frischer API-Fetch ── */
-  loading.add(catId); renderMain();
-  const cat = CATEGORIES.find(c=>c.id===catId);
-  const now = new Date();
-  const kwStr = "KW " + (() => {
-    const b = new Date(now.getFullYear(),0,1);
-    return Math.ceil(((now-b)/86400000+b.getDay()+1)/7);
-  })();
-  const dateStr = now.toLocaleDateString("de-DE",{timeZone:"Europe/Berlin",day:"2-digit",month:"long",year:"numeric"});
-
-  /* Prompt bewusst kurz gehalten → Antwort passt sicher in 1000 Token */
-  const prompt =
-    `Ausgabe ${kwStr}/${dateStr} – Kategorie: ${cat.label}.\n`+
-    `Gib ein JSON-Array mit 5 aktuellen deutschen Politikmeldungen dieser Woche.\n`+
-    `Felder je Objekt (kurz!): id(4-stellig), headline(max 8 Wörter), `+
-    `teaser(1 Satz), bedeutung(1 Satz Folgen für Bürger), `+
-    `quelle(Institution+Datum kurz), vertrauen(0-100).\n`+
-    `Nur JSON-Array. Kein Markdown. Keine Erklärung.`;
-
-  try{
-    const res = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-6",
-        max_tokens:1000,
-        messages:[{role:"user",content:prompt}]
-      })
-    });
-    const data = await res.json();
-    /* Antwort extrahieren – egal ob 200 oder Fehlerobjekt */
-    const raw = (data.content||[]).map(b=>b.type==="text"?b.text:"").join("").trim();
-    const match = raw.match(/\[[\s\S]*\]/);
-    if(match){
-      const parsed = JSON.parse(match[0]);
-      if(Array.isArray(parsed) && parsed.length){
-        aiData[catId] = parsed;
-        try{
-          localStorage.setItem("pbz-wk-"+catId, getRefreshKey());
-          localStorage.setItem("pbz-dt-"+catId, JSON.stringify(parsed));
-        }catch(_){}
-      }
-    } else {
-      /* API-Fehler oder leere Antwort → SEED bleibt erhalten */
-      console.warn("[PBZ] API kein Array:", catId, data.error?.message||raw.slice(0,80));
-    }
-  }catch(e){ console.warn("[PBZ] Fetch-Fehler:", catId, e.message); }
-
-  loading.delete(catId); loaded.add(catId); renderMain();
-}
-
-renderMain();
-// Alle Kategorien parallel vorladen – aktive Tab zuerst
-loadCategory("inland");
-CATEGORIES.filter(c=>c.id!=="inland").forEach(c=>loadCategory(c.id));
-
-/* ═══════════════════════════════════════════
-   PWA: ICON + MANIFEST + SERVICE WORKER
-═══════════════════════════════════════════ */
-(function initPWA(){
-  /* ── 1. Draw app icon on canvas ── */
-  function buildIcon(size){
-    const c=document.createElement("canvas");
-    c.width=c.height=size; const ctx=c.getContext("2d");
-    const r=size*0.18;
-
-    // Background – rounded square
-    ctx.beginPath();
-    ctx.moveTo(r,0); ctx.lineTo(size-r,0);
-    ctx.quadraticCurveTo(size,0,size,r);
-    ctx.lineTo(size,size-r);
-    ctx.quadraticCurveTo(size,size,size-r,size);
-    ctx.lineTo(r,size); ctx.quadraticCurveTo(0,size,0,size-r);
-    ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0);
-    ctx.closePath();
-    ctx.fillStyle="#0a0a08"; ctx.fill();
-
-    // Subtle inner glow ring
-    const grd=ctx.createRadialGradient(size/2,size/2,size*0.1,size/2,size/2,size*0.62);
-    grd.addColorStop(0,"rgba(45,212,160,0.10)");
-    grd.addColorStop(1,"rgba(45,212,160,0)");
-    ctx.fillStyle=grd; ctx.fill();
-
-    // Pill shape (capsule)
-    const pw=size*0.54, ph=size*0.22, px=(size-pw)/2, py=size*0.28;
-    const pr=ph/2;
-    ctx.beginPath();
-    ctx.moveTo(px+pr,py); ctx.lineTo(px+pw-pr,py);
-    ctx.arcTo(px+pw,py,px+pw,py+ph,pr);
-    ctx.lineTo(px+pw,py+ph-pr);
-    ctx.arcTo(px+pw,py+ph,px+pw-pr,py+ph,pr);
-    ctx.lineTo(px+pr,py+ph);
-    ctx.arcTo(px,py+ph,px,py+ph-pr,pr);
-    ctx.lineTo(px,py+pr);
-    ctx.arcTo(px,py,px+pr,py,pr);
-    ctx.closePath();
-    ctx.strokeStyle="#2dd4a0"; ctx.lineWidth=size*0.025; ctx.stroke();
-
-    // Divider line in center of pill
-    ctx.beginPath();
-    ctx.moveTo(size/2, py+size*0.02);
-    ctx.lineTo(size/2, py+ph-size*0.02);
-    ctx.strokeStyle="#2dd4a0"; ctx.lineWidth=size*0.018; ctx.stroke();
-
-    // "P" left, "B" right inside pill
-    ctx.fillStyle="#2dd4a0";
-    ctx.font=`700 ${size*0.13}px 'Space Mono',monospace`;
-    ctx.textAlign="center"; ctx.textBaseline="middle";
-    ctx.fillText("P", size/2 - size*0.12, py+ph/2);
-    ctx.fillText("B", size/2 + size*0.12, py+ph/2);
-
-    // "BEIPACKZETTEL" label below pill
-    ctx.fillStyle="#2dd4a0";
-    ctx.font=`${size*0.065}px 'Space Mono',monospace`;
-    ctx.globalAlpha=0.7;
-    ctx.fillText("BEIPACKZETTEL", size/2, py+ph+size*0.13);
-    ctx.globalAlpha=1;
-
-    return c.toDataURL("image/png");
-  }
-
-  const icon192 = buildIcon(192);
-  const icon512 = buildIcon(512);
-
-  /* ── 2. Apple touch icon ── */
-  document.getElementById("apple-icon").href = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAguUlEQVR42u3deXycdb0v8N/MJJksTdp0STdaCi20hQLlQFlEFkHQsirLRY8IL7wKeD3iclC8ysGjL4+goveKV62ocBRRXPAIImBBLMpWylIolAItdgtpmy5Jsy8zc//gFJJp2iZt0s7M837/BZPJZJ5f5/l9P7/v88zzxAKDpry8NGMUAIZWa2t7zCjsOYOoyAMIBwIAij2AUCAAKPgACAQCgKIPgDAgACj6AAgDAoDCD4AgIAAo+gAIAwKAwg+AICAAKPwACAICgMIPgCAgACj8AAgCAoDCD4AgMLjiij8ARK8uxQwwAESvG5AXb1LhB0AQGFw5fwhA8QcgH+V6/YobPACIXh2LGTAAGHq5dkgg5zoAij8AugERCwCKPwBCwN4RMyAAsPft60MC+7wDoPgDoBsQsQCg+AMgBEQsACj+ALDv6mE8ShsLAELAPgoAij8A7Pv6GC/kjQMAIWAfBwDFHwByp17GC2ljAEAIyJEAoPgDQO7Vz3g+v3kAEAJyLAAo/gCQu/U0nk9vFgCEgBzvAAAAuWvQA4DVPwDkfhcgnstvDgAYmjobz8U3BQAMbb11DgAARNCgBACrfwDIry5APBfeBACwd+tvfF/+cQBg39Rh5wAAQATtdgCw+geA/O0C6AAAgA6A1T8ARKELEN8bfwQAyK0Q4BAAAETQgAKA1T8AFEYXQAcAAHQArP4BIApdAB0AANABsPoHgCh0AXQAAEAHwOofAKLQBdABAAAdAKt/AIhCF0AHAAB0AACASAcA7X8AyH87quc6AACgA2D1DwBR6ALoAACADgAAEMkAoP0PAIUnu77rAACADgAAELkAoP0PAIWrZ53XAQCAqHcAAAABAAAo9ADg+D8AFL5t9V4HAACi3AEAAAQAAEAAAAAKSSwEJwACgA4AACAAAAACAAAgAAAAAgAAIAAAADkaAHwFEAB0AAAAAQAAEAAAAAEAABAAAAABAAAQAAAAAQAAEAAAAAEAABAAAAABAAAQAAAAAQAAEAAAAAEAABAAAEAAAAAEAABAAAAABAAAQAAAAAQAAEAAAAAEAABAAAAABAAAQAAAAAQAAEAAAAAEAABAAAAABAAAQAAAAAEAABAAAAABAAAQAAAAAQAAEAAAAAEAABAAAAABAAAQAACAoVdkCMgVU5+aZxAoeCuOucogoAMAAAgAAIAAAAAIAADAoImVl5dmDAN7ixP9YMecIIgAgEIPCAYIACj4gECAAICiDwgDCAAo/IAggACAog/CgEFAACC/Cr+JC/uT/Ym9w70AsOKHAt+PBQEEABR+EAQghOBKgCj+YB9HBwCTAqAbQDQ4CdBksFf/nkkH7I8IABT4ZGNyyc9/c/9u9lOiwSEAE4rJBHJYz31qKPZdhwQEABR/RR8iHAamPjXPvhwxvgWg+O/RZGTCgH0XBgZ7/3NCsA4Air/VPkS0K6AToAOA4q/4Qx6HAZ0ABADFf1AmFcUf8icEDMb+KgQIAES4+Cv8EO0gIAQIAES0+AOFEQSEAAQAxV/xByFACEAAUPy3nyQUfyjcELAn+7cQIABQwMUf0A0QAgQATAiAfR4BgEJd/ZsIQAjQBRAAUPwBIUAIEABQ/AEhQAgQAIj8Dg+YExAAyNPVvx0dGKy5QRdAACBPij+AuQgBQMIHMEcIABR64rZjA0M1V+gCCABI9YA5gzxRZAgKf/VfiKrOe2cY86VLdut3M92pkOnqDpn2zpBubAmpxpbQvW5T6KrdGDpfqw0dL68KXW9sNMh5YtyNV4aKU4/csxdJp0OmKxXSre0h3dgSuusbQtea+tDx2trQ8eLroePVtSFkMgZ7F3OT4CAAIMnntFhRIsSKEiGUJUOiujIUhxDCEVN7Pae7blNoeXRJaPrTk6Fj6UqDVuji8RBLxkMiWfzmZ2LKuFA2Z8ZbP05t3hqa//Js2Ppffw+dy2sjM3dYcBT4x94QWP3TRzIePyoMv+iUsN9/fiHsd9sXehUDoicxsioMv+iUMOmO68K4b1wZisaNNCjmKAEAq/9Clzx0Spjw/U+HmusvC/GypAGJslgsVLzryDDpzutDxSmzzSEIANhxo6Dy7OPD+O9/OsQryw1G1CfO8tIw7htXhsozjzOXIAAwtLTWckPprAPCuBuvCCFu19ENiIUx/3ZpSB46xViYqwQAiIKyOTPCiA+920AQYol4qLnu0hDiMYOBAMC+T9RadkOv+qNnhcTwCgNBKJk6oeDPBxjonKILkB98DRB2JzmXJUPVhaeELT/9k8HIE7Uf+UZof/Effa/ki4tCvKI0FO83JpQefmCoPPsdoWTaxH6/duVZx4eWh58zyAgA5E9SL3Rdq9aH1Rd9ufdkX5QIsbJkiA8rC8WTa0Ly4Emh4sTDQ+nsaQN67cr3zBEACkSmqzukGppDqqE5tL/4j9Bw58Oh+n+eFUZ+7Ox+/X7ZUdNDLBEPmVS6oOcWK/sCW8gYgtxmhxuCyb47FdJNraG7blNoW/hyaLh9fqi94qZQ+9Fvha7a/l8BsHjKuFA8cbQBLUTpTNjy43tD84NP928iLU+GooljjJu5SwCAfNT+worwxv/6Tki3tPf7d5KzDjBwBazh9vn9fm7ReBcHQgBgH9H+33PddZtD4y8f6vfzSw6cYNAKWMcra0K6tX+BMF5eao5BAIB81rxgcf9XfS4JW9gymZDatLWf6TFlvBAAGByOoe0bnctr+30yV6LKVwELXrp/dwFMbW0xVuYwAYC9T2tucFd96X5O5rHSEuNV4BIjK/vXAFi/xVyDAAARSguGoICVTBnXr3s/dNc3hO51mw0YAgDktVgsxPvZ2s+0dxmvAjb8A6f263mtT7xksBAAIO9XfdMmhliif7uG476Fq+r8k0LV+0/s13Mb73zYgJF3XAkQsgwbwHXdtX0LQ6woEWLlpaF4wqiQPPSAUDn3mFB6+NR+/W7TPY+HzuW1BhEBgMExkLNnnZQziDvE+JFh+AdP6/fzO19/w6DliYm3Xjvor9n52tpQf9OdkRvLgVwWeOpT88xROcohAPhvpYdPDRN+8NkQH1bW79/p2MHNZSh8bQtfDrVXfjtk2jsNBjoAkA9iifibNwOqLAvFk8aG5MH7hYqTjhjwzYC6Vq4b0L0DKAxda+rD5lv+GJrnLwoh41sgCACQk4r3HztkFyNp+vMiAxwBqc1bQ/vzK0Ln8trQ8uiS0PHyKoOCAABRlW7rCFvvesRAREBiZFUonT0txCvLQyadCenmttC1ZoOBQQCAKNrykz+FVEOzgYhKCKiuDGVHTw9lR08PI688J7QvXh42fvd3oeOllQaHvOUkQBigtqdfGdAdAyk8pbOnhf1uvTaM/vwHQ4ibRhEAoOB1vLQyrLv2R/2+WRAFLBYLwy88OYz75lUhVlJsPMg7DgFAPzXd92TY+I1fhXRbh8HIQ7Uf+UZo38HXNmPFRSE+rCwkRlWF5IzJofz4Q0PFKbNDrHjXU2TFSYeHUZ++MGz85q8MMgIAFNSqf+nKsOkHd4e2p142GAUq09UdUluaQmpLU+hcXhua7n0iFI0ZEWq+fFkoO2bmLn9/+IUnh9ZHng+tC5caTAQAyGfddZtDy2NLQvN9T+5w1UiBfwbqG0Ldp74Xxv/gM6HsyIN2+fzqK88RABAAIKel0yHTlQrpto6Q3toSUg3NoXvdltBVWx86l9eGjqUrXeCHNzsDqXSo/9rPw+TffjWEeGynzy2ddUBIzpgcOpatNnAIALCvda1aH1Zf9GUDwe5/htbUh9YnXwrl75i1y+cOe/dRAgB5w7cAAHah7bnl/XpectYBBgsBAKBQdK7o3+1+kzP3N1gIAOyZgdw+c6iudQ+8Kd3c1r8JtSwZ4uWlBT8eblcuAABEQqazu/+TalW5AUMAACiIibKyrP/PrSg1YAgAAIWgaMyIfj8305UyYAgAAIWgdNaB/X5uuqXNgCEAsPc4ERCGRixZHCpOPbJ/q//O7pDa3GSuQQBgzzh7Fva96o+cGRIjhvXruZ0r60LIZAyaOSwvuBIgQF8r/6JEqL58bqi+fG6/f6f9hdcNHAIAe9/Up+ZJ3LCbxT5WlgyJ6spQcuD4UHrE1DDsjDkDOvkvhBBaHllc8HMMAgBAXpl467VD+vpda+tD26JXDDR5wzkAOc6KHvLDlp/cG0I6bSDMXQIA+4YWHex9rY8tCU33LTS3IAAAREXHK2vC+ut+aiAQABh8A22lSeqwd7T87YXwxpXfDumWdqv/PZiz2DecBAgwQF1r6sPmW+4JzX9eZDAQABj6LoCVPew76abW0Lrw5dB8/8LQ8tiLTviz+hcAyE2uCQADqe6ZkOlOhUxXd0g3tYZUY0vo3rAldL+xMXSueCN0LFsdOl5dG8mib+EhACAE5JStdz8att79qH9kwrov/MggKP7sBicB5hEresAchQCABA+YOxAAJGwAcxMCAJI8YM5AAJC07dDAUM0VVv8CAFI9YI5AACDXugAA5iIEgIjueBI+MFhzg+IvABCBHR0wJyAAkOddADs8sKdzgdW/AIAQACj+CAAIAYDijwBAQU8EgH0eAYA87gKYEEDxt/oXAIh4CBAEoHALv+KPACAE6AaAVb/iLwAgBAgBoPgr/gIAQkCPiUMQgPwt/Io/AoAQIAiAwq/4IwAIAbs/sQC5Xfxzac4gtxUZguiEgMGYHHq+hkkCCqfo2691ANAJGNDEoysA+67wK/7oALDXOwG6ApD/q33FXwAgop2AoZhMhAHIn6JvP422WHl5acYwmFz2dvgA7I8IAERs0jEhYV+zr7HvOQTAkB4SAHJzfwffAsDEAPZxdAAwQegGgMKPAIAgIAiAwk9BchIg/SIIgMKPAIAwYBBA0UcAQBAAFH4EAIQBQNFHAEAgABR8BAAEA4MACj0CAAgHKPKwL7gSIAAIAACAAAAACAAAQGFwEiAA6AAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAACAAAgAAAAAgAAUEiKDAFTn/zBd0I8ntnRzzMdXUXp5rZk15oN1e0v/WNc8/ynZ3S8vGrsjp5f/s7DXh//nU/81+68l5ZHnp+27nM/PK/nY6Wzp9VOvOWaO3fn9VbO/fxVqU1bK3o+VnXeO5eM+dIl8/vc1lQ6nmltL0ltbU12rVo3suOVNTUtf3n24I5X19T0e6caM6J5/z/d+KPsx9NtHcUr3/2vn8h0dScGsg2xRDxdftIRKypOOOz15KwpdYmRVa3xitLOVENLWWpTY0XHK6trWhYsPqht0bLJmc63X7uoprpp/3tvuKXnazU/8NTM9dffemZff6fipMNXjPvWx/8QYrG333NTa+naS79+SVftxuEhhLDfz7/4i+SMyet397O2ed49J2y59b7jhuKzMupTFzwy4kOnP70n+8LGm+48tfE3C44citcbin0jhBAqzz7+pZrrL3ug52Mbvvqz9zbd+8ShZjcEAPZILFncnUgWdydGVbWUzp62dsSHTn+65a/PHbThqz97b7qlvaSgtjURT8cqy9vjleXtxRNHN5a/Y9Y/qi+fu7D1iZem1N94x+nddZurdvUaZcfOXNXX4/GyZFfpYQfWtT376n79fT9lx8xcNeaaix8unjJu8/ZBY3hz0ZjhzckZk9dXnffOJdnFZiCKJ9Vsqfn3y+/vWfxDOh1b/8WfnLWt+AOFxSEAdkvFu458bfz/+Zffh3gsE4XtLT/+0JUT5/3rrxOjh7fs8rnHHrJyJ+FgZX//ZuVZx7804eZP3tVX8R/USaAs2TXum1fdEx9W1tHz8U3f/8OJrQuXTvFpBwEAeimdPa122OlzlkVle4vGj9o66hPv+/vOWwixUHbMjNU7Dgd9dwe2CwpHTV9Tc/2lD+zs0MxgGfOlD88vmTphY8/Hmuc/PaPh9vlzBv2PZTIxew7kyJxmCMi29Z7HDqv/2u1nbPv/xPCKtpKDJ9WP+uT5f8s+/ltx8hErmv/81Mxdveamm+86ueEXDx69O++nffHyiSuOuepfez42/IOnPTP6Mxct6PnYus/NO6/lkcXTdudvbPjybWc23b9wZojHM4mq8vbk9MnrR1z+3oVl/3Tw2l6r8rnHLt347d+8K93cluzrdZIH7bchUV3Zuu3/UxsbK+LVlW2xRDwdQgjJGfuvj1dVtKe3tpTuMEMki7vHXPfhP/dqx4cQMu2dxVtuu//Y5oeeObh7/eaqeEVZR+kRU2urLjjphZ11HXZmxD+f9sywM47uFeI6X1s7ZsPXfn5GX89fe+nXL+nP64694WN/HHbaUa9mv//mh545eKg+K5u+e9fJm75718nZj+/uZ2WwX28o9g3QAWBIpRpbytoWLZu87tp552b/rHj8qMaC2th0OpZqaC5rXbh0St3VN1/Y9UbW8e94PFN6xLTaHa7cs1b4bU+/MrnztbVj3v79WKZ8zvTVO3sLw86Ys6x44ujG7OJZe8VNF2+57f5ju9ZsqM50didSW5rKWxYsPqjukzdfsO7z885NbW0tHcimlv3TwWtHfvKCv2X/W9dd88P3Zdo7i3d3CIedfvQr2cU/hBA2/t/fndy1ZkO1PQoEAPJMd93mqnRrR6/CkCnglm6mszvR+vcXpmY/XjS2umlHv5Pd4m97fsXE9ueXT+wdEg7Z6WGAqnNPeDH7sc0/ve+4jmWrd/jNi5YFiw9qfmDXnZi3tmHMiOaxX//oH7d1JraFn/Vf/PHZ3XWbqnZ3zBIjq1pHf+4Df8l+vPWxFw/Y+vu/HWEvAgGAPFQ0ZkRzvDzZ1fOxrtXrC3pFl9rSXLbdTpN1stw2sZLi7tLZvbsD7c8vn9C+eMXErJCwcoc75JvfFHijVxDp6k5s/d2C2YO1TbHiotTYG6/4Y2JkVWvPxzfdfNfJbYuWTd6T1x7zv//5wcSIYW29xrChuWzD137+HnsQ5NicbgjYZcFIFneXTJu4cfSnLlyQ/bOmPz1Z0N81TlT3LmYhhLCj4/9lRx60NlZS3P3W81raSzpff2N0qqG5vNdON37U1uJJYxq61tSPyH6NkumTNmR/s6L9hRUTBvPrlqM/e9Ffs0NG0/0LZzb88i9H7cnrVs499uWKk2cvz368/oY7Ts++FgMgAJCDqs49YUnVuScs2dXzGm6fP6e/K8ZRV1/wyKirL3hkZ89pfXLplLqrb74gZ4JPSVGq/MTDV2Q/3r1+S2WfASCr/d++5PUJIZ2JpTY2VnTVbhze87h++bGHrGxc88h2q/qSKeM2ZT/WueKN0YO1TWXHzFiVvfLPdHUnNn7rztP2KCiNHt4y+pqLH94+ID5xaMtfnztoIK+Vj5+VPRG17SV3OATAgHTXNw5refi5g+quvvmCTd/7/UmFt0fEMvGqivayY2euGv/dq+8qntD7ZLyQTseyj+m/XdSzAsDzb7f+e/53X2HhrT9fWd7R38CxW4U6q/iH8OYhgcpz3vHinrxuzZcumR+vLG/v9b7rNldtvOnXp9prQAeAApAYUdFWNK66qXjKuM2xZ16dNNDL2uaqmq9cfl/NVy6/b1fPa7p/4SF9HQJIVFe2lkybWN87ACyf0OO/J1aeeezStwLAUdPXhHg8E9LpXidR9nV+Qbq1Y8ivtlh9+dyFTfc8dtjuHGqoPPcdL5afcNjrvd90Jrbh32+bW2hXigQdACIrVlyUSh4yZd3oz/6Pv0687dpf9vzOe8F3P+o2V236/h9O7OtnZcfOXJV9Gd2Ol1aOfysALO7dNYgPK+sonXVAXe4Eu2FtIy59z1MDXkGMrW4a/ene34kPIYSGOx48uu251/azx4AOAHkk+0JA8bJkV/H+YzdXve/EF6rOP/GFbY8nD560oeYrl9/fn2OT+X6xk9Ynl06pv+EXp6c2NvZ5Mlt2+7/j1bU16ba3vzLZuXLdqFRjS1lieEVbz9DQ/sKKCb0Wzn10F+Llyc5B/ze++9HDKs88bmmsuCi17bERHzzt2cbfLjhyR9vYZ+fkukv/nN216FxeO2bzvHtO2N33FrUL47gQEAIAOSvd1lHcsWz12Pob7zg9VpRIV5779vHi8uMOWZk8ZMq6jqUrxxXCtmZS6XimraM43dSa7Fy5bmTHstVjWx5+9uCOV3Z+N8CyY3oHgOSMyeunPjXv2zv7nfJjZq7a8uN7j+811k2t2wWAopoRzYMaZp54aUr9DXecnmnvLB5+8anPbns8VlrSNfJjZz9ef8Mdp/fndarOP/GF7HMZMp3difXX33pmoRwaAgEA/lvTAwtn9gwA20JAvgeAty4FvBtKDpywqWjMwIt0ctYBdfGK0s6ex8k7V64btd3rZ51bsCe66zZVrb/up2eFdCa25db7j60854QlPa/tUHXeCUsafvnQUV2r1o/c6cQxftTWUVdv/7XQzfPufmfn8trR9hTIfc4BYGAFZGPjsOzHtjtTPmIGcoe/nmKJeLrs6N6XBe58ZU1NSPe+umLp4VPfiFeUDsphgPbnV0xMN715yeDUlqbyxl891Pu7//F4ZtQn3v/ozt94LNRcf+kD2ReFanv21f0afvnQUfYSEAAoQImsr3qFEEIs+fZx5Cjq7x3++gwPWYcO0m0dxe1LXu91XkCsuChVdeEpi4fivTf84sE5qcaWXlc7rDhl9mvZFwrqafhFpzxXdtT0Nb3ed0t7yYav/Ofc7PAC5C6HABiQipO2vzBOqrGlNKrjESsuSpUeeVCvOwZmn0TZ0363feGO5KFT1r0VHo7b/r4AW+95bFbpEVN7XVK4+iNzn2xbuHT/Hd0PoOKU2a/FSku6B3I/gG2Fu+FnDxyTfSGaUZ88/++1V9x0cfbziyeNaRj1L+/f7pbIG79152nddZur7CGgA0AhFbmS4u6SKeM2j7zinMdHfPiMRdk/39UJcoWs9PAD34iX9W6Ftz+746+/tT376qTeBbVmS9H4kVt7PtY8f9GM7LsQxsuSXRNvuebX1ZfPXVg8aUxDrKQolaiubKs4efby8d+7+q5x37zqnkTV9t2Z/mj8zYLZ3fUNvQ7tlM6etrYi+yqI8Vim5t8ueyBWWtJre1v++txBTfc9eYg9BXQAyHP9vRRwCG+2rFsfXXLgrp7Xn8udhhBCyyPPT1v3uR+el1WMaifecs2du/rdcd+66u7sx1bO/fxVQ3kd+r7u7Lez77+3PfvqpOwQVX7MIau23v3oYdv+P9PRVVT/H784Y8L/+9Rve15bIFZa0jXy4+c9OvLj5z06mNuQ6ewq2vLje48f88VLHuz5+MhPvO/vLY+9eOC2ixUVTxjdmH2zoxBCqHjXka/t6hsP27Q+tuTAus98//1D9VnJR0OxvTXXX/ZAzfWXPbCr5zXc8eDRm75718lmPR0AGLDN8+45IbWlqTyq2599Z7/u9Vsqd3Y73fbFyydmX/2v7LjtTyJsW7Rs8ob/uP09e+uYetMfH5/VtWZDrzs7lhw4YVPl2ce99HYC8XkHAYDIS7e2l2y86denNv7qL5E96zteVdGenD55Q68Cv4ur36Vb2kuyD5mUz5mxOvsOgCGE0HTP47PqPv2983f1lbxB6QKk0vG+Lt4z8opzHu95h0OgcDgEwK6LQ2d3It3WUZKqbxjW+XrdqLZFyya3LHhuWvbZ45Fb/fdRuPtz+du2Z1+dlJy5//peQWLG/uv7upZC65NLp6z5wFcuqzhl9vLyEw57PTnrgLpEdWVbvKK0I93QXNa9aWtFx7JVY1sWPD+tbdHL++/J9jQ/9Mz0EZe+56nk9ElvhZqimuqm4Re/67mG2+fPsSdAYYmVl5dmDAMARItDAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAAIAAAAAIAACAAAAACAAAgAAAAAgAACAAAAACAABQsAGgtbU9ZhgAQAcAABAAAAABAAAQAAAAAQAAEAAAgJwNAL4KCADR0draHtMBAICodgAAAAEAABAAAICCDQBOBASAwret3usAAECUOwAAgAAAAEQlADgPAAAKV886rwMAAFHvAAAAEQ0ADgMAQOHJru86AACgAwAARDYAOAwAAIWjr7quAwAAOgC6AABQ6Kt/HQAA0AEAAASA4DAAAOSzndVxHQAA0AHQBQCAQl/96wAAgA6ALgAARGH1rwMAADoAugAAEIXVvw4AAOgA6AIAQBRW/zoAAKADoAsAAFFY/e92B0AIAID8Lf67HQAAgPy22wFAFwAA8nP1rwMAADoAugAAEIXV/6B0AIQAAMiv4j8oAUAIAID8Kv6DFgAAgPwyaAFAFwAA8mP1P+gdACEAAHK/+A96ABACACD3i/+QBAAAIPcNSQDQBQCA3K6r8Xx6swCg+Od4ABACACB362g8n988ACj+ORoAhAAAyL26GS+kjQEAxT/HAoAQAAC5UyfjhbxxAKD450gAEAIAYN/XxXiUNhYAFP99HACEAAAU/31XB+NR3ngAiGr9y6niW15emvGRAEDhj0AHQDcAAMU/4gFACABA8d87crrYOiQAgMIfkQ6AbgAAin/EA4AQAIDiPzTyqrg6JACAwh/BACAIAKDwD464QQaA6NWlvC+kugEAKPwRDACCAAAKf4QDgCAAgMIf4QAgCACg8Ec4AAgCACj8EQ4AwgAAin7EA4AgAEDUC3+kA4AwAEAUi74AIAwAKPoRZxAEAgAFXwBAKABQ7KPg/wOIvJWRUzWMTgAAAABJRU5ErkJggg==";
-
-  /* ── 3. Manifest via Blob URL ── */
-  const manifest = {
-    name: "Der Polit-Beipackzettel",
-    short_name: "Polit-BZ",
-    description: "Das Volk haftet fuer Risiken & Nebenwirkungen",
-    start_url: "./",
-    display: "standalone",
-    orientation: "portrait",
-    background_color: "#0a0a08",
-    theme_color: "#0a0a08",
-    icons: [
-      { src: "data:image/png;base64,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", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-      { src: "data:image/png;base64,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", sizes: "512x512", type: "image/png", purpose: "any maskable" }
-    ]
+/* ===== ALPINE STATE ===== */
+function tridura(){
+  return{
+    view:'dashboard',
+    nav:[
+      {id:'dashboard',label:'Dashboard',full:'Dashboard & Controlling',icon:['M4 4h7v7H4z','M13 4h7v4h-7z','M13 11h7v9h-7z','M4 13h7v7H4z']},
+      {id:'curriculum',label:'Anleitungsplan',full:'Anleitungsplan',icon:['M12 3 3 7.5l9 4.5 9-4.5-9-4.5z','M3 12l9 4.5 9-4.5','M3 16.5l9 4.5 9-4.5']},
+      {id:'deployment',label:'Einsatz',full:'Einsatzkonzept',icon:['M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z','M3 20a6 6 0 0 1 12 0','M16 11a3 3 0 0 0 0-6','M21 20a6 6 0 0 0-5-5.9']},
+      {id:'sop',label:'SOP',full:'SOP Praxisanleitung',icon:['M4 6h12','M4 12h12','M4 18h7','M16 16.5l1.8 1.8L21 15']},
+      {id:'library',label:'Mediathek',full:'Mediathek',icon:['M5 4h3v16H5z','M10 4h3v16h-3z','M15 5l3-1 3 15-3 1z']},
+      {id:'legal',label:'Recht',full:'Rechtlicher Compass',icon:['M12 3v18','M5 7h14','M5 7l-3 6h6z','M19 7l-3 6h6z','M8 21h8']}
+    ],
+    get viewTitle(){const n=this.nav.find(x=>x.id===this.view);return n?n.full:'';},
+    aStd:240,eStd:2000,theorieIst:1400,praxisIst:1600,currentMonth:18,fehlTheorie:120,fehlPraxis:140,nachtStd:95,alter:19,
+    resetValues(){this.aStd=0;this.eStd=0;this.theorieIst=0;this.praxisIst=0;this.currentMonth=1;this.fehlTheorie=0;this.fehlPraxis=0;this.nachtStd=0;this.alter=0;},
+    get aqNum(){return this.eStd>0?(this.aStd/this.eStd*100):0;},
+    get aq(){return this.aqNum.toFixed(1);},
+    get aqOk(){return this.aqNum>=10;},
+    get aqBarPct(){return Math.min(this.aqNum/20*100,100);},
+    get theoriePct(){return Math.min((this.theorieIst||0)/2100*100,100);},
+    get praxisPct(){return Math.min((this.praxisIst||0)/2500*100,100);},
+    get theorieRest(){return Math.max(2100-(this.theorieIst||0),0);},
+    get praxisRest(){return Math.max(2500-(this.praxisIst||0),0);},
+    get gesamtIst(){return(this.theorieIst||0)+(this.praxisIst||0);},
+    get gesamtPct(){return Math.min(this.gesamtIst/4600*100,100);},
+    get fehlTheoriePct(){return(this.fehlTheorie||0)/2100*100;},
+    get fehlTheorieOk(){return(this.fehlTheorie||0)<=210;},
+    get fehlPraxisPct(){return(this.fehlPraxis||0)/2500*100;},
+    get fehlPraxisOk(){return(this.fehlPraxis||0)<=250;},
+    get nachtOk(){return(this.nachtStd||0)>=80&&(this.nachtStd||0)<=120;},
+    get nachtStatus(){const n=this.nachtStd||0;return n<80?'unter Minimum':n>120?'über Maximum':'im Sollbereich';},
+    get alterOk(){return(this.alter||0)>=18;},
+    get jahr(){return this.currentMonth<=12?1:this.currentMonth<=24?2:3;},
+    get timelinePct(){return this.currentMonth/36*100;},
+    blockMap:[{max:3,label:'M1–3 · Pflegeprozess, SIS, BI § 15 SGB XI'},{max:6,label:'M4–6 · Vitalzeichen, DNQP Prophylaxe, Braden'},{max:12,label:'M7–12 · Immobilität, SGB XI, 1. Pflichteinsatz'},{max:15,label:'M13–15 · Pharmakologie, 6-R-Regel, ambulant SGB V'},{max:18,label:'M16–18 · Wundmanagement, DNQP Chronische Wunden'},{max:24,label:'M19–24 · Päd./Psych., FEM § 1831 BGB, Zwischenprüfung'},{max:30,label:'M25–30 · Notfallmedizin, Palliative Care, Katheterismus'},{max:33,label:'M31–33 · Pflegeökonomie, PPR 2.0, Nachtdienst, SBAR'},{max:36,label:'M34–36 · EBN, Prüfungsvorbereitung, Staatsexamen'}],
+    get aktBlock(){const m=this.currentMonth;const b=this.blockMap.find(x=>m<=x.max);return b?b.label:'';},
+    schemata:['Braden < 18 → Eskalation','SBAR · Situation/Background/Assessment/Recommendation','GCS · Glasgow Coma Scale','6-R-Regel','URGE-Prinzip','SIS · Strukturierte Informationssammlung','BI · 6 Module (§ 15 SGB XI)','PPR 2.0 (§ 113c SGB XI)'],
+    aufbau:[{nr:1,label:'Theorie-Modul',desc:'Schulischer Unterricht · Lerninhalte des Blocks'},{nr:2,label:'Praxis-Modul',desc:'Pflichteinsatz im jeweiligen Versorgungsbereich'},{nr:3,label:'Anleitung',desc:'4-Phasen-Modell + SOP · Anleitungskonzept aus der Mediathek'},{nr:4,label:'Nachweis',desc:'Kompass.RLP · PflAPrV Anlage 2 Kompetenzbereiche'}],
+    kompetenzbereiche:[{nr:'I',text:'Pflegeprozesse und Pflegediagnostik'},{nr:'II',text:'Kommunikation und Beratung'},{nr:'III',text:'Intra-/interprofessionelles Handeln'},{nr:'IV',text:'Handeln auf Grundlage von Gesetzen, Verordnungen & ethischen Leitlinien'},{nr:'V',text:'Wissenschaftsbasiertes, reflektiertes Handeln'}],
+    curTab:'A',
+    curriculum:[
+      {tab:'A',jahr:'1. Ausbildungsjahr',range:'Monat 1–12',drittel:'1. Drittel',motto:'Grundlagen & Stabilität',blocks:[
+        {nr:1,months:'Monat 1–3',thema:'Grundlagen & Körperpflege',einsatz:'Orientierungseinsatz Teil 1',theorie:['Einführung Pflegeprozess','SIS (Strukturierte Informationssammlung)','6 Module Begutachtungsinstrument (BI) nach § 15 SGB XI','Hygiene / IfSG','Anatomie Bewegungsapparat'],praxis:['Ganz-/Teilkörperpflege bei stabilen Zuständen','Interne Desinfektionspläne','Erstorientierung im Versorgungsbereich'],konzept:{id:'1.1',titel:'Ganzkörperpflege unter Isolationsbedingungen'},kb:['I','IV'],meilenstein:null},
+        {nr:2,months:'Monat 4–6',thema:'Vitalzeichen & Prophylaxe',einsatz:'Orientierungseinsatz Teil 2',theorie:['Vitalzeichenkontrolle','DNQP Dekubitus- + Sturzprophylaxe','Gastrointestinaltrakt','Flüssigkeitsbilanzierung','Schweigepflicht § 203 StGB + DSGVO'],praxis:['Eigenständige Vitaldatenerhebung','Risiko-Screenings via Braden-Skala','Ernährungsüberwachung bei Dysphagie'],konzept:{id:'1.2',titel:'Vitaldaten-Screening & DNQP Risikomanagement'},kb:['I','IV','V'],meilenstein:null},
+        {nr:3,months:'Monat 7–12',thema:'Immobilität & Pflegeplanung',einsatz:'1. Pflichteinsatz · Akut-/Langzeitpflege',theorie:['Pflegephänomene bei Immobilität','Thrombose, Pneumonie, Kontrakturen','Leistungsrecht SGB XI','Professionelle Gesprächsführung'],praxis:['Pflegeplanung auf SIS-Basis','Physikalische Prophylaxen','Begleitung 1. Pflichteinsatz'],konzept:{id:'1.3',titel:'Gelenkmobilisation bei Immobilität'},kb:['I','II','IV'],meilenstein:null}
+      ]},
+      {tab:'B',jahr:'2. Ausbildungsjahr',range:'Monat 13–24',drittel:'2. Drittel',motto:'Behandlungspflege & Differenzierung',blocks:[
+        {nr:4,months:'Monat 13–15',thema:'Pharmakologie & Behandlungspflege',einsatz:'Pflichteinsatz · Ambulante Pflege',theorie:['Pharmakologie','6-R-Regel','BtMG','Injektionstechnik s.c./i.m.','Krankheitslehre I (Diabetes mellitus, Hypertonie, KHK, Herzinsuffizienz)'],praxis:['Häusliche Krankenpflege SGB V','Richten/Kontrollieren Medikation','s.c.-Injektionen','Stomapflege'],konzept:{id:'2.1',titel:'Subkutane Injektion (ambulant)'},kb:['I','III','IV'],meilenstein:null},
+        {nr:5,months:'Monat 16–18',thema:'Wundmanagement',einsatz:'Pflichteinsatz · Stationäre Akutpflege',theorie:['Wundmanagement','Wundphysiologie','DNQP Chronische Wunden','Krankheitslehre II (Apoplex, M. Parkinson, MS, Ulcus cruris)'],praxis:['Aseptischer Verbandwechsel','Therapeutisch-aktivierende Pflege nach Bobath','Wunddokumentation'],konzept:{id:'2.2',titel:'Aseptischer Verbandwechsel chronische Wunden'},kb:['I','V'],meilenstein:null},
+        {nr:6,months:'Monat 19–24',thema:'Gerontopsychiatrie/Pädiatrie & Recht',einsatz:'Pflichteinsätze · Pädiatrie & Psychiatrie',theorie:['Pädiatrische Entwicklungsphasen','Gerontopsychiatrie (Demenzformen/Delir)','FEM § 1831 BGB','Betreuungsrecht','Vorbereitung Zwischenprüfung'],praxis:['Validierung nach Kitwood/Feil','Einsätze Pädiatrie & Psychiatrie','Zwischenprüfung § 7 PflAPrV'],konzept:{id:'2.3',titel:'Gerontopsychiatrische Interaktion bei Demenz'},kb:['I','II','IV'],meilenstein:'Zwischenprüfung § 7 PflAPrV'}
+      ]},
+      {tab:'C',jahr:'3. Ausbildungsjahr',range:'Monat 25–36',drittel:'3. Drittel',motto:'Vertiefung, Evaluation & Fallsteuerung',blocks:[
+        {nr:7,months:'Monat 25–30',thema:'Notfall & Palliativ',einsatz:'Vertiefungseinsatz Teil 1',theorie:['Akut-/Notfallmedizin','BLS/ALS','Schockformen, Polytrauma','Enterale/parenterale Ernährung (PEG/ZVK)','Onkologie & Palliative Care','Sterbephasen'],praxis:['Transurethrale Verweilkatheter (aseptisch)','Notfallmanagement Aspiration/Schock','Sondennahrung'],konzept:{id:'3.1',titel:'Transurethraler Blasenkatheterismus & PEG'},kb:['I','III'],meilenstein:null},
+        {nr:8,months:'Monat 31–33',thema:'Ökonomie & Schnittstellen',einsatz:'Vertiefungseinsatz Teil 2 · Nachtdienst',theorie:['Pflegeökonomie','DRG-Fallpauschalen','Personalbemessung PPR 2.0 / § 113c SGB XI','CIRS','Entlassmanagement § 39 SGB V'],praxis:['Nachtdienststunden','Übergaben nach SBAR','Pflegeüberleitungsberichte'],konzept:{id:'3.2',titel:'SBAR-Schnittstellenmanagement Nachtdienst'},kb:['I','III','IV'],meilenstein:null},
+        {nr:9,months:'Monat 34–36',thema:'Evaluation & Examen',einsatz:'Praktische staatliche Abschlussprüfung',theorie:['Evidence-based Nursing (EBN)','Studienrecherche','Prüfungswissen Staatsexamen PflAPrV'],praxis:['Schichtleitungskompetenz für eine Patientengruppe','Staatliche Abschlussprüfung'],konzept:{id:'3.3',titel:'Schichtleitungssimulation Examensvorbereitung'},kb:['I','V'],meilenstein:'Staatliche Abschlussprüfung (PflAPrV)'}
+      ]}
+    ],
+    roles:[{kuerzel:'ZPA',name:'Zentraler Praxisanleiter'},{kuerzel:'DPA',name:'Dezentraler Praxisanleiter'},{kuerzel:'WBL/SL',name:'Wohnbereichs-/Stationsleitung'}],
+    phases:[{nr:1,name:'Orientierung',zeitraum:'Woche 1',inhalt:'Erstgespräch protokollieren, Abgleich schulischer Arbeitsaufträge via Kompass.RLP Teil A.'},{nr:2,name:'Erprobung',zeitraum:'Woche 2 bis Mitte',inhalt:'Strukturierte Anleitungssituationen, sukzessive Übernahme von Teilprozessen, dokumentiertes Zwischengespräch.'},{nr:3,name:'Vertiefung',zeitraum:'Mitte bis vorletzte Woche',inhalt:'Selbstständige Fallsteuerung unter indirekter Aufsicht, Integration in multiprofessionelle SBAR-Kommunikation.'},{nr:4,name:'Evaluation',zeitraum:'Letzte Woche',inhalt:'Abschlussgespräch, verhaltensbasierte Kompetenzbeurteilung, rechtsverbindlicher Eintrag in Nachweisheft Kompass.RLP.'}],
+    sop:[{nr:1,phase:'Vorbereitung',dauer:'7 Tage vorher',inhalt:'Themenauswahl nach Ausbildungsstand, schriftlicher Vorbereitungsauftrag (Recherche Leitlinien/Expertenstandards).',hinweis:null},{nr:2,phase:'Kognitiver Einstieg',dauer:'15–30 Min.',inhalt:'Reflexion des Vorbereitungsauftrags, Abfrage anatom./pathophysiolog. Grundlagen, Zielvereinbarung.',hinweis:null},{nr:3,phase:'Praktische Durchführung',dauer:'45–60 Min.',inhalt:'Pflegemaßnahme am Patienten, non-intervenierende Beobachtung durch DPA.',hinweis:'Remonstrationspflicht: Eingriff durch DPA ausschließlich bei Patientengefährdung.'},{nr:4,phase:'Reflexion & Evaluation',dauer:'30 Min.',inhalt:'Feedback via Sandwich-Prinzip (Selbst-/Fremdeinschätzung, Theorie-Praxis-Abgleich nach EBN).',hinweis:null},{nr:5,phase:'Dokumentation',dauer:'unverzüglich',inhalt:'Eintrag Stunden/Themen/Kompetenzbereiche (PflAPrV Anlage 2) in Kompass.RLP mit Gegenzeichnung.',hinweis:'Nachweis nach PflAPrV Anlage 2 · Gegenzeichnung erforderlich.'}],
+    library:[
+      {id:'1.1',titel:'Ganzkörperpflege unter Isolationsbedingungen',monat:'Monat 1–3',cluster:1,schritte:['Ressourcen- und Selbstversorgungseinschätzung (Modul 4 BI, SIS)','PSA-Anlage in korrekter Reihenfolge / Einschleusen','Ganzkörperpflege unter kinästhetischen Prinzipien','Intimpflege nach festen Hygiene-Regeln','Ausschleusen und fachgerechte PSA-Entsorgung'],alarm:{typ:'klinik',text:'Isolationsregime nach IfSG: PSA-Reihenfolge und Schleusen-Disziplin zwingend einhalten.'}},
+      {id:'1.2',titel:'Vitaldaten-Screening & DNQP Risikomanagement',monat:'Monat 4–6',cluster:1,schritte:['Auskultatorische Blutdruckmessung','Periphere Pulskontrolle über volle 60 s – Rhythmusstörungen erfassen','Inspektion der Prädilektionsstellen','Risikoeinschätzung via Braden-Skala','Eskalation bei Braden < 18'],alarm:{typ:'klinik',text:'Braden-Score < 18 → sofortige Eskalation und Einleitung der Dekubitusprophylaxe (DNQP).'}},
+      {id:'1.3',titel:'Gelenkmobilisation bei Immobilität',monat:'Monat 7–12',cluster:1,schritte:['Mobilitätseinschätzung nach DNQP Mobilitätsförderung','Passive Gelenkmobilisation untere Extremitäten – streng schmerzfrei','Mikrolagerungen durchführen','Spitzfußprophylaxe sichern','Dokumentation Bewegungsumfang und Hautstatus'],alarm:{typ:'klinik',text:'Mobilisation ausschließlich im schmerzfreien Bereich.'}},
+      {id:'2.1',titel:'Subkutane Injektion (ambulant)',monat:'Monat 13–15',cluster:2,schritte:['Prüfung der ärztlichen Anordnung (SGB V, Pos. 13a/13b)','6-R-Regel-Kontrolle','Hautdesinfektion mit Einwirkzeit 30 s','Subkutane Injektion fachgerecht applizieren','Kanülenentsorgung im durchstichsicheren Behälter, Dokumentation'],alarm:{typ:'recht',text:'Anordnungsverantwortung (Arzt) vs. Durchführungsverantwortung (Pflege) strikt trennen.'}},
+      {id:'2.2',titel:'Aseptischer Verbandwechsel chronische Wunden',monat:'Monat 16–18',cluster:2,schritte:['Wundbeurteilung nach URGE-Prinzip (DNQP Chronische Wunden)','Aseptisches Wundset vorbereiten, Non-Touch-Technik','Wundreinigung mit Polyhexanid – innen → außen','Fotodokumentation Wundstatus','Bei venöser Genese: Kompressionstherapie'],alarm:{typ:'klinik',text:'Durchgängige Asepsis (Non-Touch). Kompression nur bei gesicherter venöser Genese.'}},
+      {id:'2.3',titel:'Gerontopsychiatrische Interaktion bei Demenz',monat:'Monat 19–24',cluster:2,schritte:['Personzentrierter Ansatz nach Tom Kitwood','Validierende Kommunikation nach Naomi Feil','Deeskalation bei verbaler Agitation','Alternativen vor FEM prüfen','FEM nur als Ultima Ratio'],alarm:{typ:'recht',text:'FEM nach § 1831 BGB nur als letztes Mittel; Alternativen vorrangig prüfen und dokumentieren.'}},
+      {id:'3.1',titel:'Transurethraler Blasenkatheterismus & PEG',monat:'Monat 25–30',cluster:3,schritte:['Sterile Vorbereitung: OP-Handschuhe, Lochtuch, Katheterset','Schleimhautdesinfektion in korrekter Wischrichtung','Aseptische Katheterinsertion (Frau)','Blockung mit Aqua dest./Glycerin','PEG-Kontrolle: Mobilisation gegen Buried-Bumper-Syndrom'],alarm:{typ:'klinik',text:'Strenge Asepsis. PEG: Mobilisation gegen Buried-Bumper-Syndrom.'}},
+      {id:'3.2',titel:'SBAR-Schnittstellenmanagement Nachtdienst',monat:'Monat 31–33',cluster:3,schritte:['Strukturiertes Notfall-Assessment','Bewusstseinslage erfassen (Glasgow Coma Scale)','Arztkonsultation strikt nach SBAR-Schema','Telefonische Anordnung aufnehmen (Wiederholung/Bestätigung)','Remonstration bei bedenklicher Anordnung'],alarm:{typ:'recht',text:'Remonstrationspflicht: unklare oder bedenkliche Anordnungen hinterfragen und dokumentieren.'}},
+      {id:'3.3',titel:'Schichtleitungssimulation Examensvorbereitung',monat:'Monat 34–36',cluster:3,schritte:['Gesamtüberblick Patientengruppe (4–5 Patienten)','Priorisierung nach Dringlichkeits-Matrix','Sachgerechte Delegation von Teilaufgaben','Vollständige EDV-Dokumentation','Strukturierte Rückübergabe der Schicht'],alarm:{typ:'recht',text:'Delegation nur im Rahmen der Durchführungsverantwortung; Schichtleitungskompetenz ist examensrelevant.'}}
+    ],
+    normen:[{norm:'PflBG',inhalt:'Pflegeberufegesetz — generalistische Ausbildung'},{norm:'PflAPrV',inhalt:'Ausbildungs-/Prüfungsverordnung (Anlage 2: KB; Anlage 7: Einsatzzeiten)'},{norm:'§ 13 PflBG',inhalt:'Fehlzeiten max. 10 % Theorie / 10 % Praxis'},{norm:'§ 7 PflAPrV',inhalt:'Zwischenprüfung'},{norm:'§ 15 SGB XI',inhalt:'Begutachtungsinstrument, 6 Module'},{norm:'§ 39 SGB V',inhalt:'Entlassmanagement'},{norm:'§ 113 SGB XI',inhalt:'DNQP-Bindung, Qualitätssicherung'},{norm:'§ 113c SGB XI',inhalt:'Personalbemessung PPR 2.0'},{norm:'§ 114 SGB XI',inhalt:'MD-Qualitätsprüfung'},{norm:'§ 275 SGB V',inhalt:'MD-Prüfstruktur'},{norm:'§ 203 StGB',inhalt:'Schweigepflicht'},{norm:'§ 1831 BGB',inhalt:'Freiheitsentziehende Maßnahmen (FEM)'},{norm:'BtMG',inhalt:'Betäubungsmittelgesetz'},{norm:'JArbSchG',inhalt:'Jugendarbeitsschutz (Nachtdienst < 18 verboten)'},{norm:'IfSG',inhalt:'Infektionsschutzgesetz'},{norm:'DSGVO',inhalt:'Datenschutz'}],
+    quellen:[{label:'PflBG',url:'https://www.gesetze-im-internet.de/pflbg/'},{label:'PflAPrV',url:'https://www.gesetze-im-internet.de/pflapro/'},{label:'SGB V',url:'https://www.gesetze-im-internet.de/sgb_5/'},{label:'SGB XI',url:'https://www.gesetze-im-internet.de/sgb_11/'},{label:'DNQP',url:'https://www.dnqp.de/'},{label:'ICN',url:'https://www.icn.ch/'},{label:'Pflegecharta',url:'https://www.pflege-charta.de/'}]
   };
-  const blob = new Blob([JSON.stringify(manifest)], {type:"application/manifest+json"});
-  document.getElementById("pwa-manifest").href = URL.createObjectURL(blob);
-
-  /* ── 4. Service Worker – Pflicht für PWA-Update-Kontrolle ── */
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("./sw.js").then(reg=>{
-      // Neue SW-Version gefunden (neues HTML-Deploy) → Banner anzeigen
-      reg.addEventListener("updatefound", ()=>{
-        const nw = reg.installing;
-        nw.addEventListener("statechange", ()=>{
-          if(nw.state === "installed" && navigator.serviceWorker.controller){
-            showUpdateBanner();
-          }
-        });
-      });
-      // Nach Nutzer-Klick auf "JETZT LADEN": neuen SW sofort aktivieren
-      navigator.serviceWorker.addEventListener("controllerchange", ()=>{
-        if(!window._pbzReloading){ window._pbzReloading = true; location.reload(); }
-      });
-    }).catch(()=>{ /* sw.js nicht vorhanden – ETag-Fallback bleibt aktiv */ });
-  }
-
-})();
-
-/* ═══════════════════════════════════════════
-   PERIODISCHER CHECK – greift auch wenn App
-   dauerhaft geöffnet bleibt (alle 30 Min).
-═══════════════════════════════════════════ */
-setInterval(()=>{
-  if(!navigator.onLine) return;
-  checkForUpdate();
-  if(document.visibilityState === "visible"){
-    const didRefresh = enforceWeeklyRefresh();
-    if(didRefresh){ renderMain(); loadCategory(activeTab); }
-  }
-}, 30 * 60 * 1000);
+}
 </script>
 </body>
 </html>
