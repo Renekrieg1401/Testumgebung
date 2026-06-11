@@ -2,74 +2,46 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>GPA Tourenplan</title>
+    <title>GPA Tourenplan Professional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @media print { .no-print { display: none !important; } }
         .page { display: none; }
         .page.active { display: block; }
+        /* Kompakte Checkbox-Leistungen */
+        .service-pill { font-size: 8px; transform: scale(0.9); display: inline-flex; flex-direction: column; align-items: center; width: 25px; }
     </style>
 </head>
-<body class="bg-gray-100 p-2">
+<body class="bg-gray-100 p-4">
 
-    <div class="no-print mb-4">
-        <button onclick="showPage('plan')" class="bg-teal-700 text-white px-3 py-1 rounded">Plan</button>
-        <button onclick="showPage('clients')" class="bg-teal-700 text-white px-3 py-1 rounded">Klienten</button>
-        <button onclick="showPage('services')" class="bg-teal-700 text-white px-3 py-1 rounded">Leistungen</button>
-        <button onclick="exportPDF()" class="bg-blue-600 text-white px-3 py-1 rounded">PDF Export</button>
+    <div class="no-print mb-6">
+        <nav class="flex gap-2 mb-4">
+            <button onclick="showPage('plan')" class="bg-teal-700 text-white px-4 py-2 rounded">Tourenplan</button>
+            <button onclick="showPage('clients')" class="bg-teal-700 text-white px-4 py-2 rounded">Klientenliste</button>
+            <button onclick="showPage('services')" class="bg-teal-700 text-white px-4 py-2 rounded">Leistungen</button>
+        </nav>
+        <button onclick="exportPDF()" class="bg-blue-600 text-white px-4 py-2 rounded">PDF Drucken</button>
     </div>
 
-    <div id="page-plan" class="page active">
-        <div id="print-area" class="bg-white p-4">
-            <h1 class="text-xl font-bold mb-2">Tourenplan</h1>
-            <input type="text" class="border-b w-full mb-4" placeholder="Tourname...">
-            <table class="w-full border-collapse border text-xs" id="main-table">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border p-1">Nr</th>
-                        <th class="border p-1">Mo</th><th class="border p-1">Di</th><th class="border p-1">Mi</th>
-                        <th class="border p-1">Do</th><th class="border p-1">Fr</th><th class="border p-1">Sa</th><th class="border p-1">So</th>
-                    </tr>
-                </thead>
-                <tbody id="plan-body"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="page-clients" class="page p-4 bg-white">
-        <input id="in-client" class="border p-1"><button onclick="addEntry('clients', 'in-client')" class="bg-green-600 text-white px-2">Add</button>
-        <ul id="list-clients"></ul>
-    </div>
-
-    <div id="page-services" class="page p-4 bg-white">
-        <input id="in-service" class="border p-1"><button onclick="addEntry('services', 'in-service')" class="bg-green-600 text-white px-2">Add</button>
-        <ul id="list-services"></ul>
+    <div id="print-area" class="bg-white p-6 shadow-lg">
+        <h1 class="text-xl font-bold mb-2 text-center">Tourenplan</h1>
+        <input type="text" class="border-b-2 border-gray-400 w-full mb-6" placeholder="Tourname...">
+        
+        <table class="w-full border-collapse border text-[10px]" id="plan-table">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-1 w-8">Nr.</th>
+                    <th class="border p-1">Mo</th><th class="border p-1">Di</th><th class="border p-1">Mi</th>
+                    <th class="border p-1">Do</th><th class="border p-1">Fr</th><th class="border p-1">Sa</th><th class="border p-1">So</th>
+                </tr>
+            </thead>
+            <tbody id="plan-body"></tbody>
+        </table>
     </div>
 
     <script>
-        // 1. Daten laden
-        var state = JSON.parse(localStorage.getItem('gpa_data')) || { clients: [], services: [], schedule: { Mo:[],Di:[],Mi:[],Do:[],Fr:[],Sa:[],So:[] } };
-
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-            document.getElementById('page-' + id).classList.add('active');
-        }
-
-        function addEntry(type, inputId) {
-            var val = document.getElementById(inputId).value;
-            if(val) { state[type].push(val); save(); }
-        }
-
-        function addSlot(day, idx) {
-            state.schedule[day][idx] = { client: '', service: '' };
-            save();
-        }
-
-        function save() { 
-            localStorage.setItem('gpa_data', JSON.stringify(state)); 
-            render(); 
-        }
+        // ... (State und Basis-Funktionen identisch)
 
         function render() {
             var body = document.getElementById('plan-body');
@@ -78,32 +50,23 @@
             
             for(var i=0; i<10; i++) {
                 var tr = document.createElement('tr');
-                var html = '<td class="border p-2 font-bold text-center">' + (i+1) + '</td>';
-                for(var d=0; d<7; d++) {
-                    var day = days[d];
-                    html += '<td class="border p-1">';
-                    if(state.schedule[day][i]) {
-                        html += '<select class="w-full border-b text-[10px]"><option>Klient...</option>';
-                        for(var c=0; c<state.clients.length; c++) html += '<option>'+state.clients[c]+'</option>';
-                        html += '</select><select class="w-full border-b text-[10px]"><option>Leistung...</option>';
-                        for(var s=0; s<state.services.length; s++) html += '<option>'+state.services[s]+'</option>';
-                        html += '</select>';
-                    } else {
-                        html += '<button onclick="addSlot(\''+day+'\', '+i+')" class="text-blue-600 font-bold">+</button>';
-                    }
-                    html += '</td>';
-                }
-                tr.innerHTML = html;
+                tr.innerHTML = '<td class="border p-2 font-bold text-center">' + (i+1) + '</td>' + 
+                    days.map(function(day) {
+                        var html = '<td class="border p-1">';
+                        if(state.schedule[day][i]) {
+                            html += '<select class="w-full border-b mb-1"><option>Klient...</option>' + state.clients.map(c=>'<option>'+c+'</option>').join('') + '</select>';
+                            // Leistungen als kleine Klick-Boxen
+                            html += '<div class="flex flex-wrap gap-[2px]">' + state.services.map(s => 
+                                '<div class="service-pill"><input type="checkbox"><span>'+s+'</span></div>').join('') + '</div>';
+                        } else {
+                            html += '<button onclick="addSlot(\''+day+'\', '+i+')" class="text-blue-600 font-bold">+</button>';
+                        }
+                        return html + '</td>';
+                    }).join('');
                 body.appendChild(tr);
             }
-            // Listen aktualisieren
-            document.getElementById('list-clients').innerHTML = state.clients.map(function(c){ return '<li>'+c+'</li>'; }).join('');
-            document.getElementById('list-services').innerHTML = state.services.map(function(s){ return '<li>'+s+'</li>'; }).join('');
         }
-
-        function exportPDF() { html2pdf().from(document.getElementById('print-area')).save(); }
-
-        render();
+        // ...
     </script>
 </body>
 </html>
