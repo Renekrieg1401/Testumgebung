@@ -92,11 +92,52 @@
             padding: 6px 2px;
             text-align: center;
             font-weight: 700;
-            /* Hinzugefügter Rahmen für die Kopfzellen */
             border: 1px solid var(--border-color);
         }
 
         td {
             padding: 8px 2px;
-            /* Hinzugefügter Rahmen für die opt
+            border: 1px solid var(--border-color);
+            text-align: center;
+            height: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-buttons">
+        <button class="btn btn-nav">Tourenplan</button>
+        <button class="btn btn-nav">Klienten</button>
+        <button class="btn btn-nav">Leistungen</button>
+    </div>
+    
+    <button class="btn btn-action">PDF Drucken</button>
+
+    <div class="card">
+        <div class="card-header">Tourenplan</div>
+        
+        <div class="input-group">
+            <input type="text" placeholder="Tourname...">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nr.</th>
+                    <th>Mo</th>
+                    <th>Di</th>
+                    <th>Mi</th>
+                    <th>Do</th>
+                    <th>Fr</th>
+                    <th>Sa</th>
+                    <th>So</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
 
