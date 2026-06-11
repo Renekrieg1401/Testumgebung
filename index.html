@@ -2,23 +2,23 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>GPA Tourenplan Dynamisch</title>
+    <title>GPA Tourenplan</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-2 text-sm">
 
-    <nav class="flex gap-2 mb-4 bg-white p-2 rounded shadow">
-        <button onclick="showPage('plan')" class="bg-teal-700 text-white px-3 py-1 rounded">Plan</button>
-        <button onclick="showPage('data')" class="bg-teal-700 text-white px-3 py-1 rounded">Klienten</button>
-        <button onclick="showPage('services')" class="bg-teal-700 text-white px-3 py-1 rounded">Leistungen</button>
-    </nav>
-
     <div id="page-plan" class="page">
         <table class="w-full bg-white border" id="plan-table">
             <thead>
-                <tr>
-                    <th class="border p-1 w-12">Zeit</th>
-                    ${['Mo','Di','Mi','Do','Fr','Sa','So'].map(d => `<th class="border p-1">${d}</th>`).join('')}
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Zeit</th>
+                    <th class="border p-2">Mo</th>
+                    <th class="border p-2">Di</th>
+                    <th class="border p-2">Mi</th>
+                    <th class="border p-2">Do</th>
+                    <th class="border p-2">Fr</th>
+                    <th class="border p-2">Sa</th>
+                    <th class="border p-2">So</th>
                 </tr>
             </thead>
             <tbody id="plan-body"></tbody>
@@ -26,10 +26,9 @@
     </div>
 
     <script>
-        // State speichert für jeden Tag eine Liste von Klienten-Slots
         let state = JSON.parse(localStorage.getItem('gpa')) || { 
-            clients: [], services: ['KP', 'GP'],
-            schedule: { Mo: [], Di: [], Mi: [], Do: [], Fr: [], Sa: [], So: [] } 
+            clients: ['Klient A', 'Klient B'], services: ['KP', 'GP'],
+            schedule: { Mo:[], Di:[], Mi:[], Do:[], Fr:[], Sa:[], So:[] } 
         };
 
         function addSlot(day) {
@@ -43,23 +42,23 @@
             const body = document.getElementById('plan-body');
             body.innerHTML = '';
             
-            // Wir finden die maximale Anzahl an Slots pro Tag für die Zeilenhöhe
-            const maxSlots = Math.max(...Object.values(state.schedule).map(d => d.length), 5);
+            // Zeilen basierend auf dem längsten Tag + 1 Puffer für den "+ Klient" Button
+            const days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+            const maxRows = Math.max(...Object.values(state.schedule).map(d => d.length)) + 1;
             
-            for(let i=0; i<maxSlots; i++) {
+            for(let i=0; i<maxRows; i++) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td class="p-2 border font-bold">${i+1}</td>` + 
-                    ['Mo','Di','Mi','Do','Fr','Sa','So'].map(day => `
+                    days.map(day => `
                         <td class="p-1 border">
                             ${state.schedule[day][i] ? `
-                                <select class="w-full"><option>...</option>${state.clients.map(c => `<option>${c}</option>`).join('')}</select>
-                                <div class="flex">${state.services.map(() => '<input type="checkbox">').join('')}</div>
-                            ` : `<button onclick="addSlot('${day}')" class="text-xs text-blue-500">+ Klient</button>`}
+                                <select class="w-full border"><option>...</option>${state.clients.map(c => `<option>${c}</option>`).join('')}</select>
+                                <div class="flex gap-1 mt-1">${state.services.map(() => '<input type="checkbox">').join('')}</div>
+                            ` : `<button onclick="addSlot('${day}')" class="text-blue-600 font-bold">+ Klient</button>`}
                         </td>`).join('');
                 body.appendChild(tr);
             }
         }
-
         render();
     </script>
 </body>
