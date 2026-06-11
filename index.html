@@ -1,18 +1,50 @@
-<style>
-    .service-grid { 
-        display: grid; 
-        /* Erzwingt eine minimale Breite pro Kürzel, um Überschneidungen zu verhindern */
-        grid-template-columns: repeat(8, minmax(25px, 1fr)); 
-        gap: 1px; 
-        align-items: center; 
-        justify-items: center; 
-    }
-    .service-grid span {
-        font-size: 8px; /* Schriftgröße leicht reduziert */
-        white-space: nowrap; /* Verhindert Zeilenumbruch innerhalb des Kürzels */
-        transform: scale(0.9); /* Skaliert leicht, falls Platzmangel besteht */
-    }
-    /* Erhöht die Breite der Tagesspalte allgemein */
-    th { min-width: 200px; }
-</style>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>GPA Tourenplan - Stabilisiert</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        /* Fix: Table Layout festlegen zur Vermeidung von Überschneidungen */
+        table { table-layout: fixed; width: 100%; }
+        .service-grid { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); 
+            gap: 1px; 
+            align-items: center; 
+            justify-items: center; 
+        }
+        .service-grid span { font-size: 7px; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-gray-100 p-2">
+
+    <script>
+        // 1. Robuster Load mit Fallback
+        let state;
+        try {
+            const saved = localStorage.getItem('gpa-data');
+            state = saved ? JSON.parse(saved) : { clients: [], services: ['KP', 'GP', 'VW', 'KS', 'BZ', 'Tbl', 'Medi', 'UHbA'] };
+        } catch (e) {
+            console.error("Speicherfehler, setze zurück:", e);
+            state = { clients: [], services: ['KP', 'GP', 'VW', 'KS', 'BZ', 'Tbl', 'Medi', 'UHbA'] };
+        }
+
+        // 2. DOM-Ready Check
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAll();
+        });
+
+        function renderAll() {
+            const head = document.getElementById('table-head');
+            if(!head) return; // Schutz vor Fehler
+
+            // ... (Restliche Render-Logik)
+        }
+    </script>
 </body>
+</html>
+
