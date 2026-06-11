@@ -2,67 +2,121 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Tourenplan App</title>
+    <title>GPA Tourenplan Professional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @media print {
-            @page { size: landscape; }
-            body { -webkit-print-color-adjust: exact; }
-        }
-        .sticky-header { position: sticky; top: 0; background: white; z-index: 10; }
+        @media print { @page { size: landscape; } }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body class="p-4 bg-gray-50">
+<body class="bg-gray-100 p-5">
 
-    <div id="app" class="max-w-6xl mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Tourenplan</h1>
-        <button onclick="exportPDF()" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">Als PDF drucken (Querformat)</button>
-        
-        <div id="plan-container" class="bg-white p-4 border shadow">
-            <table class="w-full border-collapse border" id="tour-table">
+    <nav class="mb-6 flex gap-4">
+        <button onclick="showTab('plan')" class="bg-teal-700 text-white px-4 py-2 rounded">Tourenplan</button>
+        <button onclick="showTab('names')" class="bg-teal-700 text-white px-4 py-2 rounded">Namensliste</button>
+        <button onclick="showTab('services')" class="bg-teal-700 text-white px-4 py-2 rounded">Leistungen</button>
+    </nav>
+
+    <div id="plan" class="tab-content active">
+        <button onclick="exportPDF()" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">PDF Export (Querformat)</button>
+        <div id="print-area" class="bg-white p-4 overflow-x-auto">
+            <table class="w-full border-collapse border text-xs" id="tour-table">
                 <thead>
                     <tr>
-                        <th class="border p-2">Zeit</th>
-                        <th class="border p-2">Mo</th>
-                        <th class="border p-2">Di</th>
-                        <th class="border p-2">Mi</th>
-                        <th class="border p-2">Do</th>
-                        <th class="border p-2">Fr</th>
-                        <th class="border p-2">Sa</th>
-                        <th class="border p-2">So</th>
+                        <th class="border p-1">Zeit</th>
+                        <script>
+                            const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+                            days.forEach(day => {
+                                document.write(`
+                                    <th class="border p-1">
+                                        <div>${day}</div>
+                                        <div class="flex gap-1 text-[8px] mt-1 uppercase">
+                                            ${['KP','GP','VW','KS','BZ','Tbl','Medi','UHbA'].map(k => `<span>${k}</span>`).join('')}
+                                        </div>
+                                    </th>
+                                `);
+                            });
+                        </script>
                     </tr>
                 </thead>
-                <tbody id="table-body">
-                    <!-- 15 Zeilen via JS generiert -->
-                </tbody>
+                <tbody id="table-body"></tbody>
             </table>
         </div>
     </div>
 
+    <div id="names" class="tab-content">
+        <h2 class="text-xl font-bold mb-4">Personalverwaltung</h2>
+        <input type="text" id="new-name" placeholder="Name eingeben" class="border p-2">
+        <button onclick="addName()" class="bg-green-600 text-white p-2">Hinzufügen</button>
+        <ul id="name-list" class="mt-4 space-y-2"></ul>
+    </div>
+
+    <div id="services" class="tab-content">
+        <h2 class="text-xl font-bold mb-4">Leistungskürzel</h2>
+        <p class="text-sm text-gray-600">Standard: KP, GP, VW, KS, BZ, Tbl, Medi, UHbA</p>
+    </div>
+
     <script>
-        // PDF Export Logik
-        function exportPDF() {
-            const element = document.getElementById('plan-container');
-            const opt = {
-                margin: 0.5,
-                filename: 'Tourenplan.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-            };
-            html2pdf().set(opt).from(element).save();
+        let names = [];
+        const services = ['KP', 'GP', 'VW', 'KS', 'BZ', 'Tbl', 'Medi', 'UHbA'];
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
         }
 
-        // Dynamische Tabellengenerierung (Ausschnitt)
-        const tbody = document.getElementById('table-body');
-        for (let i = 6; i <= 20; i++) {
-            const row = `<tr>
-                <td class="border p-2">${i}:00</td>
-                ${Array(7).fill('<td class="border p-2"><select><option>Name</option></select><input type="checkbox"></td>').join('')}
-            </tr>`;
-            tbody.innerHTML += row;
+        function addName() {
+            const name = document.getElementById('new-name').value;
+            if(name) {
+                names.push({id: Date.now(), name: name});
+                updateNameLists();
+                document.getElementById('new-name').value = '';
+            }
         }
+
+        function deleteName(id) {
+            names = names.filter(n => n.id !== id);
+            updateNameLists();
+        }
+
+        function updateNameLists() {
+            const list = document.getElementById('name-list');
+            list.innerHTML = names.map(n => `
+                <li class="flex justify-between border p-2">
+                    ${n.name} <button onclick="deleteName(${n.id})" class="text-red-500">Löschen</button>
+                </li>
+            `).join('');
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            for (let i = 6; i <= 20; i++) {
+                let row = `<tr><td class="border p-2 font-bold">${i}:00</td>`;
+                for (let d = 0; d < 7; d++) {
+                    row += `<td class="border p-1">
+                        <select class="w-full border mb-1">
+                            <option>Name...</option>
+                            ${names.map(n => `<option>${n.name}</option>`).join('')}
+                        </select>
+                        <div class="flex gap-[6px]">
+                            ${services.map(s => `<input type="checkbox" title="${s}">`).join('')}
+                        </div>
+                    </td>`;
+                }
+                tbody.innerHTML += row + '</tr>';
+            }
+        }
+
+        function exportPDF() {
+            const opt = { jsPDF: { orientation: 'landscape', format: 'a4' } };
+            html2pdf().set(opt).from(document.getElementById('print-area')).save();
+        }
+
+        renderTable();
     </script>
 </body>
 </html>
