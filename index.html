@@ -52,23 +52,38 @@
     </div>
 
     <script>
-        var state = JSON.parse(localStorage.getItem('gpa_data')) || { clients: [], services: [], schedule: { Mo:[],Di:[],Mi:[],Do:[],Fr:[],Sa:[],So:[] } };
+        var state = JSON.parse(localStorage.getItem('gpa_data'));
+        if (!state) {
+            state = { clients: [], services: [], schedule: { Mo:[],Di:[],Mi:[],Do:[],Fr:[],Sa:[],So:[] } };
+        }
 
         function showPage(id) {
-            document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('active');
+            }
             document.getElementById('page-' + id).classList.add('active');
         }
 
-        // Leerungsfunktion: Setzt Zelle zurück ohne Zeile zu löschen
         function clearCell(btn) {
             var cell = btn.parentElement;
-            cell.querySelectorAll('select').forEach(function(s) { s.selectedIndex = 0; });
-            cell.querySelectorAll('input').forEach(function(i) { i.checked = false; });
+            var selects = cell.querySelectorAll('select');
+            for (var i = 0; i < selects.length; i++) {
+                selects[i].selectedIndex = 0;
+            }
+            var inputs = cell.querySelectorAll('input');
+            for (var j = 0; j < inputs.length; j++) {
+                inputs[j].checked = false;
+            }
         }
 
         function addEntry(type, inputId) {
             var val = document.getElementById(inputId).value;
-            if(val) { state[type].push(val); save(); document.getElementById(inputId).value = ''; }
+            if(val) { 
+                state[type].push(val); 
+                save(); 
+                document.getElementById(inputId).value = ''; 
+            }
         }
 
         function addSlot(day, index) {
@@ -76,42 +91,68 @@
             save();
         }
 
-        function save() { localStorage.setItem('gpa_data', JSON.stringify(state)); render(); }
+        function save() { 
+            localStorage.setItem('gpa_data', JSON.stringify(state)); 
+            render(); 
+        }
 
         function render() {
             var body = document.getElementById('plan-body');
             body.innerHTML = '';
             var days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
             
-            // Feste 15 Zeilen + Dynamik
-            for(var i=0; i < Math.max(15, ...Object.values(state.schedule).map(d => d.length + 1)); i++) {
+            var maxRows = 15;
+            for (var d = 0; d < days.length; d++) {
+                var dayLen = state.schedule[days[d]].length;
+                if (dayLen >= maxRows) {
+                    maxRows = dayLen + 1;
+                }
+            }
+            
+            for(var i = 0; i < maxRows; i++) {
                 var tr = document.createElement('tr');
                 var html = '<td class="border p-2 font-bold text-center">' + (i+1) + '</td>';
                 
-                for(var d=0; d<7; d++) {
-                    var day = days[d];
+                for(var k = 0; k < 7; k++) {
+                    var day = days[k];
                     html += '<td class="border p-1 relative">';
                     if(state.schedule[day][i]) {
                         html += '<select class="w-full border-b mb-1"><option>Klient...</option>';
-                        for(var c=0; c<state.clients.length; c++) html += '<option>'+state.clients[c]+'</option>';
+                        for(var c = 0; c < state.clients.length; c++) {
+                            html += '<option>' + state.clients[c] + '</option>';
+                        }
                         html += '</select>';
                         html += '<div class="flex flex-wrap">';
-                        for(var s=0; s<state.services.length; s++) html += '<div class="service-pill"><input type="checkbox"><span>'+state.services[s]+'</span></div>';
+                        for(var s = 0; s < state.services.length; s++) {
+                            html += '<div class="service-pill"><input type="checkbox"><span>' + state.services[s] + '</span></div>';
+                        }
                         html += '</div>';
                         html += '<button onclick="clearCell(this)" class="text-[8px] text-red-500 underline ml-1">Leeren</button>';
                     } else {
-                        html += '<button onclick="addSlot(\''+day+'\', '+i+')" class="text-blue-600 font-bold">+</button>';
+                        html += '<button onclick="addSlot(\'' + day + '\', ' + i + ')" class="text-blue-600 font-bold">+</button>';
                     }
                     html += '</td>';
                 }
                 tr.innerHTML = html;
                 body.appendChild(tr);
             }
-            document.getElementById('list-clients').innerHTML = state.clients.map(function(c){ return '<li>'+c+'</li>'; }).join('');
-            document.getElementById('list-services').innerHTML = state.services.map(function(s){ return '<li>'+s+'</li>'; }).join('');
+
+            var cList = '';
+            for(var cl = 0; cl < state.clients.length; cl++) {
+                cList += '<li>' + state.clients[cl] + '</li>';
+            }
+            document.getElementById('list-clients').innerHTML = cList;
+
+            var sList = '';
+            for(var sl = 0; sl < state.services.length; sl++) {
+                sList += '<li>' + state.services[sl] + '</li>';
+            }
+            document.getElementById('list-services').innerHTML = sList;
         }
 
-        function exportPDF() { html2pdf().set({jsPDF:{orientation:'landscape'}}).from(document.getElementById('print-area')).save(); }
+        function exportPDF() { 
+            html2pdf().set({jsPDF:{orientation:'landscape'}}).from(document.getElementById('print-area')).save(); 
+        }
         
         showPage('plan');
         render();
