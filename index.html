@@ -2,121 +2,104 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>GPA Tourenplan Professional</title>
+    <title>GPA Tourenplan Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @media print { @page { size: landscape; } }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        [draggable="true"] { cursor: grab; }
+        .dragging { opacity: 0.5; }
     </style>
 </head>
 <body class="bg-gray-100 p-5">
 
-    <nav class="mb-6 flex gap-4">
-        <button onclick="showTab('plan')" class="bg-teal-700 text-white px-4 py-2 rounded">Tourenplan</button>
-        <button onclick="showTab('names')" class="bg-teal-700 text-white px-4 py-2 rounded">Namensliste</button>
-        <button onclick="showTab('services')" class="bg-teal-700 text-white px-4 py-2 rounded">Leistungen</button>
+    <nav class="mb-6 flex gap-2">
+        <button onclick="showTab('plan')" class="bg-teal-800 text-white px-4 py-2 rounded">Plan</button>
+        <button onclick="showTab('names')" class="bg-teal-800 text-white px-4 py-2 rounded">Personal</button>
+        <button onclick="showTab('services')" class="bg-teal-800 text-white px-4 py-2 rounded">Leistungen</button>
     </nav>
 
     <div id="plan" class="tab-content active">
-        <button onclick="exportPDF()" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">PDF Export (Querformat)</button>
-        <div id="print-area" class="bg-white p-4 overflow-x-auto">
-            <table class="w-full border-collapse border text-xs" id="tour-table">
-                <thead>
-                    <tr>
-                        <th class="border p-1">Zeit</th>
-                        <script>
-                            const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-                            days.forEach(day => {
-                                document.write(`
-                                    <th class="border p-1">
-                                        <div>${day}</div>
-                                        <div class="flex gap-1 text-[8px] mt-1 uppercase">
-                                            ${['KP','GP','VW','KS','BZ','Tbl','Medi','UHbA'].map(k => `<span>${k}</span>`).join('')}
-                                        </div>
-                                    </th>
-                                `);
-                            });
-                        </script>
-                    </tr>
-                </thead>
+        <button onclick="exportPDF()" class="bg-blue-600 text-white px-3 py-1 text-sm rounded mb-4">PDF Export</button>
+        <div id="print-area" class="bg-white p-2">
+            <table class="w-full border-collapse border text-[10px]" id="tour-table">
+                <thead id="table-head"></thead>
                 <tbody id="table-body"></tbody>
             </table>
         </div>
     </div>
 
     <div id="names" class="tab-content">
-        <h2 class="text-xl font-bold mb-4">Personalverwaltung</h2>
-        <input type="text" id="new-name" placeholder="Name eingeben" class="border p-2">
-        <button onclick="addName()" class="bg-green-600 text-white p-2">Hinzufügen</button>
-        <ul id="name-list" class="mt-4 space-y-2"></ul>
+        <input type="text" id="name-input" class="border p-2" placeholder="Name">
+        <button onclick="addItem('names')" class="bg-green-700 text-white p-2">Hinzufügen</button>
+        <ul id="name-list" class="mt-4"></ul>
     </div>
 
     <div id="services" class="tab-content">
-        <h2 class="text-xl font-bold mb-4">Leistungskürzel</h2>
-        <p class="text-sm text-gray-600">Standard: KP, GP, VW, KS, BZ, Tbl, Medi, UHbA</p>
+        <input type="text" id="service-input" class="border p-2" placeholder="Leistungskürzel (z.B. BZ)">
+        <button onclick="addItem('services')" class="bg-green-700 text-white p-2">Hinzufügen</button>
+        <ul id="service-list" class="mt-4"></ul>
     </div>
 
     <script>
-        let names = [];
-        const services = ['KP', 'GP', 'VW', 'KS', 'BZ', 'Tbl', 'Medi', 'UHbA'];
+        let state = { names: [], services: ['KP', 'GP'] };
+        let draggedRow = null;
 
-        function showTab(tabId) {
+        function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        function addName() {
-            const name = document.getElementById('new-name').value;
-            if(name) {
-                names.push({id: Date.now(), name: name});
-                updateNameLists();
-                document.getElementById('new-name').value = '';
+        function addItem(type) {
+            const input = document.getElementById(type === 'names' ? 'name-input' : 'service-input');
+            if(input.value) {
+                type === 'names' ? state.names.push(input.value) : state.services.push(input.value);
+                input.value = '';
+                renderAll();
             }
         }
 
-        function deleteName(id) {
-            names = names.filter(n => n.id !== id);
-            updateNameLists();
-        }
-
-        function updateNameLists() {
-            const list = document.getElementById('name-list');
-            list.innerHTML = names.map(n => `
-                <li class="flex justify-between border p-2">
-                    ${n.name} <button onclick="deleteName(${n.id})" class="text-red-500">Löschen</button>
-                </li>
-            `).join('');
-            renderTable();
-        }
-
-        function renderTable() {
+        function renderAll() {
+            // Render Listen
+            document.getElementById('name-list').innerHTML = state.names.map((n, i) => `<li>${n} <button onclick="removeItem('names', ${i})" class="text-red-500">x</button></li>`).join('');
+            document.getElementById('service-list').innerHTML = state.services.map((s, i) => `<li>${s} <button onclick="removeItem('services', ${i})" class="text-red-500">x</button></li>`).join('');
+            
+            // Render Table Header
+            const head = document.getElementById('table-head');
+            head.innerHTML = `<tr><th class="border p-1">Zeit</th>` + ['Mo','Di','Mi','Do','Fr','Sa','So'].map(d => `<th class="border p-1">${d}<br><div class="flex gap-1 justify-center">${state.services.map(s => `<span>${s}</span>`).join('')}</div></th>`).join('') + `</tr>`;
+            
+            // Render Rows
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
-            for (let i = 6; i <= 20; i++) {
-                let row = `<tr><td class="border p-2 font-bold">${i}:00</td>`;
-                for (let d = 0; d < 7; d++) {
-                    row += `<td class="border p-1">
-                        <select class="w-full border mb-1">
-                            <option>Name...</option>
-                            ${names.map(n => `<option>${n.name}</option>`).join('')}
-                        </select>
-                        <div class="flex gap-[6px]">
-                            ${services.map(s => `<input type="checkbox" title="${s}">`).join('')}
-                        </div>
-                    </td>`;
-                }
-                tbody.innerHTML += row + '</tr>';
+            for (let i = 6; i <= 13; i++) {
+                const tr = document.createElement('tr');
+                tr.draggable = true;
+                tr.innerHTML = `<td class="border p-2 font-bold">${i}:00</td>` + Array(7).fill(0).map(() => `<td class="border p-1"><select class="w-full"><option>...</option>${state.names.map(n => `<option>${n}</option>`).join('')}</select><div class="flex gap-1">${state.services.map(() => `<input type="checkbox">`).join('')}</div></td>`).join('');
+                
+                tr.ondragstart = () => draggedRow = tr;
+                tr.ondragover = (e) => e.preventDefault();
+                tr.ondrop = (e) => {
+                    e.preventDefault();
+                    const target = e.target.closest('tr');
+                    if(target && target !== draggedRow) {
+                        tbody.insertBefore(draggedRow, target);
+                    }
+                };
+                tbody.appendChild(tr);
             }
+        }
+
+        function removeItem(type, idx) {
+            type === 'names' ? state.names.splice(idx, 1) : state.services.splice(idx, 1);
+            renderAll();
         }
 
         function exportPDF() {
-            const opt = { jsPDF: { orientation: 'landscape', format: 'a4' } };
-            html2pdf().set(opt).from(document.getElementById('print-area')).save();
+            html2pdf().set({ jsPDF: { orientation: 'landscape' } }).from(document.getElementById('print-area')).save();
         }
 
-        renderTable();
+        renderAll();
     </script>
 </body>
 </html>
