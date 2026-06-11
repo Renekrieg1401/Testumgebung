@@ -11,14 +11,11 @@
         .page { display: none; }
         .active { display: block; }
         
-        /* Navigation */
         .nav-bar { display: flex; gap: 5px; margin-bottom: 5px; background: #f0f0f0; padding: 5px; }
         button { cursor: pointer; padding: 4px 8px; font-size: 10px; }
 
-        /* Header Bereich */
         .header-content { border-bottom: 2px solid #333; margin-bottom: 10px; padding-bottom: 5px; }
         
-        /* Tourenplan Styling */
         .table-container { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th, td { border: 1px solid #000; padding: 1px; text-align: center; vertical-align: top; }
@@ -29,6 +26,14 @@
         
         select { width: 100%; font-size: 7px; margin-top: 1px; border: 1px solid #ccc; }
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; }
+
+        /* DRUCK-LAYOUT: Alles Unnötige ausblenden */
+        @media print {
+            .nav-bar, .undo-btn, .header-content input, .header-content h1 { display: none !important; }
+            body { font-size: 8pt; }
+            table { border: 1px solid #000; }
+            th, td { border: 1px solid #000; }
+        }
     </style>
 </head>
 <body>
@@ -43,7 +48,7 @@
     <div id="plan" class="page active">
         <div class="header-content">
             <h1>Tourenplan</h1>
-            <input type="text" id="tourName" placeholder="Tourname eingeben..." style="width:100%; box-sizing:border-box;" oninput="saveAppState()">
+            <input type="text" id="tourName" placeholder="Tourname..." style="width:100%; box-sizing:border-box;" oninput="saveAppState()">
         </div>
         <div class="table-container">
             <table>
@@ -94,8 +99,11 @@
         function renderLists() {
             ['klienten', 'leistungen'].forEach(key => {
                 const list = JSON.parse(localStorage.getItem(key) || '[]');
-                document.getElementById('list-' + key).innerHTML = list.map((item, i) => 
-                    `<li>${item} <button onclick="del('${key}', ${i})">X</button></li>`).join('');
+                const container = document.getElementById('list-' + key);
+                if (container) {
+                    container.innerHTML = list.map((item, i) => 
+                        `<li>${item} <button onclick="del('${key}', ${i})">X</button></li>`).join('');
+                }
             });
         }
 
