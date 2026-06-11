@@ -56,26 +56,29 @@
     <script>
         const tbody = document.getElementById('plan-body');
         const rows = 15;
-        // Erster Eintrag leer für Reset-Funktion
-        const nameOptions = '<option value="">-</option><option>Müller</option><option>Schmidt</option>';
-        const taskOptions = '<option value="">-</option><option>Med</option><option>Pfl</option><option>HW</option>';
-
+        
         function clearCell(btn) {
             const container = btn.parentElement;
-            const selects = container.querySelectorAll('select');
-            selects.forEach(s => s.selectedIndex = 0);
+            container.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
         }
 
         for(let i = 1; i <= rows; i++) {
             let row = `<tr><td>${i}</td>`;
             for(let j = 0; j < 7; j++) {
+                // Einzigartige Namen basierend auf Zeile (i) und Tag (j)
                 row += `<td>
                     <div class="cell-content">
                         <button class="clear-btn" onclick="clearCell(this)">×</button>
-                        <select class="name-select">${nameOptions}</select>
+                        <select name="klient_${i}_${j}" title="Klient" class="name-select">
+                            <option value="">-</option><option>Müller</option><option>Schmidt</option>
+                        </select>
                         <div class="grid-container">
-                            <select>${taskOptions}</select>
-                            <select>${taskOptions}</select>
+                            <select name="leistung_${i}_${j}_1" title="Leistung 1">
+                                <option value="">-</option><option>Med</option><option>Pfl</option>
+                            </select>
+                            <select name="leistung_${i}_${j}_2" title="Leistung 2">
+                                <option value="">-</option><option>Med</option><option>Pfl</option>
+                            </select>
                         </div>
                     </div>
                 </td>`;
