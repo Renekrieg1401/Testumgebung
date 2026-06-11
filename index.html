@@ -2,13 +2,14 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>GPA Tourenplan</title>
+    <title>GPA Tourenplan Professional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         @media print { .no-print { display: none !important; } }
         .page { display: none; }
         .page.active { display: block; }
+        table { table-layout: fixed; }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
@@ -16,80 +17,101 @@
     <div class="no-print mb-6">
         <nav class="flex gap-2 mb-4">
             <button onclick="showPage('plan')" class="bg-teal-700 text-white px-4 py-2 rounded">Tourenplan</button>
-            <button onclick="showPage('data')" class="bg-teal-700 text-white px-4 py-2 rounded">Klienten</button>
+            <button onclick="showPage('clients')" class="bg-teal-700 text-white px-4 py-2 rounded">Klientenliste</button>
             <button onclick="showPage('services')" class="bg-teal-700 text-white px-4 py-2 rounded">Leistungen</button>
         </nav>
-        <button onclick="exportPDF()" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">PDF Drucken</button>
+        <button onclick="exportPDF()" class="bg-blue-600 text-white px-4 py-2 rounded">PDF Drucken</button>
     </div>
 
-    <div id="print-area" class="bg-white p-6">
+    <div id="print-area" class="bg-white p-6 shadow-lg">
         <h1 class="text-2xl font-bold mb-4 text-center">Tourenplan</h1>
-        <div class="mb-4">
+        <div class="mb-6">
             <label class="font-bold">Tour: </label>
-            <input type="text" class="border-b-2 border-gray-400 w-64 outline-none" placeholder="Tour eintragen...">
+            <input type="text" class="border-b-2 border-gray-400 w-full outline-none" placeholder="Tour-Bezeichnung hier eingeben...">
         </div>
         
-        <table class="w-full border-collapse border text-sm" id="plan-table">
+        <table class="w-full border-collapse border text-xs" id="plan-table">
             <thead>
                 <tr class="bg-gray-200">
-                    <th class="border p-2">Anzahl</th>
-                    ${['Mo','Di','Mi','Do','Fr','Sa','So'].map(d => `<th class="border p-2">${d}</th>`).join('')}
+                    <th class="border p-2 w-12">Nr.</th>
+                    <th class="border p-2">Mo</th><th class="border p-2">Di</th><th class="border p-2">Mi</th>
+                    <th class="border p-2">Do</th><th class="border p-2">Fr</th><th class="border p-2">Sa</th><th class="border p-2">So</th>
                 </tr>
             </thead>
             <tbody id="plan-body"></tbody>
         </table>
     </div>
 
-    <div id="page-data" class="page">
-        <h2 class="font-bold">Klienten</h2>
-        <input id="client-in" class="border p-1"><button onclick="addItem('clients','client-in')" class="bg-green-600 text-white px-2">Add</button>
-        <ul id="client-list"></ul>
+    <div id="page-clients" class="page mt-6">
+        <h2 class="font-bold text-lg mb-2">Klienten verwalten</h2>
+        <input id="new-client" class="border p-1" placeholder="Name">
+        <button onclick="addEntry('clients', 'new-client')" class="bg-green-600 text-white px-2 py-1">Hinzufügen</button>
+        <ul id="client-list" class="mt-2 list-disc ml-5"></ul>
     </div>
 
-    <div id="page-services" class="page">
-        <h2 class="font-bold">Leistungen</h2>
-        <input id="service-in" class="border p-1"><button onclick="addItem('services','service-in')" class="bg-green-600 text-white px-2">Add</button>
-        <ul id="service-list"></ul>
+    <div id="page-services" class="page mt-6">
+        <h2 class="font-bold text-lg mb-2">Leistungen verwalten</h2>
+        <input id="new-service" class="border p-1" placeholder="Leistung">
+        <button onclick="addEntry('services', 'new-service')" class="bg-green-600 text-white px-2 py-1">Hinzufügen</button>
+        <ul id="service-list" class="mt-2 list-disc ml-5"></ul>
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('gpa')) || { clients: [], services: [], schedule: { Mo:[],Di:[],Mi:[],Do:[],Fr:[],Sa:[],So:[] } };
+        let state = JSON.parse(localStorage.getItem('gpa_data')) || { 
+            clients: [], services: [], 
+            schedule: { Mo:[],Di:[],Mi:[],Do:[],Fr:[],Sa:[],So:[] } 
+        };
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + id).classList.add('active');
+            if(id === 'plan') document.getElementById('print-area').classList.remove('hidden');
+            else {
+                document.getElementById('print-area').classList.add('hidden');
+                document.getElementById('page-' + id).classList.add('active');
+            }
         }
 
-        function addItem(key, inputId) {
-            state[key].push(document.getElementById(inputId).value);
+        function addEntry(type, inputId) {
+            state[type].push(document.getElementById(inputId).value);
             save();
         }
 
-        function save() { localStorage.setItem('gpa', JSON.stringify(state)); render(); }
+        function addSlot(day, index) {
+            state.schedule[day][index] = { client: '', service: '' };
+            save();
+        }
+
+        function save() { 
+            localStorage.setItem('gpa_data', JSON.stringify(state)); 
+            render(); 
+        }
 
         function render() {
             const body = document.getElementById('plan-body');
             body.innerHTML = '';
             const days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-            const max = Math.max(...Object.values(state.schedule).map(d => d.length), 5);
             
-            for(let i=0; i<max; i++) {
+            for(let i=0; i<10; i++) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="border p-2 font-bold">${i+1}</td>` + 
-                    days.map(d => `<td class="border p-1">
-                        <select class="w-full border-b mb-1"><option>Klient...</option>${state.clients.map(c=>`<option>${c}</option>`).join('')}</select>
-                        <select class="w-full border-b text-xs"><option>Leistung...</option>${state.services.map(s=>`<option>${s}</option>`).join('')}</select>
-                    </td>`).join('');
+                tr.innerHTML = `<td class="p-2 border font-bold text-center">${i+1}</td>` + 
+                    days.map(day => `
+                        <td class="border p-1">
+                            ${state.schedule[day][i] ? `
+                                <select class="w-full border-b mb-1 text-[10px]"><option>Klient...</option>${state.clients.map(c=>`<option>${c}</option>`).join('')}</select>
+                                <select class="w-full border-b text-[10px]"><option>Leistung...</option>${state.services.map(s=>`<option>${s}</option>`).join('')}</select>
+                            ` : `<button onclick="addSlot('${day}', ${i})" class="text-blue-600 text-xs font-bold">+ Klient</button>`}
+                        </td>`).join('');
                 body.appendChild(tr);
             }
-            // Listen aktualisieren
             document.getElementById('client-list').innerHTML = state.clients.map(c=>`<li>${c}</li>`).join('');
             document.getElementById('service-list').innerHTML = state.services.map(s=>`<li>${s}</li>`).join('');
         }
 
-        function exportPDF() { html2pdf().from(document.getElementById('print-area')).save(); }
-        
-        showPage('plan');
+        function exportPDF() { 
+            const opt = { margin: 5, filename: 'Tourenplan.pdf', jsPDF: { orientation: 'landscape' } };
+            html2pdf().set(opt).from(document.getElementById('print-area')).save(); 
+        }
+
         render();
     </script>
 </body>
