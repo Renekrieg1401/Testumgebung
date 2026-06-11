@@ -2,92 +2,40 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourenplan App</title>
-    <style>
-        @page { size: landscape; margin: 5mm; }
-        body { font-family: sans-serif; padding: 10px; font-size: 8px; }
-        
-        .header-container { margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .nav-bar { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn { padding: 5px 10px; cursor: pointer; background: #eee; border: 1px solid #999; }
-        .btn-print { background: #4a90e2; color: white; border: none; }
-        
-        .table-container { width: 100%; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: top; }
-        
-        .cell-content { position: relative; display: flex; flex-direction: column; gap: 2px; padding-top: 10px; }
-        
-        /* Das ↺ Symbol (U+21BA) */
-        .undo-btn { 
-            position: absolute; top: 0px; right: 0px; cursor: pointer; 
-            font-size: 10px; border: none; background: none; padding: 0; 
-            color: #444; line-height: 1; font-weight: bold;
-        }
-        
-        .name-select { width: 100%; font-weight: bold; }
-        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; }
-        select { width: 100%; font-size: 7px; border: 1px solid #ccc; }
-    </style>
+    <title>Klienten verwalten</title>
+    <style>body { font-family: sans-serif; padding: 20px; }</style>
 </head>
 <body>
-
-    <div class="header-container">
-        <h1>Tourenplan</h1>
-        <div class="nav-bar">
-            <button class="btn" onclick="location.href='index.html'">Tourenplan</button>
-            <button class="btn" onclick="location.href='klienten.html'">Klienten</button>
-            <button class="btn" onclick="location.href='leistungen.html'">Leistungen</button>
-            <button class="btn btn-print" onclick="window.print()">PDF Drucken</button>
-        </div>
-        <input type="text" style="width: 100%;" placeholder="Tourname eingeben...">
-    </div>
-
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 30px;">Nr.</th>
-                    <th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th>
-                </tr>
-            </thead>
-            <tbody id="plan-body"></tbody>
-        </table>
-    </div>
+    <h1>Klienten verwalten</h1>
+    <input type="text" id="klientName" placeholder="Name eingeben...">
+    <button onclick="addKlient()">Hinzufügen</button>
+    <ul id="klientList"></ul>
+    <button onclick="location.href='index.html'">Zurück zum Tourenplan</button>
 
     <script>
-        const tbody = document.getElementById('plan-body');
-        const rows = 15;
-        
-        function clearCell(btn) {
-            const container = btn.parentElement;
-            container.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        function loadList() {
+            const list = JSON.parse(localStorage.getItem('klienten') || '[]');
+            const ul = document.getElementById('klientList');
+            ul.innerHTML = '';
+            list.forEach((name, index) => {
+                ul.innerHTML += `<li>${name} <button onclick="removeKlient(${index})">Löschen</button></li>`;
+            });
         }
-
-        for(let i = 1; i <= rows; i++) {
-            let row = `<tr><td>${i}</td>`;
-            for(let j = 0; j < 7; j++) {
-                row += `<td>
-                    <div class="cell-content">
-                        <button class="undo-btn" onclick="clearCell(this)" title="Zelle leeren">↺</button>
-                        <select name="klient_${i}_${j}" title="Klient" class="name-select">
-                            <option value="">-</option><option>Müller</option><option>Schmidt</option>
-                        </select>
-                        <div class="grid-container">
-                            <select name="leistung_${i}_${j}_1" title="Leistung 1">
-                                <option value="">-</option><option>Med</option><option>Pfl</option>
-                            </select>
-                            <select name="leistung_${i}_${j}_2" title="Leistung 2">
-                                <option value="">-</option><option>Med</option><option>Pfl</option>
-                            </select>
-                        </div>
-                    </div>
-                </td>`;
-            }
-            row += `</tr>`;
-            tbody.innerHTML += row;
+        function addKlient() {
+            const name = document.getElementById('klientName').value;
+            if(!name) return;
+            const list = JSON.parse(localStorage.getItem('klienten') || '[]');
+            list.push(name);
+            localStorage.setItem('klienten', JSON.stringify(list));
+            loadList();
         }
+        function removeKlient(index) {
+            const list = JSON.parse(localStorage.getItem('klienten') || '[]');
+            list.splice(index, 1);
+            localStorage.setItem('klienten', JSON.stringify(list));
+            loadList();
+        }
+        loadList();
     </script>
 </body>
 </html>
