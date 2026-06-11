@@ -18,9 +18,11 @@
         th, td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: top; }
         
         .cell-content { position: relative; display: flex; flex-direction: column; gap: 2px; }
+        
+        /* Mülleimer Icon Styling */
         .clear-btn { 
-            position: absolute; top: -2px; right: -2px; cursor: pointer; 
-            color: red; font-weight: bold; font-size: 10px; border: none; background: none;
+            position: absolute; top: -3px; right: -2px; cursor: pointer; 
+            font-size: 10px; border: none; background: none; padding: 0; line-height: 1;
         }
         
         .name-select { width: 90%; font-weight: bold; }
@@ -65,10 +67,9 @@
         for(let i = 1; i <= rows; i++) {
             let row = `<tr><td>${i}</td>`;
             for(let j = 0; j < 7; j++) {
-                // Einzigartige Namen basierend auf Zeile (i) und Tag (j)
                 row += `<td>
                     <div class="cell-content">
-                        <button class="clear-btn" onclick="clearCell(this)">×</button>
+                        <button class="clear-btn" onclick="clearCell(this)" title="Zelle leeren">🗑</button>
                         <select name="klient_${i}_${j}" title="Klient" class="name-select">
                             <option value="">-</option><option>Müller</option><option>Schmidt</option>
                         </select>
