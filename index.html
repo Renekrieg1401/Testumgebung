@@ -10,9 +10,15 @@
         
         .page { display: none; }
         .active { display: block; }
+        
+        /* Navigation */
         .nav-bar { display: flex; gap: 5px; margin-bottom: 5px; background: #f0f0f0; padding: 5px; }
         button { cursor: pointer; padding: 4px 8px; font-size: 10px; }
 
+        /* Header Bereich */
+        .header-content { border-bottom: 2px solid #333; margin-bottom: 10px; padding-bottom: 5px; }
+        
+        /* Tourenplan Styling */
         .table-container { width: 100%; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th, td { border: 1px solid #000; padding: 1px; text-align: center; vertical-align: top; }
@@ -35,7 +41,10 @@
     </div>
 
     <div id="plan" class="page active">
-        <input type="text" id="tourName" placeholder="Tourname..." style="width:100%; box-sizing:border-box;" oninput="saveAppState()">
+        <div class="header-content">
+            <h1>Tourenplan</h1>
+            <input type="text" id="tourName" placeholder="Tourname eingeben..." style="width:100%; box-sizing:border-box;" oninput="saveAppState()">
+        </div>
         <div class="table-container">
             <table>
                 <thead><tr><th style="width:25px;">Nr.</th><th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th></tr></thead>
@@ -57,13 +66,11 @@
     </div>
 
     <script>
-        // Seiten-Navigation
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        // Datenverwaltung für Listen
         function addData(key, inputId) {
             const input = document.getElementById(inputId);
             const val = input.value.trim();
@@ -92,7 +99,6 @@
             });
         }
 
-        // Dropdown Synchronisation & Zustands-Speicherung
         function refreshDropdowns() {
             const kl = JSON.parse(localStorage.getItem('klienten') || '[]');
             const le = JSON.parse(localStorage.getItem('leistungen') || '[]');
@@ -132,7 +138,6 @@
             saveAppState();
         }
 
-        // Initialisierung
         const tbody = document.getElementById('plan-body');
         for(let i=1; i<=15; i++) {
             let row = `<tr><td>${i}</td>`;
