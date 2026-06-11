@@ -2,53 +2,58 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>GPA Tourenplan - Expert</title>
+    <title>GPA Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .drag-handle { cursor: grab; user-select: none; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        table { table-layout: fixed; width: 100%; border-collapse: collapse; }
-        .cell-container { position: relative; padding-right: 15px; }
-        .cell-handle { position: absolute; right: 0; top: 0; cursor: grab; color: #999; }
+        .drag-handle { cursor: move; color: #aaa; }
+        .cell-container { border: 1px solid #ccc; padding: 2px; }
     </style>
 </head>
-<body class="bg-gray-100 p-2">
+<body class="bg-gray-100 p-4">
 
-    <div id="plan" class="tab-content active">
-        <table id="tour-table" class="border">
-            <tbody id="table-body"></tbody>
+    <div id="app" class="max-w-6xl mx-auto bg-white p-4 shadow">
+        <h1 class="text-xl font-bold mb-4">GPA Tourenplan</h1>
+        <table class="w-full border-collapse border" id="main-table">
+            <tbody id="tbody"></tbody>
         </table>
     </div>
 
     <script>
-        // Logik für Drag & Drop
-        function renderAll() {
-            const tbody = document.getElementById('table-body');
+        // Daten-Initialisierung
+        let clients = ["Klient A", "Klient B"];
+        let services = ["KP", "GP", "VW"];
+
+        // Rendering-Logik
+        function init() {
+            const tbody = document.getElementById('tbody');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             for (let i = 6; i <= 13; i++) {
                 const tr = document.createElement('tr');
-                tr.className = "border-b";
+                tr.innerHTML = `<td class="p-2 font-bold border">${i}:00 <span class="drag-handle">⠿</span></td>`;
                 
-                // Zeitspalte mit Zeilen-Handle
-                tr.innerHTML = `<td class="font-bold drag-handle" draggable="true" ondragstart="startRowDrag(event)">${i}:00 ⠿</td>`;
-                
-                // Zell-Generierung
                 for (let d = 0; d < 7; d++) {
                     tr.innerHTML += `
-                        <td class="border cell-container" draggable="true" ondragstart="startCellDrag(event)">
-                            <div class="cell-handle">⠿</div>
-                            <select class="w-full text-[9px]"><option>Klient...</option></select>
-                            <div class="flex gap-[2px]">Leistungs-Checkboxen...</div>
+                        <td class="cell-container">
+                            <div class="flex justify-between items-center">
+                                <select class="w-full text-xs">
+                                    <option>Name...</option>
+                                    ${clients.map(c => `<option>${c}</option>`).join('')}
+                                </select>
+                                <span class="drag-handle ml-1">⠿</span>
+                            </div>
+                            <div class="flex gap-1 mt-1">
+                                ${services.map(() => `<input type="checkbox" class="w-3 h-3">`).join('')}
+                            </div>
                         </td>`;
                 }
                 tbody.appendChild(tr);
             }
         }
 
-        // Steuerung
-        function startRowDrag(e) { /* Logik für Zeilen-Tausch */ }
-        function startCellDrag(e) { /* Logik für Zell-Tausch (Inhalt kopieren/löschen) */ }
+        // Sicherer Start
+        window.onload = init;
     </script>
 </body>
 </html>
