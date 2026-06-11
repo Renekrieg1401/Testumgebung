@@ -2,40 +2,114 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Klienten verwalten</title>
-    <style>body { font-family: sans-serif; padding: 20px; }</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourenplan App</title>
+    <style>
+        @page { size: landscape; margin: 5mm; }
+        body { font-family: sans-serif; padding: 10px; font-size: 10px; }
+        
+        /* Navigation & Seiten */
+        .page { display: none; }
+        .active { display: block; }
+        .nav-bar { display: flex; gap: 5px; margin-bottom: 10px; }
+        button { cursor: pointer; padding: 5px; }
+
+        /* Tourenplan Styling */
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: top; }
+        .cell-content { position: relative; padding-top: 12px; }
+        .undo-btn { position: absolute; top: 0; right: 0; border: none; background: none; color: #444; font-weight: bold; }
+        
+        /* Dropdowns */
+        select { width: 100%; font-size: 8px; margin-bottom: 1px; }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; }
+    </style>
 </head>
 <body>
-    <h1>Klienten verwalten</h1>
-    <input type="text" id="klientName" placeholder="Name eingeben...">
-    <button onclick="addKlient()">Hinzufügen</button>
-    <ul id="klientList"></ul>
-    <button onclick="location.href='index.html'">Zurück zum Tourenplan</button>
+
+    <div class="nav-bar">
+        <button onclick="showPage('plan')">Tourenplan</button>
+        <button onclick="showPage('klienten')">Klienten</button>
+        <button onclick="showPage('leistungen')">Leistungen</button>
+        <button onclick="window.print()" style="background: #4a90e2; color: white;">PDF Drucken</button>
+    </div>
+
+    <div id="plan" class="page active">
+        <input type="text" placeholder="Tourname..." style="width:100%; margin-bottom:5px;">
+        <div class="table-container">
+            <table>
+                <thead><tr><th style="width:30px;">Nr.</th><th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th></tr></thead>
+                <tbody id="plan-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="klienten" class="page">
+        <h1>Klienten</h1>
+        <input type="text" id="kName"><button onclick="addData('klienten', 'kName')">Hinzufügen</button>
+        <ul id="list-klienten"></ul>
+    </div>
+
+    <div id="leistungen" class="page">
+        <h1>Leistungen</h1>
+        <input type="text" id="lName"><button onclick="addData('leistungen', 'lName')">Hinzufügen</button>
+        <ul id="list-leistungen"></ul>
+    </div>
 
     <script>
-        function loadList() {
-            const list = JSON.parse(localStorage.getItem('klienten') || '[]');
-            const ul = document.getElementById('klientList');
-            ul.innerHTML = '';
-            list.forEach((name, index) => {
-                ul.innerHTML += `<li>${name} <button onclick="removeKlient(${index})">Löschen</button></li>`;
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'plan') refreshDropdowns();
+        }
+
+        function addData(key, inputId) {
+            const val = document.getElementById(inputId).value;
+            if(!val) return;
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            list.push(val);
+            localStorage.setItem(key, JSON.stringify(list));
+            document.getElementById(inputId).value = '';
+            renderLists();
+        }
+
+        function renderLists() {
+            ['klienten', 'leistungen'].forEach(key => {
+                const list = JSON.parse(localStorage.getItem(key) || '[]');
+                document.getElementById('list-' + key).innerHTML = list.map((item, i) => 
+                    `<li>${item} <button onclick="del('${key}', ${i})">X</button></li>`).join('');
             });
+            refreshDropdowns();
         }
-        function addKlient() {
-            const name = document.getElementById('klientName').value;
-            if(!name) return;
-            const list = JSON.parse(localStorage.getItem('klienten') || '[]');
-            list.push(name);
-            localStorage.setItem('klienten', JSON.stringify(list));
-            loadList();
+
+        function del(key, i) {
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            list.splice(i, 1);
+            localStorage.setItem(key, JSON.stringify(list));
+            renderLists();
         }
-        function removeKlient(index) {
-            const list = JSON.parse(localStorage.getItem('klienten') || '[]');
-            list.splice(index, 1);
-            localStorage.setItem('klienten', JSON.stringify(list));
-            loadList();
+
+        function refreshDropdowns() {
+            const kl = JSON.parse(localStorage.getItem('klienten') || '[]');
+            const le = JSON.parse(localStorage.getItem('leistungen') || '[]');
+            const optionsKl = '<option value="">-</option>' + kl.map(n => `<option>${n}</option>`).join('');
+            const optionsLe = '<option value="">-</option>' + le.map(n => `<option>${n}</option>`).join('');
+            
+            document.querySelectorAll('.name-select').forEach(s => s.innerHTML = optionsKl);
+            document.querySelectorAll('.task-select').forEach(s => s.innerHTML = optionsLe);
         }
-        loadList();
+
+        function clearCell(btn) {
+            btn.parentElement.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+        }
+
+        // Initialisierung
+        const tbody = document.getElementById('plan-body');
+        for(let i=1; i<=15; i++) {
+            tbody.innerHTML += `<tr><td>${i}</td>` + '<td><div class="cell-content"><button class="undo-btn" onclick="clearCell(this)">↺</button><select class="name-select"></select><div class="grid-container"><select class="task-select"></select><select class="task-select"></select></div></div></td>'.repeat(7) + '</tr>';
+        }
+        renderLists();
     </script>
 </body>
 </html>
