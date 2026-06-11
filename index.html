@@ -77,12 +77,15 @@
             box-sizing: border-box;
         }
 
-        .input-group input::placeholder {
-            color: #888888;
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
+            min-width: 600px; /* Sichert die Lesbarkeit der Dropdowns auf mobilen Geräten */
             border-collapse: collapse;
             font-size: 10px;
             table-layout: fixed;
@@ -101,7 +104,7 @@
         }
 
         td {
-            padding: 2px;
+            padding: 0;
             border: 1px solid var(--border-color);
             text-align: center;
             height: 25px;
@@ -110,12 +113,16 @@
 
         select {
             width: 100%;
-            height: 100%;
+            height: 25px;
             border: none;
             background-color: transparent;
             font-size: 10px;
             outline: none;
             cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
     </style>
 </head>
@@ -124,5 +131,84 @@
     <div class="nav-buttons">
         <button class="btn btn-nav">Tourenplan</button>
         <button class="btn btn-nav">Klienten</button>
-        <button class="btn btn-nav">Leistungen</
+        <button class="btn btn-nav">Leistungen</button>
+    </div>
+    
+    <button class="btn btn-action">PDF Drucken</button>
+
+    <div class="card">
+        <div class="card-header">Tourenplan</div>
+        
+        <div class="input-group">
+            <input type="text" placeholder="Tourname...">
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nr.</th>
+                        <th>Mo</th>
+                        <th>Di</th>
+                        <th>Mi</th>
+                        <th>Do</th>
+                        <th>Fr</th>
+                        <th>Sa</th>
+                        <th>So</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option
 
