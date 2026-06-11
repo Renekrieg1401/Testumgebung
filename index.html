@@ -3,48 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourenplan - 2 Felder</title>
+    <title>Tourenplan App</title>
     <style>
         @page { size: landscape; margin: 5mm; }
-        body { font-family: sans-serif; padding: 5px; font-size: 8px; }
+        body { font-family: sans-serif; padding: 10px; font-size: 8px; }
+        
+        .header-container { margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .nav-bar { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn { padding: 5px 10px; cursor: pointer; background: #eee; border: 1px solid #999; }
+        .btn-print { background: #4a90e2; color: white; border: none; }
         
         .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: top; }
         
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            table-layout: fixed; 
+        .cell-content { position: relative; display: flex; flex-direction: column; gap: 2px; }
+        .clear-btn { 
+            position: absolute; top: -2px; right: -2px; cursor: pointer; 
+            color: red; font-weight: bold; font-size: 10px; border: none; background: none;
         }
         
-        th, td { border: 1px solid #000; padding: 1px; text-align: center; vertical-align: top; }
-        
-        .cell-content { display: flex; flex-direction: column; gap: 2px; }
-        
-        .name-select { width: 100%; font-weight: bold; }
-        
-        /* Hier wurde von 4 auf 2 Spalten reduziert */
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 1px; 
-        }
-        
-        select { 
-            width: 100%; 
-            font-size: 7px; 
-            padding: 0; 
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
+        .name-select { width: 90%; font-weight: bold; }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; }
+        select { width: 100%; font-size: 7px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
+
+    <div class="header-container">
+        <h1>Tourenplan</h1>
+        <div class="nav-bar">
+            <button class="btn" onclick="location.href='index.html'">Tourenplan</button>
+            <button class="btn" onclick="location.href='klienten.html'">Klienten</button>
+            <button class="btn" onclick="location.href='leistungen.html'">Leistungen</button>
+            <button class="btn btn-print" onclick="window.print()">PDF Drucken</button>
+        </div>
+        <input type="text" style="width: 100%;" placeholder="Tourname eingeben...">
+    </div>
 
     <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 25px;">Nr.</th>
+                    <th style="width: 30px;">Nr.</th>
                     <th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th>
                 </tr>
             </thead>
@@ -55,14 +56,22 @@
     <script>
         const tbody = document.getElementById('plan-body');
         const rows = 15;
-        const nameOptions = '<option>Name</option><option>Müller</option><option>Schmidt</option>';
-        const taskOptions = '<option>Leist.</option><option>Med</option><option>Pfl</option><option>HW</option>';
+        // Erster Eintrag leer für Reset-Funktion
+        const nameOptions = '<option value="">-</option><option>Müller</option><option>Schmidt</option>';
+        const taskOptions = '<option value="">-</option><option>Med</option><option>Pfl</option><option>HW</option>';
+
+        function clearCell(btn) {
+            const container = btn.parentElement;
+            const selects = container.querySelectorAll('select');
+            selects.forEach(s => s.selectedIndex = 0);
+        }
 
         for(let i = 1; i <= rows; i++) {
             let row = `<tr><td>${i}</td>`;
             for(let j = 0; j < 7; j++) {
                 row += `<td>
                     <div class="cell-content">
+                        <button class="clear-btn" onclick="clearCell(this)">×</button>
                         <select class="name-select">${nameOptions}</select>
                         <div class="grid-container">
                             <select>${taskOptions}</select>
