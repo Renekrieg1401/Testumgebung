@@ -40,33 +40,36 @@
         }
 
         function save() { localStorage.setItem('gpa', JSON.stringify(state)); render(); }
+        
+        function addClient() { state.clients.push(document.getElementById('new-client').value); save(); }
+        function addService() { state.services.push(document.getElementById('new-service').value); save(); }
 
         function render() {
-            // Plan rendern
             const body = document.getElementById('plan-body');
             body.innerHTML = '';
             for(let i=6; i<=13; i++) {
                 const tr = document.createElement('tr');
-                tr.className = "border-b draggable";
-                tr.draggable = true;
-                tr.innerHTML = `<td class="p-2 font-bold w-12 border-r">${i}:00</td>` + 
+                tr.className = "border-b";
+                // NUR die Uhrzeit ist draggable
+                tr.innerHTML = `<td class="p-2 font-bold w-12 border-r cursor-move bg-gray-200" draggable="true" ondragstart="handleDrag(event)">${i}:00</td>` + 
                                 Array(7).fill(0).map(() => `<td class="p-1 border"><select class="w-full"><option>...</option>${state.clients.map(c => `<option>${c}</option>`).join('')}</select><div class="flex">${state.services.map(() => '<input type="checkbox" class="mx-0.5">').join('')}</div></td>`).join('');
                 body.appendChild(tr);
             }
-            // Listen rendern
-            document.getElementById('client-list').innerHTML = state.clients.map((c,i) => `<li>${c} <button onclick="state.clients.splice(${i},1);save()">x</button></li>`).join('');
-            document.getElementById('service-list').innerHTML = state.services.map((s,i) => `<li>${s} <button onclick="state.services.splice(${i},1);save()">x</button></li>`).join('');
+            document.getElementById('client-list').innerHTML = state.clients.map((c,i) => `<li>${c}</li>`).join('');
+            document.getElementById('service-list').innerHTML = state.services.map((s,i) => `<li>${s}</li>`).join('');
         }
 
-        // Einfaches Drag & Drop
-        document.addEventListener('dragstart', e => e.target.classList.contains('draggable') ? e.dataTransfer.setData('text', e.target.rowIndex) : null);
-        document.addEventListener('drop', e => {
-            const from = e.dataTransfer.getData('text');
-            const to = e.target.closest('tr').rowIndex;
-            if(from && to) { /* Tauschlogik hier */ render(); }
-            e.preventDefault();
-        });
+        let draggedRow = null;
+        function handleDrag(e) { draggedRow = e.target.closest('tr'); }
+        
         document.addEventListener('dragover', e => e.preventDefault());
+        document.addEventListener('drop', e => {
+            const targetRow = e.target.closest('tr');
+            if (draggedRow && targetRow && draggedRow !== targetRow) {
+                const tbody = document.getElementById('plan-body');
+                tbody.insertBefore(draggedRow, targetRow);
+            }
+        });
 
         render();
     </script>
