@@ -3,36 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourenplan Erweitert</title>
+    <title>Tourenplan Hochdicht</title>
     <style>
-        /* Druck-Optimierung Querformat */
         @page { size: landscape; margin: 5mm; }
-        
-        body { font-family: sans-serif; padding: 5px; font-size: 9px; }
+        body { font-family: sans-serif; padding: 5px; font-size: 8px; }
         
         .table-container { width: 100%; overflow-x: auto; }
         
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            table-layout: fixed; 
+            table-layout: fixed; /* Fixiert die Spaltenbreite */
         }
         
-        th, td { border: 1px solid #000; padding: 2px; text-align: center; }
+        th, td { border: 1px solid #000; padding: 1px; text-align: center; vertical-align: top; }
         
-        /* Dropdown Styling */
-        .cell-stack { display: flex; flex-direction: column; gap: 1px; }
+        /* Container für Dropdown-Gruppe */
+        .cell-content { display: flex; flex-direction: column; gap: 2px; }
+        
+        /* Name vollbreit oben */
+        .name-select { width: 100%; font-weight: bold; }
+        
+        /* Die 4 Felder nebeneinander */
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 1px; 
+        }
         
         select { 
             width: 100%; 
-            font-size: 8px; 
-            border: 1px solid #ddd; 
-            border-radius: 2px;
-            padding: 1px;
-            background: #fff;
+            font-size: 7px; 
+            padding: 0; 
+            border: 1px solid #ccc;
+            cursor: pointer;
         }
-        
-        .name-select { background-color: #f9f9f9; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -41,7 +46,7 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 30px;">Nr.</th>
+                    <th style="width: 25px;">Nr.</th>
                     <th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th>
                 </tr>
             </thead>
@@ -52,21 +57,21 @@
     <script>
         const tbody = document.getElementById('plan-body');
         const rows = 15;
-        
-        // Optionen für die Felder
-        const nameOptions = '<option value="">Name</option><option>Müller</option><option>Schmidt</option>';
-        const taskOptions = '<option value="">Leist.</option><option>Med</option><option>Pfl</option><option>HW</option>';
+        const nameOptions = '<option>Name</option><option>Müller</option><option>Schmidt</option>';
+        const taskOptions = '<option>Leist.</option><option>Med</option><option>Pfl</option><option>HW</option>';
 
         for(let i = 1; i <= rows; i++) {
             let row = `<tr><td>${i}</td>`;
             for(let j = 0; j < 7; j++) {
                 row += `<td>
-                    <div class="cell-stack">
+                    <div class="cell-content">
                         <select class="name-select">${nameOptions}</select>
-                        <select>${taskOptions}</select>
-                        <select>${taskOptions}</select>
-                        <select>${taskOptions}</select>
-                        <select>${taskOptions}</select>
+                        <div class="grid-container">
+                            <select>${taskOptions}</select>
+                            <select>${taskOptions}</select>
+                            <select>${taskOptions}</select>
+                            <select>${taskOptions}</select>
+                        </div>
                     </div>
                 </td>`;
             }
