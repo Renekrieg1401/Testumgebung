@@ -3,212 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourenplan UI</title>
+    <title>Tourenplan Querformat</title>
     <style>
-        :root {
-            --bg-color: #f4f5f7;
-            --card-bg: #ffffff;
-            --btn-nav-bg: #3c7d71;
-            --btn-action-bg: #4169e1;
-            --text-color: #000000;
-            --table-header-bg: #e9ecef;
-            --border-color: #cccccc;
+        /* Druck-spezifische Anweisung für Querformat */
+        @page {
+            size: landscape;
+            margin: 10mm;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 10px;
-            color: var(--text-color);
+            font-family: sans-serif;
+            padding: 5px;
+            background-color: #ffffff;
         }
 
-        .nav-buttons {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            border: none;
-            padding: 6px 12px;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .btn-nav {
-            background-color: var(--btn-nav-bg);
-        }
-
-        .btn-action {
-            background-color: var(--btn-action-bg);
-            margin-bottom: 15px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            padding: 15px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-header {
-            text-align: center;
-            font-size: 16px;
-            font-weight: 800;
-            margin-bottom: 15px;
-            letter-spacing: 0.5px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group input {
+        .table-container {
             width: 100%;
-            border: none;
-            border-bottom: 1px solid var(--border-color);
-            padding: 5px 0;
-            font-size: 12px;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
-            min-width: 600px; /* Sichert die Lesbarkeit der Dropdowns auf mobilen Geräten */
             border-collapse: collapse;
-            font-size: 10px;
-            table-layout: fixed;
+            font-size: 11px; /* Optimierte Schriftgröße für Querformat */
+            table-layout: fixed; /* Erzwingt gleichmäßige Spaltenbreite */
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 6px;
+            text-align: center;
+            overflow: hidden;
         }
 
         th {
-            background-color: var(--table-header-bg);
-            padding: 6px 2px;
-            text-align: center;
-            font-weight: 700;
-            border: 1px solid var(--border-color);
+            background-color: #e9ecef;
+            font-weight: bold;
         }
 
-        th:first-child {
-            width: 30px;
-        }
-
-        td {
-            padding: 0;
-            border: 1px solid var(--border-color);
-            text-align: center;
-            height: 25px;
-            vertical-align: middle;
-        }
-
+        /* Dropdown-Styling für Druck optimiert */
         select {
             width: 100%;
-            height: 25px;
             border: none;
-            background-color: transparent;
+            background: transparent;
             font-size: 10px;
-            outline: none;
-            cursor: pointer;
             text-align: center;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
         }
+
+        /* Spaltenbreiten definieren */
+        th:first-child, td:first-child { width: 40px; }
     </style>
 </head>
 <body>
 
-    <div class="nav-buttons">
-        <button class="btn btn-nav">Tourenplan</button>
-        <button class="btn btn-nav">Klienten</button>
-        <button class="btn btn-nav">Leistungen</button>
+    <div class="table-container">
+        <h3>Tourenplan</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nr.</th>
+                    <th>Mo</th>
+                    <th>Di</th>
+                    <th>Mi</th>
+                    <th>Do</th>
+                    <th>Fr</th>
+                    <th>Sa</th>
+                    <th>So</th>
+                </tr>
+            </thead>
+            <tbody>
+                <script>
+                    for(let i=1; i<=15; i++) {
+                        document.write(`<tr>
+                            <td>${i}</td>
+                            ${'<td><select><option></option><option>Müller</option><option>Schmidt</option></select></td>'.repeat(7)}
+                        </tr>`);
+                    }
+                </script>
+            </tbody>
+        </table>
     </div>
-    
-    <button class="btn btn-action">PDF Drucken</button>
 
-    <div class="card">
-        <div class="card-header">Tourenplan</div>
-        
-        <div class="input-group">
-            <input type="text" placeholder="Tourname...">
-        </div>
-
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nr.</th>
-                        <th>Mo</th>
-                        <th>Di</th>
-                        <th>Mi</th>
-                        <th>Do</th>
-                        <th>Fr</th>
-                        <th>Sa</th>
-                        <th>So</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option><option>Weber</option></select></td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td><select><option></option><option>Müller</option><option>Schmidt</option><option>Schneider</option><option>Fischer</option
+</body>
+</html>
 
