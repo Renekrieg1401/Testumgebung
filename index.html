@@ -3,86 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourenplan Querformat</title>
+    <title>Tourenplan Erweitert</title>
     <style>
-        /* Druck-spezifische Anweisung für Querformat */
-        @page {
-            size: landscape;
-            margin: 10mm;
+        /* Druck-Optimierung Querformat */
+        @page { size: landscape; margin: 5mm; }
+        
+        body { font-family: sans-serif; padding: 5px; font-size: 9px; }
+        
+        .table-container { width: 100%; overflow-x: auto; }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            table-layout: fixed; 
         }
-
-        body {
-            font-family: sans-serif;
-            padding: 5px;
-            background-color: #ffffff;
+        
+        th, td { border: 1px solid #000; padding: 2px; text-align: center; }
+        
+        /* Dropdown Styling */
+        .cell-stack { display: flex; flex-direction: column; gap: 1px; }
+        
+        select { 
+            width: 100%; 
+            font-size: 8px; 
+            border: 1px solid #ddd; 
+            border-radius: 2px;
+            padding: 1px;
+            background: #fff;
         }
-
-        .table-container {
-            width: 100%;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px; /* Optimierte Schriftgröße für Querformat */
-            table-layout: fixed; /* Erzwingt gleichmäßige Spaltenbreite */
-        }
-
-        th, td {
-            border: 1px solid #000000;
-            padding: 6px;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        th {
-            background-color: #e9ecef;
-            font-weight: bold;
-        }
-
-        /* Dropdown-Styling für Druck optimiert */
-        select {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 10px;
-            text-align: center;
-        }
-
-        /* Spaltenbreiten definieren */
-        th:first-child, td:first-child { width: 40px; }
+        
+        .name-select { background-color: #f9f9f9; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="table-container">
-        <h3>Tourenplan</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Nr.</th>
-                    <th>Mo</th>
-                    <th>Di</th>
-                    <th>Mi</th>
-                    <th>Do</th>
-                    <th>Fr</th>
-                    <th>Sa</th>
-                    <th>So</th>
+                    <th style="width: 30px;">Nr.</th>
+                    <th>Mo</th><th>Di</th><th>Mi</th><th>Do</th><th>Fr</th><th>Sa</th><th>So</th>
                 </tr>
             </thead>
-            <tbody>
-                <script>
-                    for(let i=1; i<=15; i++) {
-                        document.write(`<tr>
-                            <td>${i}</td>
-                            ${'<td><select><option></option><option>Müller</option><option>Schmidt</option></select></td>'.repeat(7)}
-                        </tr>`);
-                    }
-                </script>
-            </tbody>
+            <tbody id="plan-body"></tbody>
         </table>
     </div>
 
+    <script>
+        const tbody = document.getElementById('plan-body');
+        const rows = 15;
+        
+        // Optionen für die Felder
+        const nameOptions = '<option value="">Name</option><option>Müller</option><option>Schmidt</option>';
+        const taskOptions = '<option value="">Leist.</option><option>Med</option><option>Pfl</option><option>HW</option>';
+
+        for(let i = 1; i <= rows; i++) {
+            let row = `<tr><td>${i}</td>`;
+            for(let j = 0; j < 7; j++) {
+                row += `<td>
+                    <div class="cell-stack">
+                        <select class="name-select">${nameOptions}</select>
+                        <select>${taskOptions}</select>
+                        <select>${taskOptions}</select>
+                        <select>${taskOptions}</select>
+                        <select>${taskOptions}</select>
+                    </div>
+                </td>`;
+            }
+            row += `</tr>`;
+            tbody.innerHTML += row;
+        }
+    </script>
 </body>
 </html>
 
