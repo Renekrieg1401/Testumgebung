@@ -17,15 +17,16 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th, td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: top; }
         
-        .cell-content { position: relative; display: flex; flex-direction: column; gap: 2px; }
+        .cell-content { position: relative; display: flex; flex-direction: column; gap: 2px; padding-top: 10px; }
         
-        /* Mülleimer Icon Styling */
-        .clear-btn { 
-            position: absolute; top: -3px; right: -2px; cursor: pointer; 
-            font-size: 10px; border: none; background: none; padding: 0; line-height: 1;
+        /* Neues Undo-Symbol Styling */
+        .undo-btn { 
+            position: absolute; top: 0px; right: 0px; cursor: pointer; 
+            font-size: 9px; border: none; background: none; padding: 0; 
+            color: #555; line-height: 1; opacity: 0.6;
         }
         
-        .name-select { width: 90%; font-weight: bold; }
+        .name-select { width: 100%; font-weight: bold; }
         .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; }
         select { width: 100%; font-size: 7px; border: 1px solid #ccc; }
     </style>
@@ -69,7 +70,7 @@
             for(let j = 0; j < 7; j++) {
                 row += `<td>
                     <div class="cell-content">
-                        <button class="clear-btn" onclick="clearCell(this)" title="Zelle leeren">🗑</button>
+                        <button class="undo-btn" onclick="clearCell(this)" title="Zelle leeren">↶</button>
                         <select name="klient_${i}_${j}" title="Klient" class="name-select">
                             <option value="">-</option><option>Müller</option><option>Schmidt</option>
                         </select>
