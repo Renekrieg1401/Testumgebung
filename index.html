@@ -328,19 +328,47 @@ td:nth-child(6) .cc.filled{border-color:rgba(219,39,119,.22);background:#fdf2f8}
 
 /* ── PRINT ──────────────────────────────────────────────── */
 @media print{
-  .orb,.grid-bg,#nav,#lock,#toast,.clr,.sbadge{display:none!important}
-  body{background:#fff}
-  .pg{display:none!important;padding:0}
-  #plan.pg{display:block!important}
-  .card{background:#fff;border:1px solid #ddd;box-shadow:none;margin-bottom:8px}
-  .cc{background:#fff;border:1px solid #ccc;min-height:72px}
-  .cs{background:#fff;color:#000;border:1px solid #bbb;font-size:7pt}
-  .tn{color:#000}
-  thead th{background:#f5f5f5!important;color:#333!important;border:1px solid #bbb!important}
-  tbody td:first-child{color:#888}
-  .spill{background:#f5f5f5;border:1px solid #ddd;color:#444}
-  .spill b{color:#000}
   @page{size:landscape;margin:8mm}
+
+  /* ① Reset orientation transform (prevents blank page) */
+  html{
+    overflow:visible!important;transform:none!important;
+    width:auto!important;height:auto!important;
+  }
+  body{
+    position:static!important;transform:none!important;
+    width:auto!important;height:auto!important;
+    overflow:visible!important;background:#fff!important;
+  }
+
+  /* ② Hide all UI chrome */
+  .orb,.grid-bg,#nav,#lock,#toast,.clr,.sbadge,#verPill,
+  .badge-sec{display:none!important}
+
+  /* ③ Show only plan — all other pages hidden */
+  .pg{display:none!important;padding:0!important}
+  #plan.pg{display:block!important;padding:0!important}
+
+  /* ④ Auto-scale to fit one landscape page */
+  #plan{zoom:.72;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+  /* ⑤ Print-friendly styling */
+  .card{background:#fff!important;border:1px solid #ddd!important;
+    box-shadow:none!important;padding:10px!important;margin-bottom:6px!important;
+    transform:none!important}
+  .cc{background:#fff!important;border:1px solid #ccc!important;min-height:58px!important}
+  .cs{background:#fff!important;color:#000!important;border:1px solid #bbb!important;
+    font-size:7pt!important;padding:2px 14px 2px 4px!important;
+    box-shadow:none!important;min-height:18px!important}
+  .sk{background-color:#e8f0fe!important;border-color:#93c5fd!important}
+  .sl{background-color:#ede9fe!important;border-color:#c4b5fd!important}
+  .tn{color:#000!important;border-bottom-color:#ddd!important;font-size:16pt!important}
+  thead th{background:#f5f5f5!important;color:#333!important;border:1px solid #bbb!important}
+  tbody td:first-child{color:#999!important}
+  .spill{background:#f5f5f5!important;border:1px solid #ddd!important;color:#444!important}
+  .spill b{color:#000!important}
+  .ph{margin-bottom:8px!important}
+  .sbar{flex-wrap:nowrap!important;gap:5px!important}
 }
 
 /* ── SCROLLBAR ──────────────────────────────────────────── */
@@ -827,6 +855,39 @@ function buildTable(){
 }
 
 /* ════════════════════════════════════════════════════════════
+   PRINT HANDLER — strips orientation transform before print
+   so the browser doesn't capture a blank rotated view.
+   Restores everything cleanly after the dialog closes.
+════════════════════════════════════════════════════════════ */
+const ORIENT_PROPS = ['position','top','left','width','height',
+  'transformOrigin','transform','overflowY','overflowX',
+  'WebkitOverflowScrolling','zoom'];
+
+window.addEventListener('beforeprint', () => {
+  // ① Remember which page was active
+  document.querySelectorAll('.pg').forEach(p => {
+    p._wasActive = p.classList.contains('on');
+    p.classList.remove('on');
+  });
+  // ② Force plan page visible
+  document.getElementById('plan').classList.add('on');
+  // ③ CRITICAL: remove all orientation transform styles from body
+  ORIENT_PROPS.forEach(p => document.body.style.removeProperty(p));
+  document.documentElement.style.overflow = '';
+  document.documentElement.style.transform = '';
+});
+
+window.addEventListener('afterprint', () => {
+  // ④ Restore page visibility
+  document.querySelectorAll('.pg').forEach(p => {
+    p.classList.toggle('on', !!p._wasActive);
+    delete p._wasActive;
+  });
+  // ⑤ Re-apply orientation transform
+  applyOrientation();
+});
+
+/* ════════════════════════════════════════════════════════════
    ORIENTATION — force landscape via JS (exact px, reliable on
    all WebKit versions incl. older iOS builds)
 ════════════════════════════════════════════════════════════ */
@@ -872,4 +933,5 @@ function applyOrientation(){
 })();
 </script>
 </body>
+</html>
 </html>
