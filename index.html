@@ -70,22 +70,50 @@ body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:var(--
 
 /* ── APP LAYOUT ─────────────────────────────────────────── */
 #app{display:none;height:100%;position:relative;z-index:1}
-.app-wrap{display:flex;height:100%}
+.app-wrap{display:flex;height:100%;position:relative}
 
 /* ── SIDEBAR ────────────────────────────────────────────── */
 #sidebar{
-  width:var(--sb);flex-shrink:0;
-  background:#f1f5f9;border-right:1px solid rgba(0,0,0,.09);
-  display:flex;flex-direction:column;height:100%;overflow:hidden;
+  width:var(--sb);flex-shrink:0;height:100%;
+  /* ── SLIDE ANIMATION ── */
+  transition:width .28s cubic-bezier(.4,0,.2,1),border-color .28s;
+  overflow:hidden;
   position:relative;z-index:10;
+}
+#sidebar.closed{width:0;border-right-color:transparent}
+/* Fixed-width inner keeps content from squeezing during animation */
+.sb-inner{
+  width:150px;height:100%;
+  background:#f1f5f9;border-right:1px solid rgba(0,0,0,.09);
+  display:flex;flex-direction:column;overflow:hidden;
 }
 .sb-hdr{
   padding:12px 10px 8px;flex-shrink:0;
   border-bottom:1px solid rgba(0,0,0,.07);
   display:flex;align-items:center;gap:7px;
 }
-.sb-logo{font-size:18px;line-height:1}
-.sb-appname{font-size:13px;font-weight:800;color:var(--txt);letter-spacing:-.4px}
+.sb-logo{font-size:18px;line-height:1;flex-shrink:0}
+.sb-appname{font-size:13px;font-weight:800;color:var(--txt);letter-spacing:-.4px;flex:1;white-space:nowrap}
+/* Close button inside sidebar header */
+.sb-toggle{
+  background:none;border:none;cursor:pointer;
+  color:var(--txt3);font-size:13px;padding:3px 4px;
+  border-radius:5px;flex-shrink:0;line-height:1;
+  transition:all .15s;
+}
+.sb-toggle:hover{background:rgba(0,0,0,.07);color:var(--txt)}
+/* Floating open button when sidebar is closed */
+.sb-open-btn{
+  position:absolute;top:10px;left:10px;z-index:100;
+  width:32px;height:32px;border-radius:var(--rs);
+  background:#fff;border:1px solid var(--bdr);
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+  cursor:pointer;font-size:15px;color:var(--txt2);
+  display:none;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.sb-open-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,.14);color:var(--txt)}
+.sb-open-btn.show{display:flex}
 .sb-plans{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 6px;scrollbar-width:none}
 .sb-plans::-webkit-scrollbar{display:none}
 .sb-section-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--txt3);padding:6px 6px 3px;margin-top:4px}
@@ -319,20 +347,26 @@ td:nth-child(6) .cc.filled{border-color:rgba(219,39,119,.22);background:#fdf2f8}
 
     <!-- SIDEBAR -->
     <aside id="sidebar">
-      <div class="sb-hdr">
-        <span class="sb-logo">📋</span>
-        <span class="sb-appname">Tourenplan</span>
-      </div>
-      <div class="sb-plans" id="sbPlans"></div>
-      <button class="sb-add" onclick="openNewPlanModal()">＋ Neuer Plan</button>
-      <div class="sb-foot">
-        <button class="sb-btn" id="btnViewPlan" onclick="showView('viewPlan',this)"><span class="sb-btn-ico">📅</span>Aktiver Plan</button>
-        <button class="sb-btn" id="btnViewK" onclick="showView('viewKlienten',this)"><span class="sb-btn-ico">👥</span>Klienten</button>
-        <button class="sb-btn" id="btnViewL" onclick="showView('viewLeistungen',this)"><span class="sb-btn-ico">📦</span>Leistungen</button>
-        <button class="sb-btn" onclick="window.print()"><span class="sb-btn-ico">🖨</span>Drucken</button>
-        <button class="sb-btn lock-btn" onclick="lockApp()"><span class="sb-btn-ico">🔒</span>Sperren</button>
+      <div class="sb-inner">
+        <div class="sb-hdr">
+          <span class="sb-logo">📋</span>
+          <span class="sb-appname">Tourenplan</span>
+          <button class="sb-toggle" onclick="toggleSidebar()" title="Sidebar schließen">◀</button>
+        </div>
+        <div class="sb-plans" id="sbPlans"></div>
+        <button class="sb-add" onclick="openNewPlanModal()">＋ Neuer Plan</button>
+        <div class="sb-foot">
+          <button class="sb-btn" id="btnViewPlan" onclick="showView('viewPlan',this)"><span class="sb-btn-ico">📅</span>Aktiver Plan</button>
+          <button class="sb-btn" id="btnViewK" onclick="showView('viewKlienten',this)"><span class="sb-btn-ico">👥</span>Klienten</button>
+          <button class="sb-btn" id="btnViewL" onclick="showView('viewLeistungen',this)"><span class="sb-btn-ico">📦</span>Leistungen</button>
+          <button class="sb-btn" onclick="window.print()"><span class="sb-btn-ico">🖨</span>Drucken</button>
+          <button class="sb-btn lock-btn" onclick="lockApp()"><span class="sb-btn-ico">🔒</span>Sperren</button>
+        </div>
       </div>
     </aside>
+
+    <!-- Floating open button (visible when sidebar is closed) -->
+    <button id="sbOpenBtn" class="sb-open-btn" onclick="toggleSidebar()" title="Sidebar öffnen">☰</button>
 
     <!-- MAIN -->
     <main id="main">
@@ -790,6 +824,7 @@ async function onUnlockSuccess(){
   document.body.classList.add('unlocked');
   applyOrientation();
   await Store.load();
+  restoreSidebar();
   toast('🔓 Entsperrt');
   Guardian.notifyIfUpdated();
   showView('viewPlan',document.getElementById('btnViewPlan'));
@@ -900,6 +935,31 @@ function clearCell(btn){
   const card=btn.closest('.cc');
   card.querySelectorAll('select').forEach(s=>{s.selectedIndex=0;});
   card.classList.remove('filled');triggerSave();
+}
+
+/* ── SIDEBAR TOGGLE ─────────────────────────────────────── */
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const btn=document.getElementById('sbOpenBtn');
+  const isClosed=sb.classList.contains('closed');
+  sb.classList.toggle('closed',!isClosed);
+  btn.classList.toggle('show',!isClosed);
+  // Update close button icon direction
+  const toggle=sb.querySelector('.sb-toggle');
+  if(toggle)toggle.textContent=isClosed?'◀':'▶';
+  // Persist preference (not sensitive data)
+  try{localStorage.setItem('_sbstate',isClosed?'1':'0');}catch{}
+}
+
+function restoreSidebar(){
+  try{
+    if(localStorage.getItem('_sbstate')==='0'){
+      document.getElementById('sidebar').classList.add('closed');
+      document.getElementById('sbOpenBtn').classList.add('show');
+      const toggle=document.querySelector('.sb-toggle');
+      if(toggle)toggle.textContent='▶';
+    }
+  }catch{}
 }
 
 /* ── UI HELPERS ─────────────────────────────────────────── */
