@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "aeris-api",
+  "sourceRoot": "apps/aeris-api/src",
+  "projectType": "application",
+  "tags": ["scope:api", "type:app"],
+  "targets": {
+    "typecheck": { "executor": "nx:run-script", "options": { "script": "typecheck" } },
+    "test": { "executor": "nx:run-script", "options": { "script": "test" } },
+    "serve": { "executor": "nx:run-script", "options": { "script": "dev" } }
+  }
+}

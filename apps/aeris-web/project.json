@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nrwl/nx/master/packages/nx/schemas/project-schema.json",
+  "name": "aeris-web",
+  "sourceRoot": "apps/aeris-web",
+  "projectType": "application",
+  "tags": ["scope:web", "type:app"],
+  "targets": {
+    "build": { "executor": "nx:run-script", "options": { "script": "build" } },
+    "typecheck": { "executor": "nx:run-script", "options": { "script": "typecheck" } },
+    "test": { "executor": "nx:run-script", "options": { "script": "test" } },
+    "serve": { "executor": "nx:run-script", "options": { "script": "dev" } }
+  }
+}

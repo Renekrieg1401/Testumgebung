@@ -1,0 +1,252 @@
+:root {
+  color-scheme: light;
+  --mist: #dfe6e3;
+  --sky: #a9c4d4;
+  --deep-sky: #3d5a6c;
+  --amber: #d99a3c;
+  --amber-700: #a86a1c;
+  --sky-700: #26404e;
+  --ink: #1f2421;
+  --paper: #ffffff;
+  --cream: #f6f8f7;
+  --line: #e2e7e5;
+  --text-muted: #5b6157;
+  --link: var(--sky-700);
+  --font-display: 'Sora', system-ui, Segoe UI, Roboto, sans-serif;
+  --font-body: 'Inter', system-ui, Segoe UI, Roboto, sans-serif;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --focus: 0 0 0 3px var(--cream), 0 0 0 6px var(--sky-700);
+  --shadow: 0 1px 2px rgba(31, 36, 33, 0.05), 0 10px 34px -20px rgba(31, 36, 33, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--cream);
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+a {
+  color: var(--link);
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: 8px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 200;
+}
+
+.skip-link:focus {
+  left: 12px;
+}
+
+header.appbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--cream) 90%, transparent);
+  backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 16px;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--sky-700);
+}
+
+main.screen {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px 96px;
+}
+
+.page-title {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin: 24px 0 12px;
+}
+
+.lede {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.card.soft {
+  background: var(--cream);
+  box-shadow: none;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+}
+
+input[type='password'],
+input[type='text'] {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+  background: var(--paper);
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--sky-700);
+  height: 30px;
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range-row output {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  min-width: 26px;
+  text-align: right;
+}
+
+.range-row-group {
+  margin-bottom: 18px;
+}
+
+.btn {
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--amber);
+  color: var(--ink);
+  width: 100%;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--sky-700);
+  border-color: var(--sky);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--line);
+}
+
+.alert {
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+}
+
+.alert-ok {
+  border-color: var(--sky);
+  background: color-mix(in srgb, var(--sky) 18%, transparent);
+  color: var(--sky-700);
+}
+
+.alert-err {
+  border-color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 15%, transparent);
+  color: var(--amber-700);
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assessment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

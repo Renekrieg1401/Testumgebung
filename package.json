@@ -1,0 +1,32 @@
+{
+  "name": "aeris-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AERIS — Digitale Pflegeanwendung (DiPA, § 78a SGB XI) mit Zero-Knowledge-Architektur.",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "dev:api": "npm run dev -w @aeris/api",
+    "dev:web": "npm run dev -w @aeris/web"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.15.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.16.0",
+    "vitest": "^2.1.5"
+  }
+}
