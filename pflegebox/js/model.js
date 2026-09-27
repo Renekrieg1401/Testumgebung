@@ -1,12 +1,11 @@
 // @ts-check
 // Fachliches Datenmodell der PflegeBox (rein, ohne DOM/I/O).
 // Übernommene AERIS-Logik: schema-versionierter Datenbestand mit zentralem Migrations-Sicherheitsnetz
-// und Änderungsprotokoll je Monat.
+// je Monat.
 
 export const SCHEMA = 2;
 export const MAX_ZEILEN = 60;
 export const MAX_PACKUNGEN = 5;
-export const PROTOKOLL_MAX = 50;
 
 export const MONATSNAMEN = Object.freeze([
   'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
@@ -38,9 +37,8 @@ export const ARTIKEL = /** @type {ReadonlyArray<Artikel>} */ (Object.freeze([
  *   wh: boolean, ul: boolean, dh: boolean, df: boolean, wph: boolean, wpf: boolean,
  *   inko: string
  * }} Zeile
- * @typedef {{ zeit: string, aktion: string }} ProtokollEintrag
  * @typedef {{
- *   zeilen: Zeile[], protokoll: ProtokollEintrag[], geaendert: string, gesendet: Gesendet|null
+ *   zeilen: Zeile[], geaendert: string, gesendet: Gesendet|null
  * }} Monat
  * @typedef {'PDF'|'JPG'} Format
  * @typedef {{ zeilen: Zeile[], zeit: string, format: Format }} Gesendet
@@ -114,7 +112,7 @@ export function istLeer(z) {
 
 /** @param {string} jetztIso @returns {Monat} */
 export function neuerMonat(jetztIso) {
-  return { zeilen: [], protokoll: [], geaendert: jetztIso, gesendet: null };
+  return { zeilen: [], geaendert: jetztIso, gesendet: null };
 }
 
 // ---------- Validierung/Normalisierung an der Vertrauensgrenze (entschlüsselter/importierter Bestand) ----------
@@ -167,10 +165,7 @@ function normGesendet(v, ym) {
 export function normMonat(v, ym, jetztIso) {
   const o = istObjekt(v) ? v : {};
   const zeilen = normZeilen(o.zeilen, 'm' + ym.replace('-', '') + 'r');
-  const protokoll = Array.isArray(o.protokoll)
-    ? o.protokoll.filter(istObjekt).slice(-PROTOKOLL_MAX).map((p) => ({ zeit: text(p.zeit, 40), aktion: text(p.aktion, 200) }))
-    : [];
-  return { zeilen, protokoll, geaendert: text(o.geaendert, 40) || jetztIso, gesendet: normGesendet(o.gesendet, ym) };
+  return { zeilen, geaendert: text(o.geaendert, 40) || jetztIso, gesendet: normGesendet(o.gesendet, ym) };
 }
 
 /** @param {unknown} v @returns {Einstellungen} */
@@ -231,7 +226,6 @@ export function migriereAltbestand(roh, jetzt) {
     }, 'alt' + i);
     if (!istLeer(z)) monat.zeilen.push(z);
   }
-  monat.protokoll.push({ zeit: jetzt.toISOString(), aktion: 'Aus unverschlüsseltem Altbestand übernommen' });
   daten.monate[ym] = monat;
   daten.aktuellerMonat = ym;
   return daten;
@@ -278,7 +272,6 @@ export function schliesseAb(m, format, zeit) {
   m.gesendet = { zeilen, zeit, format };
   m.zeilen = [];
   m.geaendert = zeit;
-  protokolliere(m, zeit, format + ' gesendet/gespeichert (' + zeilen.length + ' Pers.), Eingaben zurückgesetzt');
 }
 
 /** Holt die zuletzt gesendete Bestellung zurück (nur in einen leeren Monat). @param {Monat} m @param {string} zeit @returns {boolean} */
@@ -287,14 +280,7 @@ export function stelleGesendeteWiederHer(m, zeit) {
   m.zeilen = m.gesendet.zeilen;
   m.gesendet = null;
   m.geaendert = zeit;
-  protokolliere(m, zeit, 'Gesendete Bestellung wiederhergestellt');
   return true;
-}
-
-/** @param {Monat} m @param {string} zeit @param {string} aktion */
-export function protokolliere(m, zeit, aktion) {
-  m.protokoll.push({ zeit, aktion });
-  if (m.protokoll.length > PROTOKOLL_MAX) m.protokoll.splice(0, m.protokoll.length - PROTOKOLL_MAX);
 }
 
 /** @param {Zeile} z @param {ArtikelKey} k @returns {number} */

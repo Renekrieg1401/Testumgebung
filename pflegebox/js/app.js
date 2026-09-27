@@ -4,7 +4,7 @@
 
 import {
   istLeer, leereZeile, letzterBefuellterMonatVor, MAX_ZEILEN, neueId, neuerMonat,
-  protokolliere, schliesseAb, stelleGesendeteWiederHer, uebernehmeZeilen, ymAus, ymText, ymVerschieben
+  schliesseAb, stelleGesendeteWiederHer, uebernehmeZeilen, ymAus, ymText, ymVerschieben
 } from './model.js';
 import { erzeugeSpeicher } from './store.js';
 import { erzeugeSpiegel } from './spiegel.js';
@@ -98,16 +98,6 @@ function zeigeUebernahme() {
   $('uebernahme').dataset.quelle = quelle || '';
 }
 
-function zeigeProtokoll() {
-  const liste = $('protokoll-liste');
-  liste.replaceChildren(...monat.protokoll.slice().reverse().map((p) => {
-    const li = document.createElement('li');
-    li.textContent = new Date(p.zeit).toLocaleString('de-DE') + ' — ' + p.aktion;
-    return li;
-  }));
-  $('protokoll').hidden = monat.protokoll.length === 0;
-}
-
 function zeigeMonat() {
   const vorhanden = speicher.daten.monate[ym];
   if (vorhanden) vorhanden.zeilen = vorhanden.zeilen.filter((z) => !istLeer(z));
@@ -116,7 +106,6 @@ function zeigeMonat() {
   zeigeKopfzeile();
   zeigeGesendet();
   zeigeUebernahme();
-  zeigeProtokoll();
 }
 
 /** @param {number} delta */
@@ -196,7 +185,6 @@ $('btn-leeren').addEventListener('click', () => {
     .then((ja) => {
       if (!ja) return;
       monat.zeilen = [];
-      protokolliere(monat, new Date().toISOString(), 'Monat geleert');
       monatGeaendert();
       zeigeMonat();
       toast('Monat geleert', 'warn');
@@ -210,7 +198,6 @@ function uebernehmen(art) {
   if (!q) return;
   monatUebernehmen();
   uebernehmeZeilen(q, monat, art === 'alles', idGen);
-  protokolliere(monat, new Date().toISOString(), 'Aus ' + ymText(quelle) + ' übernommen (' + (art === 'alles' ? 'mit Mengen' : 'nur Personen') + ')');
   monatGeaendert();
   zeigeMonat();
 }

@@ -47,7 +47,7 @@ test('Normalisierung verwirft/klemmt ungültige Werte (Vertrauensgrenze)', () =>
     einstellungen: { absender: { name: 42 }, lieferant: { name: 'x'.repeat(500) } },
     monate: {
       '2026-13': { zeilen: [{ name: 'x' }] },
-      '2026-09': { zeilen: [{ id: 'a', name: 'A', hs: 99, wh: 'ja' }, { id: 'a', name: 'B' }, {}], protokoll: 'kaputt' }
+      '2026-09': { zeilen: [{ id: 'a', name: 'A', hs: 99, wh: 'ja' }, { id: 'a', name: 'B' }, {}] }
     },
     aktuellerMonat: 'x'
   }, JETZT);
@@ -55,7 +55,6 @@ test('Normalisierung verwirft/klemmt ungültige Werte (Vertrauensgrenze)', () =>
   assert.equal(d.einstellungen.lieferant.name.length, 120);
   assert.deepEqual(Object.keys(d.monate), ['2026-09']);
   const m = d.monate['2026-09'];
-  assert.deepEqual(m.protokoll, []);
   assert.equal(m.zeilen.length, 2, 'leere Zeile entfernt');
   assert.equal(m.zeilen[0].hs, 5);
   assert.equal(m.zeilen[0].wh, false);

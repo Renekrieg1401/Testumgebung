@@ -106,9 +106,6 @@ button, input, select { font: inherit; color: inherit; }
   padding: .7rem 1rem; margin-bottom: .75rem; border-radius: var(--radius); background: #e6f6fd; border: 1px solid #9bd8f2;
 }
 .hinweis-gesendet { background: #e8f5e9; border-color: #81c784; }
-.protokoll { margin-top: 1rem; }
-.protokoll summary { cursor: pointer; font-weight: 600; }
-.protokoll ul { font-size: .875rem; color: var(--text-leise); padding-left: 1.2rem; }
 
 /* ---------- Tabelle (Desktop/Tablet) ---------- */
 .tabelle-rahmen { background: var(--flaeche); border-radius: var(--radius); box-shadow: var(--schatten); overflow-x: auto; }
