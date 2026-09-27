@@ -20,7 +20,7 @@ const LEGENDE = Object.freeze([
   ['Unterl.', 'Einmal-Krankenunterlagen'],
   ['Desinf. H / F', 'Desinfektionsmittel für Hände / Fläche'],
   ['Wipes H / F', 'Desinfektions-Wipes für Hände / Fläche'],
-  ['X', 'wird benötigt (1 Packung); Inkontinenz = Freitext']
+  ['X', 'wird benötigt; Inkontinenz = Freitext']
 ]);
 
 /** Spaltenbreiten: Nr, Name, 9 Artikel, Inko → Summe = B − 2·RAND. */

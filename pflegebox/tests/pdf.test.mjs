@@ -49,7 +49,7 @@ test('PDF ist gültig und enthält Briefkopf, Zeilen, Summe', async () => {
   for (const s of ['Bestellformular Pflegehilfsmittel', 'Monat: September 2026', 'Pflegedienst Sonnenschein', 'Sanitätshaus Müller',
     'Kunden-Nr. K-4711', 'Person Ä(0)', 'Pants Gr. M', 'Summe (4 Pers.)', 'Seite 1 von 1',
     'Legende', 'Einmal-Krankenunterlagen', 'Desinfektionsmittel für Hände / Fläche', 'Desinfektions-Wipes für Hände / Fläche',
-    'Einmalhandschuhe, Größe S, M, L (Anzahl Packungen)']) {
+    'Einmalhandschuhe, Größe S, M, L (Anzahl Packungen)', 'wird benötigt; Inkontinenz = Freitext']) {
     assert.ok(text.includes(s), 'fehlt: ' + s + '\n' + text);
   }
   assert.equal(dateiname('2026-09', 'pdf'), 'Bestellung_2026-09.pdf');

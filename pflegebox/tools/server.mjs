@@ -1,4 +1,5 @@
 // Minimaler statischer Server für lokale Tests (nur Lesen innerhalb des App-Ordners).
+// Cache-Header wie GitHub Pages (max-age=600), damit Update-Probleme durch HTTP-Caching auffallen.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize, sep } from 'node:path';
@@ -15,7 +16,7 @@ export function starteServer(port) {
     if (!datei.startsWith(WURZEL) || datei.includes(sep + 'node_modules' + sep)) { res.writeHead(403).end(); return; }
     try {
       const inhalt = await readFile(datei);
-      res.writeHead(200, { 'Content-Type': TYPEN[extname(datei)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
+      res.writeHead(200, { 'Content-Type': TYPEN[extname(datei)] || 'application/octet-stream', 'Cache-Control': 'max-age=600' });
       res.end(inhalt);
     } catch (_) {
       res.writeHead(404).end('Nicht gefunden');

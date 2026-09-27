@@ -50,7 +50,9 @@ sw.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== sw.location.origin) return;
   event.respondWith(
-    fetch(req)
+    // cache: 'no-cache' — immer beim Server nachfragen (ETag), nie ungeprüft aus dem HTTP-Cache
+    // (GitHub Pages: max-age=600), sonst passen nach einem Update Seite und Programmteile nicht zusammen.
+    fetch(req, { cache: 'no-cache' })
       .then((res) => {
         if (res.ok && res.type === 'basic' && !new URL(req.url).search) {
           const kopie = res.clone();

@@ -12,7 +12,7 @@ import { erzeugeTabelle } from './tabelle.js';
 import { dateiname, erzeugeBestellJpeg, erzeugeBestellPdf } from './bestellung.js';
 import { erkenneDownloadDienst, herunterladen, teileOderLade } from './teilen.js';
 import { $, bestaetige, toast } from './dialoge.js';
-import { appVersion, registriereServiceWorker, starteUpdatePruefung } from './update.js';
+import { aktiviereNeueVersion, appVersion, registriereServiceWorker, starteUpdatePruefung } from './update.js';
 
 
 /** @typedef {import('./model.js').Monat} Monat */
@@ -230,13 +230,18 @@ window.addEventListener('pagehide', () => { spiegel.flush(); });
 // ---------- Update ----------
 
 const version = appVersion(document);
+let neueVersion = '';
 $('update-laden').addEventListener('click', () => {
+  const knopf = /** @type {HTMLButtonElement} */ ($('update-laden'));
+  knopf.disabled = true;
+  knopf.textContent = 'Wird aktualisiert …';
   speichern();
-  spiegel.flush().finally(() => location.reload());
+  Promise.all([spiegel.flush(), aktiviereNeueVersion(neueVersion)]).finally(() => location.reload());
 });
 $('update-schliessen').addEventListener('click', () => { $('update-banner').hidden = true; });
 registriereServiceWorker(version);
-starteUpdatePruefung(version, () => {
+starteUpdatePruefung(version, (neu) => {
+  neueVersion = neu;
   $('update-banner').hidden = false;
   $('update-laden').focus();
 });
