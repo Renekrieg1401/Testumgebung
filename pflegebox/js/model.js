@@ -24,11 +24,11 @@ export const ARTIKEL = /** @type {ReadonlyArray<Artikel>} */ (Object.freeze([
   { key: 'hm', label: 'Einmalhandschuhe Gr. M', kurz: 'Handsch. M', typ: 'menge' },
   { key: 'hl', label: 'Einmalhandschuhe Gr. L', kurz: 'Handsch. L', typ: 'menge' },
   { key: 'wh', label: 'Einmal-Waschhandschuhe', kurz: 'Waschh.', typ: 'check' },
-  { key: 'ul', label: 'Bettschutzeinlagen (Unterlagen)', kurz: 'Unterl.', typ: 'check' },
-  { key: 'dh', label: 'Händedesinfektion', kurz: 'Desinf. H', typ: 'check' },
-  { key: 'df', label: 'Flächendesinfektion', kurz: 'Desinf. F', typ: 'check' },
-  { key: 'wph', label: 'Desinfektionstücher Hände', kurz: 'Wipes H', typ: 'check' },
-  { key: 'wpf', label: 'Desinfektionstücher Flächen', kurz: 'Wipes F', typ: 'check' }
+  { key: 'ul', label: 'Einmal-Krankenunterlagen', kurz: 'Unterl.', typ: 'check' },
+  { key: 'dh', label: 'Desinfektionsmittel Hände', kurz: 'Desinf. H', typ: 'check' },
+  { key: 'df', label: 'Desinfektionsmittel Fläche', kurz: 'Desinf. F', typ: 'check' },
+  { key: 'wph', label: 'Desinfektions-Wipes Hände', kurz: 'Wipes H', typ: 'check' },
+  { key: 'wpf', label: 'Desinfektions-Wipes Fläche', kurz: 'Wipes F', typ: 'check' }
 ]));
 
 /**

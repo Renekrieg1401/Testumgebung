@@ -11,6 +11,17 @@ const LILA = '#702673', CYAN = '#00AEEF', GRAU = '#5f6368', LINIE = '#9aa0a6', Z
 const ZEILE_H = 18, KOPF_H = 24;
 const TABELLE_Y = 150;
 const FUSS_RESERVE = 40;
+const LEGENDE_H = 52;
+
+/** Erklärung der Spaltenkürzel für den Empfänger (zwei Spalten à drei Zeilen). */
+const LEGENDE = Object.freeze([
+  ['Handsch. S / M / L', 'Einmalhandschuhe, Größe S, M, L (Anzahl Packungen)'],
+  ['Waschh.', 'Einmal-Waschhandschuhe'],
+  ['Unterl.', 'Einmal-Krankenunterlagen'],
+  ['Desinf. H / F', 'Desinfektionsmittel für Hände / Fläche'],
+  ['Wipes H / F', 'Desinfektions-Wipes für Hände / Fläche'],
+  ['X', 'wird benötigt (1 Packung); Inkontinenz = Freitext']
+]);
 
 /** Spaltenbreiten: Nr, Name, 9 Artikel, Inko → Summe = B − 2·RAND. */
 const SPALTEN = (() => {
@@ -107,6 +118,18 @@ function zellen(z, nr) {
   }), z.inko];
 }
 
+/** @param {Zeichenflaeche} doc @param {number} y */
+function legende(doc, y) {
+  doc.text(RAND, y + 8, 'Legende', { groesse: 7.5, fett: true, farbe: GRAU });
+  const spalteB = (B - 2 * RAND) / 2;
+  LEGENDE.forEach(([kurz, text], i) => {
+    const x = RAND + (i < 3 ? 0 : spalteB);
+    const zy = y + 21 + (i % 3) * 11;
+    doc.text(x, zy, kurz, { groesse: 8, fett: true });
+    doc.text(x + 88, zy, passeEin(text, spalteB - 96, 8, false), { groesse: 8 });
+  });
+}
+
 /** @param {Zeichenflaeche} doc @param {number} seite @param {number} gesamt @param {string} kennung */
 function fusszeile(doc, seite, gesamt, kennung) {
   doc.linie(RAND, H - 28, B - RAND, H - 28, LINIE, 0.4);
@@ -115,13 +138,13 @@ function fusszeile(doc, seite, gesamt, kennung) {
 }
 
 /**
- * Seitenumbruch-Plan: Anzahl Datenzeilen je Seite; die Summenzeile steht immer auf der letzten Seite.
+ * Seitenumbruch-Plan: Anzahl Datenzeilen je Seite; Summenzeile und Legende stehen immer auf der letzten Seite.
  * @param {number} anzahl @returns {number[]}
  */
 export function seitenplan(anzahl) {
   const erste = Math.floor((H - FUSS_RESERVE - TABELLE_Y - KOPF_H) / ZEILE_H);
   const folge = Math.floor((H - FUSS_RESERVE - RAND - KOPF_H) / ZEILE_H);
-  const schluss = 1;
+  const schluss = Math.ceil((ZEILE_H + 10 + LEGENDE_H) / ZEILE_H);
   /** @type {number[]} */
   const plan = [];
   let rest = anzahl;
@@ -159,6 +182,7 @@ function zeichneBestellung(doc, d, ym, m, jetzt) {
       tabellenzeile(doc, y, ['', 'Summe (' + sum.personen + ' Pers.)', ...ARTIKEL.map((a) => String(sum[a.key])),
         sum.inko ? sum.inko + ' Pers.' : ''], { fett: true, fuellung: '#e6f6fd' });
       doc.linie(RAND, y, B - RAND, y, LILA, 1.2);
+      legende(doc, y + ZEILE_H + 10);
     }
     fusszeile(doc, s + 1, plan.length, kennung);
   });

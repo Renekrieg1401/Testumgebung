@@ -47,7 +47,9 @@ test('PDF ist gültig und enthält Briefkopf, Zeilen, Summe', async () => {
   assert.equal(new TextDecoder().decode(bytes.slice(0, 8)), '%PDF-1.4');
   const [text] = await pdfText(bytes);
   for (const s of ['Bestellformular Pflegehilfsmittel', 'Monat: September 2026', 'Pflegedienst Sonnenschein', 'Sanitätshaus Müller',
-    'Kunden-Nr. K-4711', 'Person Ä(0)', 'Pants Gr. M', 'Summe (4 Pers.)', 'Seite 1 von 1']) {
+    'Kunden-Nr. K-4711', 'Person Ä(0)', 'Pants Gr. M', 'Summe (4 Pers.)', 'Seite 1 von 1',
+    'Legende', 'Einmal-Krankenunterlagen', 'Desinfektionsmittel für Hände / Fläche', 'Desinfektions-Wipes für Hände / Fläche',
+    'Einmalhandschuhe, Größe S, M, L (Anzahl Packungen)']) {
     assert.ok(text.includes(s), 'fehlt: ' + s + '\n' + text);
   }
   assert.equal(dateiname('2026-09', 'pdf'), 'Bestellung_2026-09.pdf');
@@ -60,6 +62,7 @@ test('PDF mehrseitig mit Seitenzählung', async () => {
   assert.ok(seiten.length >= 2);
   const letzte = seiten[seiten.length - 1];
   assert.ok(letzte.includes('Summe (45 Pers.)'), letzte);
+  assert.ok(letzte.includes('Legende') && !seiten[0].includes('Legende'), 'Legende nur auf der letzten Seite');
   assert.ok(letzte.includes('Seite ' + seiten.length + ' von ' + seiten.length));
   assert.ok(seiten.join(' ').includes('Person Ä(44)'));
 });
