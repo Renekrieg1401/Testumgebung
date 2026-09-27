@@ -1,15 +1,12 @@
 // @ts-check
 // Fachliches Datenmodell der PflegeBox (rein, ohne DOM/I/O).
-// Übernommene AERIS-Logik: schema-versionierter Datenbestand mit zentralem Migrations-Sicherheitsnetz,
-// einmalig vergebene und danach stabile Belegnummern (vgl. getOrAssignRechnungsnr), Versiegelung mit
-// Unterschrift + Änderungsprotokoll (vgl. Tages-/Monatsfreigabe) und Budgetberechnung in Cent.
+// Übernommene AERIS-Logik: schema-versionierter Datenbestand mit zentralem Migrations-Sicherheitsnetz
+// und Änderungsprotokoll je Monat.
 
 export const SCHEMA = 2;
 export const MAX_ZEILEN = 60;
 export const MAX_PACKUNGEN = 5;
 export const PROTOKOLL_MAX = 50;
-/** Monatliche Pauschale für zum Verbrauch bestimmte Pflegehilfsmittel, § 40 Abs. 2 SGB XI (seit 01.01.2025). */
-export const BUDGET_STANDARD_CENT = 4200;
 
 export const MONATSNAMEN = Object.freeze([
   'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
@@ -21,7 +18,7 @@ export const MONATSNAMEN = Object.freeze([
  * @typedef {{ key: ArtikelKey, label: string, kurz: string, typ: 'menge'|'check' }} Artikel
  */
 
-/** Artikel, die aus der Pauschale nach § 40 Abs. 2 SGB XI bezahlt werden. Inkontinenzmaterial (SGB V) bewusst nicht. */
+/** Bestellbare Pflegehilfsmittel (Inkontinenzmaterial separat als Freitext). */
 export const ARTIKEL = /** @type {ReadonlyArray<Artikel>} */ (Object.freeze([
   { key: 'hs', label: 'Einmalhandschuhe Gr. S', kurz: 'Handsch. S', typ: 'menge' },
   { key: 'hm', label: 'Einmalhandschuhe Gr. M', kurz: 'Handsch. M', typ: 'menge' },
@@ -41,21 +38,16 @@ export const ARTIKEL = /** @type {ReadonlyArray<Artikel>} */ (Object.freeze([
  *   wh: boolean, ul: boolean, dh: boolean, df: boolean, wph: boolean, wpf: boolean,
  *   inko: string
  * }} Zeile
- * @typedef {{ name: string, sig: string, zeit: string }} Siegel
  * @typedef {{ zeit: string, aktion: string }} ProtokollEintrag
  * @typedef {{
- *   zeilen: Zeile[], status: 'entwurf'|'versiegelt', bestellnr: string|null,
- *   siegel: Siegel|null, protokoll: ProtokollEintrag[], geaendert: string
+ *   zeilen: Zeile[], protokoll: ProtokollEintrag[], geaendert: string
  * }} Monat
  * @typedef {{ name: string, strasse: string, ort: string, telefon: string }} Anschrift
  * @typedef {{ name: string, email: string, kundennr: string }} Lieferant
+ * @typedef {{ absender: Anschrift, lieferant: Lieferant }} Einstellungen
  * @typedef {{
- *   absender: Anschrift, lieferant: Lieferant, budgetCent: number,
- *   preiseCent: Record<ArtikelKey, number>
- * }} Einstellungen
- * @typedef {{
- *   schema: number, einstellungen: Einstellungen, monate: Record<string, Monat>,
- *   zaehler: Record<string, number>, aktuellerMonat: string
+ *   schema: number, einstellungen: Einstellungen, einstellungenGeaendert: string,
+ *   monate: Record<string, Monat>, aktuellerMonat: string
  * }} Daten
  */
 
@@ -84,7 +76,7 @@ export function ymText(ym) {
 export function istYm(v) { return typeof v === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(v); }
 
 /** @returns {Record<ArtikelKey, number>} */
-function leerePreise() {
+function nullmengen() {
   return { hs: 0, hm: 0, hl: 0, wh: 0, ul: 0, dh: 0, df: 0, wph: 0, wpf: 0 };
 }
 
@@ -94,12 +86,10 @@ export function standardDaten(jetzt) {
     schema: SCHEMA,
     einstellungen: {
       absender: { name: '', strasse: '', ort: '', telefon: '' },
-      lieferant: { name: '', email: '', kundennr: '' },
-      budgetCent: BUDGET_STANDARD_CENT,
-      preiseCent: leerePreise()
+      lieferant: { name: '', email: '', kundennr: '' }
     },
+    einstellungenGeaendert: '',
     monate: {},
-    zaehler: {},
     aktuellerMonat: ymAus(jetzt)
   };
 }
@@ -122,7 +112,7 @@ export function istLeer(z) {
 
 /** @param {string} jetztIso @returns {Monat} */
 export function neuerMonat(jetztIso) {
-  return { zeilen: [], status: 'entwurf', bestellnr: null, siegel: null, protokoll: [], geaendert: jetztIso };
+  return { zeilen: [], protokoll: [], geaendert: jetztIso };
 }
 
 // ---------- Validierung/Normalisierung an der Vertrauensgrenze (entschlüsselter/importierter Bestand) ----------
@@ -150,16 +140,8 @@ function normZeile(v, ersatzId) {
   };
 }
 
-/** @param {unknown} v @returns {Siegel|null} */
-function normSiegel(v) {
-  if (!istObjekt(v)) return null;
-  const sig = text(v.sig, 400000);
-  if (!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(sig)) return null;
-  return { name: text(v.name, 80), sig, zeit: text(v.zeit, 40) };
-}
-
 /** @param {unknown} v @param {string} ym @param {string} jetztIso @returns {Monat} */
-function normMonat(v, ym, jetztIso) {
+export function normMonat(v, ym, jetztIso) {
   const o = istObjekt(v) ? v : {};
   const roh = Array.isArray(o.zeilen) ? o.zeilen.slice(0, MAX_ZEILEN) : [];
   /** @type {Set<string>} */
@@ -170,32 +152,20 @@ function normMonat(v, ym, jetztIso) {
     ids.add(zeile.id);
     return zeile;
   }).filter((z) => !istLeer(z));
-  const siegel = normSiegel(o.siegel);
-  const versiegelt = o.status === 'versiegelt' && siegel !== null;
   const protokoll = Array.isArray(o.protokoll)
     ? o.protokoll.filter(istObjekt).slice(-PROTOKOLL_MAX).map((p) => ({ zeit: text(p.zeit, 40), aktion: text(p.aktion, 200) }))
     : [];
-  return {
-    zeilen, status: versiegelt ? 'versiegelt' : 'entwurf',
-    bestellnr: typeof o.bestellnr === 'string' && /^BS-\d{4}-\d{3,}$/.test(o.bestellnr) ? o.bestellnr : null,
-    siegel: versiegelt ? siegel : null, protokoll,
-    geaendert: text(o.geaendert, 40) || jetztIso
-  };
+  return { zeilen, protokoll, geaendert: text(o.geaendert, 40) || jetztIso };
 }
 
 /** @param {unknown} v @returns {Einstellungen} */
-function normEinstellungen(v) {
+export function normEinstellungen(v) {
   const o = istObjekt(v) ? v : {};
   const abs = istObjekt(o.absender) ? o.absender : {};
   const lief = istObjekt(o.lieferant) ? o.lieferant : {};
-  const preiseRoh = istObjekt(o.preiseCent) ? o.preiseCent : {};
-  const preiseCent = leerePreise();
-  ARTIKEL.forEach((a) => { preiseCent[a.key] = ganzzahl(preiseRoh[a.key], 0, 100000); });
   return {
     absender: { name: text(abs.name, 120), strasse: text(abs.strasse, 120), ort: text(abs.ort, 120), telefon: text(abs.telefon, 60) },
-    lieferant: { name: text(lief.name, 120), email: text(lief.email, 120), kundennr: text(lief.kundennr, 60) },
-    budgetCent: o.budgetCent === undefined ? BUDGET_STANDARD_CENT : ganzzahl(o.budgetCent, 0, 100000),
-    preiseCent
+    lieferant: { name: text(lief.name, 120), email: text(lief.email, 120), kundennr: text(lief.kundennr, 60) }
   };
 }
 
@@ -213,17 +183,11 @@ export function normalisiereDaten(roh, jetzt) {
       monate[ym] = normMonat(/** @type {Record<string, unknown>} */ (o.monate)[ym], ym, jetztIso);
     });
   }
-  /** @type {Record<string, number>} */
-  const zaehler = {};
-  if (istObjekt(o.zaehler)) {
-    Object.keys(o.zaehler).filter((j) => /^\d{4}$/.test(j)).forEach((j) => {
-      zaehler[j] = ganzzahl(/** @type {Record<string, unknown>} */ (o.zaehler)[j], 0, 999999);
-    });
-  }
   return {
     schema: SCHEMA,
     einstellungen: normEinstellungen(o.einstellungen),
-    monate, zaehler,
+    einstellungenGeaendert: text(o.einstellungenGeaendert, 40),
+    monate,
     aktuellerMonat: istYm(o.aktuellerMonat) ? o.aktuellerMonat : ymAus(jetzt)
   };
 }
@@ -280,47 +244,14 @@ export function letzterBefuellterMonatVor(d, ym) {
  * @param {Monat} quelle @param {Monat} ziel @param {boolean} mitMengen @param {() => string} idGen
  */
 export function uebernehmeZeilen(quelle, ziel, mitMengen, idGen) {
-  if (ziel.status !== 'entwurf' || ziel.zeilen.length > 0) return;
+  if (ziel.zeilen.length > 0) return;
   ziel.zeilen = quelle.zeilen.map((q) => (mitMengen ? { ...q, id: idGen() } : { ...leereZeile(idGen()), name: q.name, inko: q.inko }));
-}
-
-/**
- * Einmalige, stabile Bestellnummer je Monat (AERIS: getOrAssignRechnungsnr).
- * @param {Daten} d @param {string} ym @param {Monat} monat @returns {string}
- */
-export function vergibBestellnr(d, ym, monat) {
-  if (monat.bestellnr) return monat.bestellnr;
-  const jahr = ym.slice(0, 4);
-  const lfd = (d.zaehler[jahr] || 0) + 1;
-  d.zaehler[jahr] = lfd;
-  monat.bestellnr = 'BS-' + jahr + '-' + String(lfd).padStart(3, '0');
-  return monat.bestellnr;
 }
 
 /** @param {Monat} m @param {string} zeit @param {string} aktion */
 export function protokolliere(m, zeit, aktion) {
   m.protokoll.push({ zeit, aktion });
   if (m.protokoll.length > PROTOKOLL_MAX) m.protokoll.splice(0, m.protokoll.length - PROTOKOLL_MAX);
-}
-
-/** @param {Daten} d @param {string} ym @param {Monat} m @param {Siegel} siegel */
-export function versiegle(d, ym, m, siegel) {
-  if (m.status === 'versiegelt') return;
-  vergibBestellnr(d, ym, m);
-  m.status = 'versiegelt';
-  m.siegel = siegel;
-  m.geaendert = siegel.zeit;
-  protokolliere(m, siegel.zeit, 'Versiegelt und unterschrieben von ' + (siegel.name || 'unbekannt') + ' (' + m.bestellnr + ')');
-}
-
-/** @param {Monat} m @param {string} zeit */
-export function entsiegle(m, zeit) {
-  if (m.status !== 'versiegelt') return;
-  const wer = m.siegel ? m.siegel.name : '';
-  m.status = 'entwurf';
-  m.siegel = null;
-  m.geaendert = zeit;
-  protokolliere(m, zeit, 'Versiegelung aufgehoben (vorher unterschrieben von ' + (wer || 'unbekannt') + ')');
 }
 
 /** @param {Zeile} z @param {ArtikelKey} k @returns {number} */
@@ -331,7 +262,7 @@ export function menge(z, k) {
 
 /** @param {Zeile[]} zeilen @returns {Record<ArtikelKey, number> & { inko: number, personen: number }} */
 export function summen(zeilen) {
-  const s = { ...leerePreise(), inko: 0, personen: 0 };
+  const s = { ...nullmengen(), inko: 0, personen: 0 };
   zeilen.forEach((z) => {
     if (istLeer(z)) return;
     s.personen += 1;
@@ -339,33 +270,4 @@ export function summen(zeilen) {
     if (z.inko.trim()) s.inko += 1;
   });
   return s;
-}
-
-/** @param {Einstellungen} e @returns {boolean} */
-export function preiseHinterlegt(e) { return ARTIKEL.some((a) => e.preiseCent[a.key] > 0); }
-
-/**
- * @param {Zeile} z @param {Einstellungen} e
- * @returns {{ kostenCent: number, budgetCent: number, restCent: number, ueberschritten: boolean }}
- */
-export function budgetZeile(z, e) {
-  const kostenCent = ARTIKEL.reduce((sum, a) => sum + menge(z, a.key) * e.preiseCent[a.key], 0);
-  return { kostenCent, budgetCent: e.budgetCent, restCent: e.budgetCent - kostenCent, ueberschritten: kostenCent > e.budgetCent };
-}
-
-/** @param {number} cent @returns {string} */
-export function euro(cent) {
-  const neg = cent < 0;
-  const abs = Math.abs(Math.round(cent));
-  const ganz = String(Math.floor(abs / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return (neg ? '−' : '') + ganz + ',' + pad2(abs % 100) + ' €';
-}
-
-/** @param {string} eingabe @returns {number|null} Cent oder null bei ungültiger Eingabe */
-export function parseEuro(eingabe) {
-  const s = eingabe.replace(/\s|€/g, '');
-  if (s === '') return 0;
-  const m = /^(\d{1,5})(?:[.,](\d{1,2}))?$/.exec(s);
-  if (!m) return null;
-  return Number(m[1]) * 100 + (m[2] ? Number(m[2].padEnd(2, '0')) : 0);
 }

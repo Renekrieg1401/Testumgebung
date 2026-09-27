@@ -1,17 +1,17 @@
 // @ts-check
-// Bestelltabelle: DOM-Aufbau aus ARTIKEL (Single Source of Truth), Event-Delegation, automatische
-// Leerzeile am Ende (Ersatz für die starren 16 Zeilen), Budget-Ampel je Person, Summenzeile.
+// Bestelltabelle: DOM-Aufbau aus ARTIKEL (Single Source of Truth), Event-Delegation, Personen-Kacheln
+// per „+“ hinzufügen und per „−“ entfernen (Ersatz für die starren 16 Zeilen), Summenzeile.
 
-import { ARTIKEL, MAX_PACKUNGEN, MAX_ZEILEN, budgetZeile, euro, istLeer, preiseHinterlegt, summen } from './model.js';
+import { ARTIKEL, MAX_PACKUNGEN, MAX_ZEILEN, summen } from './model.js';
 
 /**
  * @typedef {import('./model.js').Zeile} Zeile
  * @typedef {import('./model.js').Monat} Monat
- * @typedef {import('./model.js').Einstellungen} Einstellungen
  * @typedef {{
  *   neueZeile: () => Zeile|null,
  *   zeileGeaendert: (z: Zeile) => void,
- *   zeileEntfernen: (id: string) => void
+ *   zeileEntfernen: (id: string) => void,
+ *   limitErreicht: () => void
  * }} TabellenCallbacks
  */
 
@@ -33,19 +33,30 @@ function baueKopf(tabelle) {
     el('th', { scope: 'col', class: 'sp-name' }, ['Name']),
     ...ARTIKEL.map((a) => el('th', { scope: 'col', title: a.label }, [a.kurz])),
     el('th', { scope: 'col', class: 'sp-inko', title: 'Inkontinenzmaterial (Versorgung über SGB V)' }, ['Inko']),
-    el('th', { scope: 'col', class: 'sp-budget', title: 'Kosten gegenüber Pauschale § 40 Abs. 2 SGB XI' }, ['Budget']),
     el('th', { scope: 'col', class: 'sp-aktion' }, [el('span', { class: 'sr-only' }, ['Aktion'])])
   ]);
   tabelle.tHead?.replaceChildren(kopf);
 }
 
-/** @param {Zeile|null} z @param {number} nr @param {boolean} nurLesen @returns {HTMLTableRowElement} */
-function baueZeile(z, nr, nurLesen) {
+/** @param {number} nr @returns {HTMLElement} */
+function minusKnopf(nr) {
+  return el('button', { type: 'button', class: 'btn-minus', 'data-aktion': 'entfernen',
+    'aria-label': 'Person ' + nr + ' entfernen', title: 'Person entfernen' }, ['−']);
+}
+
+/** Letzte Tabellenzeile mit dem „+“ für eine weitere Person. @returns {HTMLTableRowElement} */
+function baueplusZeile() {
+  const knopf = el('button', { type: 'button', class: 'btn-plus', 'data-aktion': 'neu', id: 'btn-person-neu',
+    'aria-label': 'Weitere Person hinzufügen', title: 'Weitere Person hinzufügen' }, ['+']);
+  const zelle = el('td', { colspan: String(ARTIKEL.length + 4), class: 'sp-plus' }, [knopf, el('span', { 'aria-hidden': 'true' }, ['Weitere Person'])]);
+  return /** @type {HTMLTableRowElement} */ (el('tr', { class: 'plus-zeile' }, [zelle]));
+}
+
+/** @param {Zeile|null} z @param {number} nr @returns {HTMLTableRowElement} */
+function baueZeile(z, nr) {
   const suffix = ', Zeile ' + nr;
-  /** @type {Record<string, string>} */
-  const dis = nurLesen ? { disabled: '' } : {};
   const name = el('input', { type: 'text', 'data-feld': 'name', maxlength: '80', autocomplete: 'off',
-    'aria-label': 'Name' + suffix, placeholder: z ? '' : 'Name eintragen …', ...dis });
+    'aria-label': 'Name' + suffix, placeholder: z ? '' : 'Name eintragen …' });
   /** @type {HTMLInputElement} */ (name).value = z ? z.name : '';
   const artikel = ARTIKEL.map((a) => {
     const label = a.label + (a.typ === 'menge' ? ' (Packungen)' : '') + suffix;
@@ -53,26 +64,23 @@ function baueZeile(z, nr, nurLesen) {
     if (a.typ === 'menge') {
       const opts = [];
       for (let v = 0; v <= MAX_PACKUNGEN; v++) opts.push(el('option', { value: String(v) }, [v === 0 ? '–' : String(v)]));
-      feld = el('select', { 'data-feld': a.key, 'aria-label': label, ...dis }, opts);
+      feld = el('select', { 'data-feld': a.key, 'aria-label': label }, opts);
       /** @type {HTMLSelectElement} */ (feld).value = String(z ? z[a.key] : 0);
     } else {
-      feld = el('input', { type: 'checkbox', 'data-feld': a.key, 'aria-label': label, ...dis });
+      feld = el('input', { type: 'checkbox', 'data-feld': a.key, 'aria-label': label });
       /** @type {HTMLInputElement} */ (feld).checked = z ? z[a.key] === true : false;
     }
     return el('td', { 'data-label': a.kurz }, [feld]);
   });
   const inko = el('input', { type: 'text', 'data-feld': 'inko', maxlength: '80', autocomplete: 'off',
-    'aria-label': 'Inkontinenzmaterial' + suffix, ...dis });
+    'aria-label': 'Inkontinenzmaterial' + suffix });
   /** @type {HTMLInputElement} */ (inko).value = z ? z.inko : '';
-  const entfernen = z && !nurLesen
-    ? el('button', { type: 'button', class: 'btn-icon', 'data-aktion': 'entfernen', 'aria-label': 'Zeile ' + nr + ' entfernen' }, ['×'])
-    : '';
+  const entfernen = minusKnopf(nr);
   const tr = /** @type {HTMLTableRowElement} */ (el('tr', { 'data-id': z ? z.id : '' }, [
     el('td', { class: 'sp-nr', 'data-label': 'Nr.' }, [String(nr)]),
     el('td', { class: 'sp-name', 'data-label': 'Name' }, [name]),
     ...artikel,
     el('td', { class: 'sp-inko', 'data-label': 'Inko' }, [inko]),
-    el('td', { class: 'sp-budget', 'data-label': 'Budget', 'aria-live': 'polite' }, ['']),
     el('td', { class: 'sp-aktion' }, [entfernen])
   ]));
   if (!z) tr.classList.add('leerzeile');
@@ -101,30 +109,39 @@ export function erzeugeTabelle(tabelle, cb) {
   const tfoot = tabelle.tFoot;
   /** @type {Monat|null} */
   let monat = null;
-  /** @type {Einstellungen|null} */
-  let einst = null;
-  let nurLesen = false;
   baueKopf(tabelle);
 
   /** @param {string} id @returns {Zeile|undefined} */
   const finde = (id) => (monat ? monat.zeilen.find((z) => z.id === id) : undefined);
 
+  const plusZeile = baueplusZeile();
+  /** @returns {HTMLTableRowElement[]} */
+  const personen = () => /** @type {HTMLTableRowElement[]} */ (Array.from(tbody.rows).filter((tr) => tr !== plusZeile));
+
+  /** @returns {HTMLTableRowElement|null} */
   function haengeLeerzeileAn() {
-    if (nurLesen || !monat || monat.zeilen.length >= MAX_ZEILEN) return;
-    tbody.append(baueZeile(null, tbody.rows.length + 1, false));
+    const anzahl = personen().length;
+    if (!monat || anzahl >= MAX_ZEILEN) return null;
+    const tr = baueZeile(null, anzahl + 1);
+    tbody.insertBefore(tr, plusZeile);
+    return tr;
   }
 
-  /** @param {HTMLTableRowElement} tr @param {Zeile} z */
-  function budgetZelle(tr, z) {
-    const zelle = tr.querySelector('.sp-budget');
-    if (!zelle || !einst) return;
-    zelle.classList.remove('budget-ok', 'budget-ueber');
-    if (!preiseHinterlegt(einst) || istLeer(z)) { zelle.textContent = '—'; return; }
-    const b = budgetZeile(z, einst);
-    zelle.textContent = euro(b.kostenCent) + (b.ueberschritten ? ' ⚠' : '');
-    zelle.classList.add(b.ueberschritten ? 'budget-ueber' : 'budget-ok');
-    zelle.setAttribute('title', (b.ueberschritten ? 'Pauschale überschritten um ' + euro(-b.restCent) : 'Rest ' + euro(b.restCent)) +
-      ' (Pauschale ' + euro(b.budgetCent) + ')');
+  /** Neue, leere Personen-Kachel; Fokus ins Namensfeld. */
+  function neuePerson() {
+    const tr = haengeLeerzeileAn();
+    if (!tr) { cb.limitErreicht(); return; }
+    const name = /** @type {HTMLInputElement|null} */ (tr.querySelector('[data-feld="name"]'));
+    if (name) { name.focus(); name.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  }
+
+  function nummeriere() {
+    personen().forEach((tr, i) => {
+      const nr = tr.querySelector('.sp-nr');
+      if (nr) nr.textContent = String(i + 1);
+      const minus = tr.querySelector('[data-aktion="entfernen"]');
+      if (minus) minus.setAttribute('aria-label', 'Person ' + (i + 1) + ' entfernen');
+    });
   }
 
   function summenZeile() {
@@ -134,7 +151,6 @@ export function erzeugeTabelle(tabelle, cb) {
       el('th', { scope: 'row', colspan: '2', class: 'sp-name' }, ['Summe (' + s.personen + ' Pers.)']),
       ...ARTIKEL.map((a) => el('td', { 'data-label': a.kurz }, [String(s[a.key])])),
       el('td', { class: 'sp-inko', 'data-label': 'Inko' }, [s.inko ? s.inko + ' Pers.' : '–']),
-      el('td', { class: 'sp-budget' }, ['']),
       el('td', { class: 'sp-aktion' }, [''])
     ]));
   }
@@ -142,7 +158,7 @@ export function erzeugeTabelle(tabelle, cb) {
   /** @param {Event} e */
   function beiEingabe(e) {
     const feld = /** @type {HTMLElement} */ (e.target);
-    if (!monat || nurLesen || !feld.dataset || !feld.dataset.feld) return;
+    if (!monat || !feld.dataset || !feld.dataset.feld) return;
     const tr = /** @type {HTMLTableRowElement|null} */ (feld.closest('tr'));
     if (!tr) return;
     let z = finde(tr.dataset.id || '');
@@ -153,13 +169,8 @@ export function erzeugeTabelle(tabelle, cb) {
       tr.dataset.id = z.id;
       tr.classList.remove('leerzeile');
       tr.querySelectorAll('[data-feld]').forEach((f) => uebernimmFeld(/** @type {HTMLElement} */ (f), /** @type {Zeile} */ (z)));
-      const aktion = tr.querySelector('.sp-aktion');
-      if (aktion) aktion.replaceChildren(el('button', { type: 'button', class: 'btn-icon', 'data-aktion': 'entfernen',
-        'aria-label': 'Zeile ' + (tr.sectionRowIndex + 1) + ' entfernen' }, ['×']));
-      haengeLeerzeileAn();
     }
     uebernimmFeld(feld, z);
-    budgetZelle(tr, z);
     summenZeile();
     cb.zeileGeaendert(z);
   }
@@ -167,29 +178,24 @@ export function erzeugeTabelle(tabelle, cb) {
   tbody.addEventListener('input', beiEingabe);
   tbody.addEventListener('change', beiEingabe);
   tbody.addEventListener('click', (e) => {
+    if (/** @type {HTMLElement} */ (e.target).closest('[data-aktion="neu"]')) { neuePerson(); return; }
     const btn = /** @type {HTMLElement} */ (e.target).closest('[data-aktion="entfernen"]');
     const tr = btn ? /** @type {HTMLTableRowElement|null} */ (btn.closest('tr')) : null;
-    if (!tr || !tr.dataset.id || nurLesen) return;
-    cb.zeileEntfernen(tr.dataset.id);
+    if (!tr) return;
+    if (tr.dataset.id) { cb.zeileEntfernen(tr.dataset.id); return; }
+    tr.remove();
+    nummeriere();
   });
 
   return {
-    /** @param {Monat|null} m @param {Einstellungen} e @param {boolean} lesen */
-    zeige(m, e, lesen) {
-      monat = m; einst = e; nurLesen = lesen;
-      tabelle.classList.toggle('nur-lesen', lesen);
+    /** @param {Monat|null} m */
+    zeige(m) {
+      monat = m;
       const zeilen = m ? m.zeilen : [];
-      tbody.replaceChildren(...zeilen.map((z, i) => {
-        const tr = baueZeile(z, i + 1, lesen);
-        budgetZelle(tr, z);
-        return tr;
-      }));
-      if (m) { haengeLeerzeileAn(); summenZeile(); } else if (tfoot) tfoot.replaceChildren();
-    },
-    leeren() {
-      monat = null;
-      tbody.replaceChildren();
-      if (tfoot) tfoot.replaceChildren();
+      tbody.replaceChildren(...zeilen.map((z, i) => baueZeile(z, i + 1)), plusZeile);
+      if (!m) { if (tfoot) tfoot.replaceChildren(); return; }
+      if (zeilen.length === 0) haengeLeerzeileAn();
+      summenZeile();
     }
   };
 }

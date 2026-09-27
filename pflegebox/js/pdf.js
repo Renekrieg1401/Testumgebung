@@ -1,6 +1,6 @@
 // @ts-check
 // Minimaler, abhängigkeitsfreier PDF-1.4-Schreiber (Vektor-Text/-Linien, Standardschriften Helvetica/
-// Helvetica-Bold mit WinAnsiEncoding, JPEG-Einbettung via DCTDecode). Ersetzt html2canvas + jsPDF:
+// Helvetica-Bold mit WinAnsiEncoding). Ersetzt html2canvas + jsPDF:
 // kein CDN, voll offlinefähig, synchron (Teilen bleibt im Klick-Gesten-Kontext), scharfer Druck.
 
 const W_REG = [278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584];
@@ -77,24 +77,14 @@ function farbe(hex) {
 function f(n) { return (Math.round(n * 100) / 100).toString(); }
 
 /**
- * @param {Uint8Array<ArrayBuffer>} b
- * @returns {{ breite: number, hoehe: number, komponenten: number }|null}
+ * Gemeinsame Zeichenschnittstelle für PDF (Vektor) und Canvas (JPG). Koordinaten in pt, Ursprung oben links.
+ * @typedef {{
+ *   seite: () => void,
+ *   text: (x: number, y: number, s: string, opt?: TextOpt) => void,
+ *   rechteck: (x: number, y: number, w: number, h: number, opt: RechteckOpt) => void,
+ *   linie: (x1: number, y1: number, x2: number, y2: number, hex: string, staerke: number) => void
+ * }} Zeichenflaeche
  */
-export function jpegInfo(b) {
-  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8) return null;
-  let i = 2;
-  while (i + 9 < b.length) {
-    if (b[i] !== 0xff) { i += 1; continue; }
-    const m = b[i + 1];
-    if (m === 0xd8 || m === 0x01 || (m >= 0xd0 && m <= 0xd7) || m === 0xff) { i += (m === 0xff ? 1 : 2); continue; }
-    const len = (b[i + 2] << 8) | b[i + 3];
-    if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) {
-      return { hoehe: (b[i + 5] << 8) | b[i + 6], breite: (b[i + 7] << 8) | b[i + 8], komponenten: b[i + 9] };
-    }
-    i += 2 + len;
-  }
-  return null;
-}
 
 /**
  * @typedef {{ groesse?: number, fett?: boolean, farbe?: string, ausrichtung?: 'links'|'mitte'|'rechts' }} TextOpt
@@ -108,8 +98,6 @@ export function jpegInfo(b) {
 export function neuesDokument(breite, hoehe) {
   /** @type {string[][]} */
   const seiten = [];
-  /** @type {{ daten: Uint8Array<ArrayBuffer>, breite: number, hoehe: number, komponenten: number }[]} */
-  const bilder = [];
   /** @type {string[]} */
   let aktuell = [];
 
@@ -143,30 +131,16 @@ export function neuesDokument(breite, hoehe) {
       f(x2) + ' ' + f(hoehe - y2) + ' l S Q');
   }
 
-  /**
-   * @param {Uint8Array<ArrayBuffer>} jpeg @param {number} x @param {number} y @param {number} maxB @param {number} maxH
-   * @returns {boolean}
-   */
-  function bild(jpeg, x, y, maxB, maxH) {
-    const info = jpegInfo(jpeg);
-    if (!info || (info.komponenten !== 1 && info.komponenten !== 3)) return false;
-    const skala = Math.min(maxB / info.breite, maxH / info.hoehe);
-    const w = info.breite * skala, h = info.hoehe * skala;
-    bilder.push({ daten: jpeg, ...info });
-    aktuell.push('q ' + f(w) + ' 0 0 ' + f(h) + ' ' + f(x) + ' ' + f(hoehe - y - h) + ' cm /Im' + bilder.length + ' Do Q');
-    return true;
-  }
-
   /** @param {string} titel @param {Date} zeit @returns {Uint8Array<ArrayBuffer>} */
   function bytes(titel, zeit) {
-    /** @type {(string|Uint8Array<ArrayBuffer>)[]} */
+    /** @type {string[]} */
     const teile = [];
     /** @type {number[]} */
     const offsets = [];
     let laenge = 0;
-    /** @param {string|Uint8Array<ArrayBuffer>} t */
+    /** @param {string} t */
     const push = (t) => { teile.push(t); laenge += t.length; };
-    /** @param {number} nr @param {string} kopf @param {Uint8Array<ArrayBuffer>|string} [strom] */
+    /** @param {number} nr @param {string} kopf @param {string} [strom] */
     const obj = (nr, kopf, strom) => {
       offsets[nr] = laenge;
       if (strom === undefined) { push(nr + ' 0 obj\n' + kopf + '\nendobj\n'); return; }
@@ -175,19 +149,13 @@ export function neuesDokument(breite, hoehe) {
       push('\nendstream\nendobj\n');
     };
     push('%PDF-1.4\n%âãÏÓ\n');
-    const ersteSeite = 5 + bilder.length;
+    const ersteSeite = 5;
     const kids = seiten.map((_, i) => (ersteSeite + i * 2) + ' 0 R').join(' ');
-    const xobj = bilder.map((_, i) => '/Im' + (i + 1) + ' ' + (5 + i) + ' 0 R').join(' ');
     obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
     obj(2, '<< /Type /Pages /Kids [' + kids + '] /Count ' + seiten.length + ' >>');
     obj(3, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
     obj(4, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
-    bilder.forEach((b, i) => {
-      obj(5 + i, '<< /Type /XObject /Subtype /Image /Width ' + b.breite + ' /Height ' + b.hoehe +
-        ' /ColorSpace /' + (b.komponenten === 1 ? 'DeviceGray' : 'DeviceRGB') + ' /BitsPerComponent 8 /Filter /DCTDecode /Length ' +
-        b.daten.length + ' >>', b.daten);
-    });
-    const ressourcen = '<< /Font << /F1 3 0 R /F2 4 0 R >>' + (xobj ? ' /XObject << ' + xobj + ' >>' : '') + ' >>';
+    const ressourcen = '<< /Font << /F1 3 0 R /F2 4 0 R >> >>';
     seiten.forEach((ops, i) => {
       const nr = ersteSeite + i * 2;
       const inhalt = ops.join('\n');
@@ -205,15 +173,14 @@ export function neuesDokument(breite, hoehe) {
     const out = new Uint8Array(laenge);
     let pos = 0;
     teile.forEach((t) => {
-      if (typeof t === 'string') { for (let k = 0; k < t.length; k++) out[pos + k] = t.charCodeAt(k) & 0xff; }
-      else out.set(t, pos);
+      for (let k = 0; k < t.length; k++) out[pos + k] = t.charCodeAt(k) & 0xff;
       pos += t.length;
     });
     return out;
   }
 
   seite();
-  return { seite, text, rechteck, linie, bild, bytes, breite, hoehe, /** @returns {number} */ get seitenzahl() { return seiten.length; } };
+  return { seite, text, rechteck, linie, bytes, breite, hoehe, /** @returns {number} */ get seitenzahl() { return seiten.length; } };
 }
 
 /** @typedef {ReturnType<typeof neuesDokument>} PdfDokument */

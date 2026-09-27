@@ -1,5 +1,5 @@
 // @ts-check
-// Service-Worker-Registrierung + sichtbarer Update-Hinweis (AERIS: pruefeAufUpdate mit APP-VERSION).
+// Service-Worker-Registrierung + Update-Overlay beim Öffnen (AERIS: pruefeAufUpdate mit APP-VERSION).
 // Einzige Versionsquelle: <meta name="app-version"> in index.html; der Service Worker erhält sie als
 // Query-Parameter (neue Version ⇒ neue SW-URL ⇒ neuer Cache, alte Caches werden verworfen).
 
@@ -38,7 +38,7 @@ export function starteUpdatePruefung(version, beiNeuerVersion) {
       })
       .catch(() => { /* offline — nächster Versuch beim nächsten Intervall */ });
   };
-  window.setTimeout(pruefe, 1500);
+  pruefe();
   window.setInterval(pruefe, 5 * 60 * 1000);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pruefe(); });
 }

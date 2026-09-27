@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="app-version" content="2026-09-27-001">
-  <meta name="description" content="Monatlicher Bestellschein für Pflegehilfsmittel — offline, verschlüsselt, mit Unterschrift und PDF-Export.">
+  <meta name="app-version" content="2026-09-27-005">
+  <meta name="description" content="Monatlicher Bestellschein für Pflegehilfsmittel — offline, mit PDF- und JPG-Export.">
   <meta name="theme-color" content="#702673">
   <meta name="color-scheme" content="light">
   <meta name="mobile-web-app-capable" content="yes">
@@ -23,62 +23,27 @@
 <body>
   <a class="skip" href="#haupt">Zum Formular springen</a>
 
-  <div id="update-banner" class="update-banner" role="status" hidden>
-    <span>Update verfügbar</span>
-    <button type="button" id="update-laden" class="btn btn-hell">Jetzt aktualisieren</button>
-    <button type="button" id="update-schliessen" class="btn-icon btn-icon-hell" aria-label="Hinweis schließen">×</button>
+  <div id="update-banner" class="update-overlay" role="alertdialog" aria-modal="true" aria-labelledby="update-titel" aria-describedby="update-text" hidden>
+    <div class="update-karte">
+      <h2 id="update-titel">Neue Version verfügbar</h2>
+      <p id="update-text">Eine aktualisierte PflegeBox wurde veröffentlicht. Ihre Eingaben bleiben beim Aktualisieren erhalten.</p>
+      <button type="button" id="update-laden" class="btn btn-primaer">Jetzt aktualisieren</button>
+      <button type="button" id="update-schliessen" class="btn btn-rand">Später</button>
+    </div>
   </div>
 
-  <!-- PIN-Gate: blickdicht, höchste Ebene; wird ausschließlich per gate.js nach erfolgreicher PIN-Prüfung ausgeblendet. -->
-  <section id="gate" class="gate" aria-labelledby="gate-titel">
-    <div class="gate-karte">
-      <img src="icons/icon.svg" alt="" width="72" height="72">
-      <h1 id="gate-titel">PflegeBox</h1>
-      <p id="gate-hinweis" aria-live="polite">Speicherstand wird geprüft …</p>
-      <form id="gate-form" autocomplete="off" novalidate>
-        <div class="feld">
-          <label for="gate-pin">PIN (6–8 Ziffern)</label>
-          <input id="gate-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" required>
-        </div>
-        <div class="feld" id="gate-pin2-wrap" hidden>
-          <label for="gate-pin2">PIN wiederholen</label>
-          <input id="gate-pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="new-password">
-        </div>
-        <p id="gate-fehler" class="fehler" role="alert"></p>
-        <button type="submit" id="gate-los" class="btn btn-primaer btn-breit">Entsperren</button>
-      </form>
-      <details id="gate-hilfe" class="gate-hilfe" hidden>
-        <summary>PIN vergessen?</summary>
-        <p>Ohne PIN lassen sich die Daten nicht entschlüsseln — es gibt bewusst kein Master-Passwort. Sie können nur alle Daten löschen und neu beginnen.</p>
-        <button type="button" id="gate-reset" class="btn btn-gefahr">Alle Daten löschen …</button>
-      </details>
-      <p class="klein">Alle Daten bleiben ausschließlich auf diesem Gerät, verschlüsselt mit AES-256-GCM.</p>
-    </div>
-  </section>
-
-  <header id="kopf" class="kopf" inert aria-hidden="true">
+  <header id="kopf" class="kopf">
     <h1 class="kopf-titel">Bestellformular Pflegehilfsmittel</h1>
     <nav class="monat-nav" aria-label="Monat wählen">
       <button type="button" id="monat-zurueck" class="btn-icon btn-icon-hell" aria-label="Vorheriger Monat">‹</button>
       <output id="monat-label" class="monat-label" aria-live="polite"></output>
       <button type="button" id="monat-vor" class="btn-icon btn-icon-hell" aria-label="Nächster Monat">›</button>
     </nav>
-    <div class="kopf-aktionen">
-      <button type="button" id="btn-einstellungen" class="btn-icon btn-icon-hell" aria-label="Einstellungen" title="Einstellungen">⚙</button>
-      <button type="button" id="btn-sperren" class="btn-icon btn-icon-hell" aria-label="App sperren" title="App sperren">🔒</button>
-    </div>
   </header>
 
-  <main id="haupt" class="haupt" inert aria-hidden="true" tabindex="-1">
+  <main id="haupt" class="haupt" tabindex="-1">
     <div class="statusleiste">
-      <span id="status-badge" class="badge badge-entwurf">Entwurf</span>
-      <span id="bestellnr" class="bestellnr"></span>
       <span class="speicherstatus"><span id="speicher-punkt" class="punkt" aria-hidden="true"></span><span id="speicher-text" role="status"></span></span>
-    </div>
-
-    <div id="versiegelt-hinweis" class="hinweis hinweis-versiegelt" hidden>
-      <span id="versiegelt-text"></span>
-      <button type="button" id="btn-entsiegeln" class="btn btn-klein btn-rand">Versiegelung aufheben …</button>
     </div>
 
     <div id="uebernahme" class="hinweis" hidden>
@@ -91,17 +56,12 @@
 
     <div class="tabelle-rahmen">
       <table id="tabelle" class="tabelle">
-        <caption class="sr-only">Bestellpositionen je Person. Neue Zeile entsteht automatisch beim Ausfüllen der letzten Zeile.</caption>
+        <caption class="sr-only">Bestellpositionen je Person. Mit „Weitere Person hinzufügen“ eine neue Zeile anlegen, mit „Person entfernen“ löschen.</caption>
         <thead></thead>
         <tbody></tbody>
         <tfoot></tfoot>
       </table>
     </div>
-
-    <p id="budget-hinweis" class="klein">
-      Budgetprüfung (Pauschale § 40 Abs. 2 SGB XI): <button type="button" id="budget-link" class="link">Packungspreise in den Einstellungen hinterlegen</button>.
-      Inkontinenzmaterial wird über SGB V versorgt und nicht angerechnet.
-    </p>
 
     <details id="protokoll" class="protokoll" hidden>
       <summary>Änderungsprotokoll dieses Monats</summary>
@@ -109,12 +69,11 @@
     </details>
   </main>
 
-  <nav id="aktionen" class="aktionen" aria-label="Aktionen" inert aria-hidden="true">
+  <nav id="aktionen" class="aktionen" aria-label="Aktionen">
     <button type="button" id="btn-pdf" class="btn btn-teilen">PDF senden / teilen</button>
-    <button type="button" id="btn-pdf-oeffnen" class="btn btn-rand">PDF öffnen / drucken</button>
-    <button type="button" id="btn-csv" class="btn btn-rand">CSV-Export</button>
-    <button type="button" id="btn-versiegeln" class="btn btn-primaer">Versiegeln &amp; unterschreiben</button>
-    <button type="button" id="btn-leeren" class="btn btn-gefahr">Leeren</button>
+    <button type="button" id="btn-pdf-laden" class="btn btn-rand" aria-label="PDF herunterladen">⬇ PDF<span class="nur-breit">&nbsp;herunterladen</span></button>
+    <button type="button" id="btn-jpg-laden" class="btn btn-rand" aria-label="JPG herunterladen">⬇ JPG<span class="nur-breit">&nbsp;herunterladen</span></button>
+    <button type="button" id="btn-leeren" class="btn btn-gefahr">Monat leeren</button>
   </nav>
 
   <dialog id="dlg-bestaetigen" class="dialog" aria-labelledby="dlg-bestaetigen-titel" aria-describedby="dlg-bestaetigen-text">
@@ -128,73 +87,6 @@
     </form>
   </dialog>
 
-  <dialog id="dlg-signatur" class="dialog dialog-breit" aria-labelledby="signatur-titel">
-    <form method="dialog" id="signatur-form" novalidate>
-      <h2 id="signatur-titel">Versiegeln</h2>
-      <p class="klein">Nach dem Versiegeln ist der Monat schreibgeschützt und erhält eine fortlaufende Bestell-Nr.</p>
-      <div class="feld">
-        <label for="signatur-name">Name der unterzeichnenden Person</label>
-        <input id="signatur-name" type="text" maxlength="80" autocomplete="name" required>
-      </div>
-      <p class="label" id="signatur-label">Unterschrift</p>
-      <canvas id="signatur-canvas" class="signatur-canvas" role="img" aria-labelledby="signatur-label"></canvas>
-      <p id="signatur-fehler" class="fehler" role="alert"></p>
-      <div class="knopfgruppe knopfgruppe-ende">
-        <button type="button" id="signatur-leeren" class="btn btn-rand">Löschen</button>
-        <button type="submit" value="abbrechen" class="btn btn-rand" formnovalidate>Abbrechen</button>
-        <button type="submit" value="versiegeln" class="btn btn-primaer">Versiegeln</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="dlg-einstellungen" class="dialog dialog-breit" aria-labelledby="einstellungen-titel">
-    <form method="dialog" id="einstellungen-form" novalidate>
-      <h2 id="einstellungen-titel">Einstellungen</h2>
-      <fieldset>
-        <legend>Besteller (Briefkopf)</legend>
-        <div class="raster">
-          <div class="feld"><label for="abs-name">Name / Einrichtung</label><input id="abs-name" type="text" maxlength="120" autocomplete="organization"></div>
-          <div class="feld"><label for="abs-strasse">Straße, Nr.</label><input id="abs-strasse" type="text" maxlength="120" autocomplete="street-address"></div>
-          <div class="feld"><label for="abs-ort">PLZ, Ort</label><input id="abs-ort" type="text" maxlength="120"></div>
-          <div class="feld"><label for="abs-telefon">Telefon</label><input id="abs-telefon" type="tel" maxlength="60" autocomplete="tel"></div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Lieferant</legend>
-        <div class="raster">
-          <div class="feld"><label for="lief-name">Name</label><input id="lief-name" type="text" maxlength="120"></div>
-          <div class="feld"><label for="lief-kundennr">Kunden-Nr.</label><input id="lief-kundennr" type="text" maxlength="60"></div>
-          <div class="feld"><label for="lief-email">E-Mail</label><input id="lief-email" type="email" maxlength="120"></div>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>Budget (§ 40 Abs. 2 SGB XI)</legend>
-        <div class="feld"><label for="budget">Monatliche Pauschale je Person in €</label><input id="budget" type="text" inputmode="decimal" autocomplete="off"></div>
-        <p class="klein">Preise je Packung in €. Leer = nicht hinterlegt. Ohne Preise erfolgt keine Budgetprüfung.</p>
-        <div class="raster" id="preis-felder"></div>
-      </fieldset>
-      <p id="einstellungen-fehler" class="fehler" role="alert"></p>
-      <div class="knopfgruppe knopfgruppe-ende">
-        <button type="submit" value="abbrechen" class="btn btn-rand" formnovalidate>Abbrechen</button>
-        <button type="submit" value="speichern" class="btn btn-primaer">Speichern</button>
-      </div>
-      <fieldset>
-        <legend>Datensicherung</legend>
-        <p class="klein">Die Sicherungsdatei bleibt verschlüsselt und ist nur mit der PIN zum Zeitpunkt der Sicherung lesbar.</p>
-        <button type="button" id="btn-sicherung" class="btn btn-rand">Verschlüsselte Sicherung herunterladen</button>
-        <div class="raster">
-          <div class="feld"><label for="sicherung-datei">Sicherungsdatei</label><input id="sicherung-datei" type="file" accept="application/json,.json"></div>
-          <div class="feld"><label for="sicherung-pin">PIN der Sicherung</label><input id="sicherung-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off"></div>
-        </div>
-        <button type="button" id="btn-wiederherstellen" class="btn btn-rand">Sicherung wiederherstellen …</button>
-        <p id="speicherstand" class="klein"></p>
-      </fieldset>
-      <fieldset>
-        <legend>Gefahrenbereich</legend>
-        <button type="button" id="btn-alles-loeschen" class="btn btn-gefahr">Alle Daten auf diesem Gerät löschen …</button>
-      </fieldset>
-    </form>
-  </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>

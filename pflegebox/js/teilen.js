@@ -1,11 +1,29 @@
 // @ts-check
-// Teilen/Herunterladen/Öffnen von Dateien (AERIS: exportSteuerberaterMonat + aeOpenPrintFragment).
+// Teilen/Herunterladen von Dateien (AERIS: exportSteuerberaterMonat).
 // navigator.share wird synchron im Klick-Handler aufgerufen (transiente Nutzeraktivierung, iOS).
+// Läuft die App als claude.ai-Artifact, sind <a download> und Web Share gesperrt; dort wird die
+// Plattform-Funktion „downloads“ genutzt (der Nutzer bestätigt das Speichern).
 
 /**
- * @param {Blob} blob @param {string} dateiname
+ * @typedef {'geteilt'|'geladen'|'abgebrochen'|'fehler'} TeilErgebnis
+ * @typedef {{ save(req: { filename: string, data: Blob }): Promise<{ status: string }> }} DownloadDienst
+ * @typedef {{ use(name: string): Promise<unknown> }} ClaudeLaufzeit
  */
-export function herunterladen(blob, dateiname) {
+
+/** @type {DownloadDienst|null} */
+let dienst = null;
+
+/** Erkennt die Artifact-Laufzeit; außerhalb von claude.ai bleibt der normale Download aktiv. */
+export function erkenneDownloadDienst() {
+  const laufzeit = /** @type {{ claude?: ClaudeLaufzeit }} */ (/** @type {unknown} */ (window)).claude;
+  if (!laufzeit || typeof laufzeit.use !== 'function') return;
+  laufzeit.use('downloads').then((ns) => {
+    if (ns && typeof /** @type {DownloadDienst} */ (ns).save === 'function') dienst = /** @type {DownloadDienst} */ (ns);
+  }, () => { /* nicht verfügbar — normaler Download */ });
+}
+
+/** @param {Blob} blob @param {string} dateiname */
+function ankerDownload(blob, dateiname) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -17,41 +35,38 @@ export function herunterladen(blob, dateiname) {
   window.setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
+/** @param {unknown} err @returns {TeilErgebnis} */
+function saveFehler(err) {
+  const code = err && typeof err === 'object' ? /** @type {{ code?: unknown }} */ (err).code : undefined;
+  return code === 'declined' ? 'abgebrochen' : 'fehler';
+}
+
+/**
+ * @param {Blob} blob @param {string} dateiname @returns {Promise<TeilErgebnis>}
+ */
+export function herunterladen(blob, dateiname) {
+  if (!dienst) {
+    ankerDownload(blob, dateiname);
+    return Promise.resolve('geladen');
+  }
+  return dienst.save({ filename: dateiname, data: blob }).then(() => /** @type {TeilErgebnis} */ ('geladen'), saveFehler);
+}
+
 /**
  * @param {Blob} blob @param {string} dateiname @param {string} titel
- * @returns {Promise<'geteilt'|'geladen'|'abgebrochen'>}
+ * @returns {Promise<TeilErgebnis>}
  */
 export function teileOderLade(blob, dateiname, titel) {
   let datei = null;
   try { datei = new File([blob], dateiname, { type: blob.type }); } catch (_) { datei = null; }
   let kannTeilen = false;
   try {
-    kannTeilen = !!datei && typeof navigator.share === 'function' && typeof navigator.canShare === 'function' &&
+    kannTeilen = !dienst && !!datei && typeof navigator.share === 'function' && typeof navigator.canShare === 'function' &&
       navigator.canShare({ files: [datei] });
   } catch (_) { kannTeilen = false; }
-  if (!kannTeilen || !datei) {
-    herunterladen(blob, dateiname);
-    return Promise.resolve('geladen');
-  }
+  if (!kannTeilen || !datei) return herunterladen(blob, dateiname);
   return navigator.share({ files: [datei], title: titel }).then(
-    () => /** @type {'geteilt'} */ ('geteilt'),
-    (err) => {
-      if (err instanceof Error && err.name === 'AbortError') return /** @type {'abgebrochen'} */ ('abgebrochen');
-      herunterladen(blob, dateiname);
-      return /** @type {'geladen'} */ ('geladen');
-    }
+    () => /** @type {TeilErgebnis} */ ('geteilt'),
+    (err) => (err instanceof Error && err.name === 'AbortError' ? /** @type {TeilErgebnis} */ ('abgebrochen') : herunterladen(blob, dateiname))
   );
-}
-
-/**
- * Öffnet die Datei in neuem Tab (auch in iOS-Standalone-PWAs druckbar); Popup-Blocker → Download.
- * @param {Blob} blob @param {string} dateiname @returns {'geoeffnet'|'geladen'}
- */
-export function oeffneInTab(blob, dateiname) {
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  window.setTimeout(() => URL.revokeObjectURL(url), 60000);
-  if (win) return 'geoeffnet';
-  herunterladen(blob, dateiname);
-  return 'geladen';
 }

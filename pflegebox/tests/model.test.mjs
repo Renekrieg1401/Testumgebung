@@ -1,12 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  budgetZeile, entsiegle, euro, istLeer, leereZeile, letzterBefuellterMonatVor, migriereAltbestand, neuerMonat,
-  normalisiereDaten, parseEuro, standardDaten, summen, uebernehmeZeilen, vergibBestellnr, versiegle, ymText, ymVerschieben
+  istLeer, leereZeile, letzterBefuellterMonatVor, migriereAltbestand, neuerMonat,
+  normalisiereDaten, standardDaten, summen, uebernehmeZeilen, ymText, ymVerschieben
 } from '../js/model.js';
 
 const JETZT = new Date('2026-09-27T10:00:00Z');
-const SIG = 'data:image/jpeg;base64,/9j/AAAA';
 
 test('Monatsarithmetik über Jahresgrenzen', () => {
   assert.equal(ymVerschieben('2026-01', -1), '2025-12');
@@ -15,46 +14,7 @@ test('Monatsarithmetik über Jahresgrenzen', () => {
   assert.equal(ymText('2026-03'), 'März 2026');
 });
 
-test('Euro-Formatierung und -Parsing in Cent', () => {
-  assert.equal(euro(4200), '42,00 €');
-  assert.equal(euro(123456), '1.234,56 €');
-  assert.equal(euro(-5), '−0,05 €');
-  assert.equal(parseEuro('8,9'), 890);
-  assert.equal(parseEuro('12.34'), 1234);
-  assert.equal(parseEuro(' 7 € '), 700);
-  assert.equal(parseEuro(''), 0);
-  assert.equal(parseEuro('abc'), null);
-  assert.equal(parseEuro('1,234'), null);
-});
-
-test('Bestellnummer wird je Monat einmalig und fortlaufend je Jahr vergeben', () => {
-  const d = standardDaten(JETZT);
-  const a = neuerMonat(JETZT.toISOString()), b = neuerMonat(JETZT.toISOString()), c = neuerMonat(JETZT.toISOString());
-  assert.equal(vergibBestellnr(d, '2026-09', a), 'BS-2026-001');
-  assert.equal(vergibBestellnr(d, '2026-09', a), 'BS-2026-001');
-  assert.equal(vergibBestellnr(d, '2026-10', b), 'BS-2026-002');
-  assert.equal(vergibBestellnr(d, '2027-01', c), 'BS-2027-001');
-});
-
-test('Versiegeln/Entsiegeln protokolliert und behält Bestellnummer', () => {
-  const d = standardDaten(JETZT);
-  const m = neuerMonat(JETZT.toISOString());
-  versiegle(d, '2026-09', m, { name: 'A. Muster', sig: SIG, zeit: JETZT.toISOString() });
-  assert.equal(m.status, 'versiegelt');
-  assert.equal(m.bestellnr, 'BS-2026-001');
-  entsiegle(m, JETZT.toISOString());
-  assert.equal(m.status, 'entwurf');
-  assert.equal(m.siegel, null);
-  assert.equal(m.bestellnr, 'BS-2026-001');
-  assert.equal(m.protokoll.length, 2);
-  versiegle(d, '2026-09', m, { name: 'B', sig: SIG, zeit: JETZT.toISOString() });
-  assert.equal(m.bestellnr, 'BS-2026-001');
-});
-
-test('Summen und Budget § 40 Abs. 2 SGB XI (Inko nicht angerechnet)', () => {
-  const d = standardDaten(JETZT);
-  d.einstellungen.preiseCent.hm = 890;
-  d.einstellungen.preiseCent.dh = 1250;
+test('Summen (Inko als Personenanzahl)', () => {
   const z1 = { ...leereZeile('a'), name: 'Frau A', hm: 3, dh: true, inko: 'Pants M' };
   const z2 = { ...leereZeile('b'), name: 'Herr B', hm: 1 };
   const s = summen([z1, z2, leereZeile('c')]);
@@ -62,12 +22,6 @@ test('Summen und Budget § 40 Abs. 2 SGB XI (Inko nicht angerechnet)', () => {
   assert.equal(s.hm, 4);
   assert.equal(s.dh, 1);
   assert.equal(s.inko, 1);
-  const b = budgetZeile(z1, d.einstellungen);
-  assert.equal(b.kostenCent, 3 * 890 + 1250);
-  assert.equal(b.ueberschritten, false);
-  const teuer = budgetZeile({ ...z1, hm: 5 }, d.einstellungen);
-  assert.equal(teuer.kostenCent, 5700);
-  assert.equal(teuer.ueberschritten, true);
 });
 
 test('Übernahme aus Vormonat (nur Personen / mit Mengen)', () => {
@@ -90,29 +44,22 @@ test('Übernahme aus Vormonat (nur Personen / mit Mengen)', () => {
 
 test('Normalisierung verwirft/klemmt ungültige Werte (Vertrauensgrenze)', () => {
   const d = normalisiereDaten({
-    einstellungen: { budgetCent: -5, preiseCent: { hs: '120', xx: 5 }, absender: { name: 42 } },
+    einstellungen: { absender: { name: 42 }, lieferant: { name: 'x'.repeat(500) } },
     monate: {
       '2026-13': { zeilen: [{ name: 'x' }] },
-      '2026-09': {
-        status: 'versiegelt', siegel: { name: 'x', sig: 'javascript:alert(1)', zeit: '' },
-        zeilen: [{ id: 'a', name: 'A', hs: 99, wh: 'ja' }, { id: 'a', name: 'B' }, {}], bestellnr: 'kaputt'
-      }
+      '2026-09': { zeilen: [{ id: 'a', name: 'A', hs: 99, wh: 'ja' }, { id: 'a', name: 'B' }, {}], protokoll: 'kaputt' }
     },
-    zaehler: { '2026': 3, abc: 1 }, aktuellerMonat: 'x'
+    aktuellerMonat: 'x'
   }, JETZT);
-  assert.equal(d.einstellungen.budgetCent, 0);
-  assert.equal(d.einstellungen.preiseCent.hs, 120);
   assert.equal(d.einstellungen.absender.name, '');
+  assert.equal(d.einstellungen.lieferant.name.length, 120);
   assert.deepEqual(Object.keys(d.monate), ['2026-09']);
   const m = d.monate['2026-09'];
-  assert.equal(m.status, 'entwurf', 'Versiegelung ohne gültige Signatur wird nicht übernommen');
-  assert.equal(m.siegel, null);
-  assert.equal(m.bestellnr, null);
+  assert.deepEqual(m.protokoll, []);
   assert.equal(m.zeilen.length, 2, 'leere Zeile entfernt');
   assert.equal(m.zeilen[0].hs, 5);
   assert.equal(m.zeilen[0].wh, false);
   assert.notEqual(m.zeilen[0].id, m.zeilen[1].id, 'doppelte IDs werden aufgelöst');
-  assert.deepEqual(d.zaehler, { '2026': 3 });
   assert.equal(d.aktuellerMonat, '2026-09');
 });
 
