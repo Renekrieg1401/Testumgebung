@@ -40,8 +40,10 @@ export const ARTIKEL = /** @type {ReadonlyArray<Artikel>} */ (Object.freeze([
  * }} Zeile
  * @typedef {{ zeit: string, aktion: string }} ProtokollEintrag
  * @typedef {{
- *   zeilen: Zeile[], protokoll: ProtokollEintrag[], geaendert: string
+ *   zeilen: Zeile[], protokoll: ProtokollEintrag[], geaendert: string, gesendet: Gesendet|null
  * }} Monat
+ * @typedef {'PDF'|'JPG'} Format
+ * @typedef {{ zeilen: Zeile[], zeit: string, format: Format }} Gesendet
  * @typedef {{ name: string, strasse: string, ort: string, telefon: string }} Anschrift
  * @typedef {{ name: string, email: string, kundennr: string }} Lieferant
  * @typedef {{ absender: Anschrift, lieferant: Lieferant }} Einstellungen
@@ -112,7 +114,7 @@ export function istLeer(z) {
 
 /** @param {string} jetztIso @returns {Monat} */
 export function neuerMonat(jetztIso) {
-  return { zeilen: [], protokoll: [], geaendert: jetztIso };
+  return { zeilen: [], protokoll: [], geaendert: jetztIso, gesendet: null };
 }
 
 // ---------- Validierung/Normalisierung an der Vertrauensgrenze (entschlüsselter/importierter Bestand) ----------
@@ -140,22 +142,35 @@ function normZeile(v, ersatzId) {
   };
 }
 
-/** @param {unknown} v @param {string} ym @param {string} jetztIso @returns {Monat} */
-export function normMonat(v, ym, jetztIso) {
-  const o = istObjekt(v) ? v : {};
-  const roh = Array.isArray(o.zeilen) ? o.zeilen.slice(0, MAX_ZEILEN) : [];
+/** @param {unknown} v @param {string} praefix @returns {Zeile[]} */
+function normZeilen(v, praefix) {
+  const roh = Array.isArray(v) ? v.slice(0, MAX_ZEILEN) : [];
   /** @type {Set<string>} */
   const ids = new Set();
-  const zeilen = roh.map((z, i) => {
-    const zeile = normZeile(z, 'm' + ym.replace('-', '') + 'r' + i);
-    if (ids.has(zeile.id)) zeile.id = 'm' + ym.replace('-', '') + 'r' + i;
+  return roh.map((z, i) => {
+    const zeile = normZeile(z, praefix + i);
+    if (ids.has(zeile.id)) zeile.id = praefix + i;
     ids.add(zeile.id);
     return zeile;
   }).filter((z) => !istLeer(z));
+}
+
+/** @param {unknown} v @param {string} ym @returns {Gesendet|null} */
+function normGesendet(v, ym) {
+  if (!istObjekt(v)) return null;
+  const zeilen = normZeilen(v.zeilen, 'g' + ym.replace('-', '') + 'r');
+  if (zeilen.length === 0) return null;
+  return { zeilen, zeit: text(v.zeit, 40), format: v.format === 'JPG' ? 'JPG' : 'PDF' };
+}
+
+/** @param {unknown} v @param {string} ym @param {string} jetztIso @returns {Monat} */
+export function normMonat(v, ym, jetztIso) {
+  const o = istObjekt(v) ? v : {};
+  const zeilen = normZeilen(o.zeilen, 'm' + ym.replace('-', '') + 'r');
   const protokoll = Array.isArray(o.protokoll)
     ? o.protokoll.filter(istObjekt).slice(-PROTOKOLL_MAX).map((p) => ({ zeit: text(p.zeit, 40), aktion: text(p.aktion, 200) }))
     : [];
-  return { zeilen, protokoll, geaendert: text(o.geaendert, 40) || jetztIso };
+  return { zeilen, protokoll, geaendert: text(o.geaendert, 40) || jetztIso, gesendet: normGesendet(o.gesendet, ym) };
 }
 
 /** @param {unknown} v @returns {Einstellungen} */
@@ -235,7 +250,7 @@ export function holeMonat(d, ym, jetztIso) {
 
 /** @param {Daten} d @param {string} ym @returns {string|null} */
 export function letzterBefuellterMonatVor(d, ym) {
-  const kandidaten = Object.keys(d.monate).filter((k) => k < ym && d.monate[k].zeilen.length > 0).sort();
+  const kandidaten = Object.keys(d.monate).filter((k) => k < ym && personenVon(d.monate[k]).length > 0).sort();
   return kandidaten.length ? kandidaten[kandidaten.length - 1] : null;
 }
 
@@ -245,7 +260,35 @@ export function letzterBefuellterMonatVor(d, ym) {
  */
 export function uebernehmeZeilen(quelle, ziel, mitMengen, idGen) {
   if (ziel.zeilen.length > 0) return;
-  ziel.zeilen = quelle.zeilen.map((q) => (mitMengen ? { ...q, id: idGen() } : { ...leereZeile(idGen()), name: q.name, inko: q.inko }));
+  ziel.zeilen = personenVon(quelle).map((q) => (mitMengen ? { ...q, id: idGen() } : { ...leereZeile(idGen()), name: q.name, inko: q.inko }));
+}
+
+/** Aktuelle Zeilen, sonst die zuletzt gesendeten (Quelle für die Übernahme in Folgemonate). @param {Monat} m @returns {Zeile[]} */
+export function personenVon(m) {
+  return m.zeilen.length > 0 ? m.zeilen : m.gesendet ? m.gesendet.zeilen : [];
+}
+
+/**
+ * Nach bestätigtem Senden/Speichern: Eingaben zurücksetzen, gesendeten Stand zur Wiederherstellung aufbewahren.
+ * @param {Monat} m @param {Format} format @param {string} zeit
+ */
+export function schliesseAb(m, format, zeit) {
+  const zeilen = m.zeilen.filter((z) => !istLeer(z));
+  if (zeilen.length === 0) return;
+  m.gesendet = { zeilen, zeit, format };
+  m.zeilen = [];
+  m.geaendert = zeit;
+  protokolliere(m, zeit, format + ' gesendet/gespeichert (' + zeilen.length + ' Pers.), Eingaben zurückgesetzt');
+}
+
+/** Holt die zuletzt gesendete Bestellung zurück (nur in einen leeren Monat). @param {Monat} m @param {string} zeit @returns {boolean} */
+export function stelleGesendeteWiederHer(m, zeit) {
+  if (!m.gesendet || m.zeilen.length > 0) return false;
+  m.zeilen = m.gesendet.zeilen;
+  m.gesendet = null;
+  m.geaendert = zeit;
+  protokolliere(m, zeit, 'Gesendete Bestellung wiederhergestellt');
+  return true;
 }
 
 /** @param {Monat} m @param {string} zeit @param {string} aktion */

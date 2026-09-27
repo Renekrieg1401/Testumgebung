@@ -79,3 +79,27 @@ test('Migration des Klartext-Altbestands (Bestellschein v1)', () => {
   assert.equal(migriereAltbestand(null, JETZT), null);
   assert.ok(istLeer(leereZeile('x')));
 });
+
+test('Abschluss nach Senden: zurücksetzen, aufbewahren, wiederherstellen, als Übernahmequelle nutzen', async () => {
+  const { schliesseAb, stelleGesendeteWiederHer, personenVon } = await import('../js/model.js');
+  const d = standardDaten(JETZT);
+  const m = neuerMonat(JETZT.toISOString());
+  m.zeilen.push({ ...leereZeile('a'), name: 'Frau A', hs: 2 }, leereZeile('leer'));
+  d.monate['2026-09'] = m;
+  schliesseAb(m, 'JPG', '2026-09-27T12:00:00.000Z');
+  assert.equal(m.zeilen.length, 0);
+  assert.equal(m.gesendet?.format, 'JPG');
+  assert.equal(m.gesendet?.zeilen.length, 1, 'leere Zeilen werden nicht aufbewahrt');
+  assert.equal(personenVon(m)[0].name, 'Frau A');
+  assert.equal(letzterBefuellterMonatVor(d, '2026-10'), '2026-09');
+  const n = normalisiereDaten(JSON.parse(JSON.stringify(d)), JETZT);
+  assert.equal(n.monate['2026-09'].gesendet?.zeilen[0].hs, 2, 'gesendeter Stand übersteht Speichern/Laden');
+  schliesseAb(m, 'PDF', 'x');
+  assert.equal(m.gesendet?.format, 'JPG', 'leerer Monat überschreibt die Aufbewahrung nicht');
+  m.zeilen.push({ ...leereZeile('b'), name: 'Neu' });
+  assert.equal(stelleGesendeteWiederHer(m, 'y'), false, 'nicht über neue Eingaben');
+  m.zeilen = [];
+  assert.equal(stelleGesendeteWiederHer(m, 'y'), true);
+  assert.equal(m.zeilen[0].name, 'Frau A');
+  assert.equal(m.gesendet, null);
+});

@@ -59,7 +59,9 @@ try {
   assert.equal(await page.locator('#btn-einstellungen').count(), 0);
   schritt('Keine Einstellungs-Option');
 
-  // 4) PDF (Headless: kein navigator.share → Download-Fallback)
+  // 4) PDF/JPG (Headless: kein navigator.share → Download-Fallback, Abschluss unbekannt → Rückfrage)
+  const personen = () => page.locator('#tabelle tbody tr[data-id]:not([data-id=""])').count();
+  const behalten = async () => { await page.waitForSelector('#dlg-bestaetigen[open]'); await page.click('#dlg-bestaetigen-abbrechen'); };
   const dl = page.waitForEvent('download');
   await page.click('#btn-pdf');
   const datei = await dl;
@@ -67,6 +69,9 @@ try {
   await datei.saveAs(pdfPfad);
   assert.equal(readFileSync(pdfPfad).subarray(0, 5).toString(), '%PDF-');
   assert.match(datei.suggestedFilename(), /^Bestellung_\d{4}-\d{2}\.pdf$/);
+  assert.match(await page.textContent('#dlg-bestaetigen-titel'), /Download abgeschlossen/);
+  await behalten();
+  assert.equal(await personen(), 2, '„Nein, behalten“ darf nichts zurücksetzen');
   const dlJpg = page.waitForEvent('download');
   await page.click('#btn-jpg-laden');
   const jpg = await dlJpg;
@@ -76,13 +81,42 @@ try {
   assert.equal(jpgBytes[0], 0xff);
   assert.equal(jpgBytes[1], 0xd8);
   assert.match(jpg.suggestedFilename(), /^Bestellung_\d{4}-\d{2}\.jpg$/);
-  const dlJpg2 = page.waitForEvent('download');
-  await page.click('#btn-jpg');
-  assert.match((await dlJpg2).suggestedFilename(), /\.jpg$/);
+  await behalten();
   const dlPdf2 = page.waitForEvent('download');
   await page.click('#btn-pdf-laden');
   assert.match((await dlPdf2).suggestedFilename(), /\.pdf$/);
-  schritt('PDF und JPG: senden/teilen und herunterladen');
+  await page.waitForSelector('#dlg-bestaetigen[open]');
+  await page.click('#dlg-bestaetigen-ok');
+  await page.waitForSelector('#gesendet-hinweis:not([hidden])');
+  assert.equal(await personen(), 0, 'nach bestätigtem Download zurückgesetzt');
+  await page.reload();
+  await page.waitForSelector('#gesendet-hinweis:not([hidden])');
+  assert.equal(await personen(), 0, 'Zurücksetzen bleibt nach Neustart bestehen');
+  await page.click('#btn-wiederherstellen');
+  assert.equal(await personen(), 2);
+  assert.equal(await zeile(1).locator('[data-feld="name"]').inputValue(), 'Herr Neu');
+  schritt('Download: Rückfrage, „Nein“ behält, „Ja“ setzt zurück, Wiederherstellen');
+
+  // 4b) Teilen: abgebrochen → nichts passiert; erfolgreich → sofort zurückgesetzt (ohne Rückfrage)
+  await page.evaluate(() => {
+    const nav = /** @type {any} */ (navigator);
+    nav.canShare = () => true;
+    nav.share = () => (window.__teilenAbbruch ? Promise.reject(new DOMException('abgebrochen', 'AbortError')) : Promise.resolve());
+    window.__teilenAbbruch = true;
+  });
+  await page.click('#btn-jpg');
+  await page.waitForTimeout(300);
+  assert.equal(await personen(), 2, 'abgebrochenes Teilen darf nichts zurücksetzen');
+  assert.equal(await page.locator('#dlg-bestaetigen[open]').count(), 0);
+  await page.evaluate(() => { window.__teilenAbbruch = false; });
+  await page.click('#btn-pdf');
+  await page.waitForSelector('#gesendet-hinweis:not([hidden])');
+  assert.equal(await personen(), 0);
+  assert.match(await page.textContent('#gesendet-text'), /als PDF/);
+  await page.click('#btn-wiederherstellen');
+  assert.equal(await personen(), 2);
+  await page.reload();
+  schritt('Teilen: Abbruch behält, Erfolg setzt zurück, Wiederherstellen');
 
   // 5) Folgemonat: Übernahme aus Vormonat
   await page.click('#monat-vor');

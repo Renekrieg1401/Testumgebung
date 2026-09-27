@@ -4,7 +4,7 @@
 
 import {
   istLeer, leereZeile, letzterBefuellterMonatVor, MAX_ZEILEN, neueId, neuerMonat,
-  protokolliere, uebernehmeZeilen, ymAus, ymText, ymVerschieben
+  protokolliere, schliesseAb, stelleGesendeteWiederHer, uebernehmeZeilen, ymAus, ymText, ymVerschieben
 } from './model.js';
 import { erzeugeSpeicher } from './store.js';
 import { erzeugeSpiegel } from './spiegel.js';
@@ -82,8 +82,17 @@ function zeigeKopfzeile() {
   ['btn-pdf', 'btn-jpg', 'btn-pdf-laden', 'btn-jpg-laden', 'btn-leeren'].forEach((id) => { /** @type {HTMLButtonElement} */ ($(id)).disabled = !befuellt; });
 }
 
+function zeigeGesendet() {
+  const g = monat.zeilen.length === 0 ? monat.gesendet : null;
+  $('gesendet-hinweis').hidden = !g;
+  if (g) {
+    $('gesendet-text').textContent = 'Bestellung (' + g.zeilen.length + ' Pers.) wurde am ' + new Date(g.zeit).toLocaleString('de-DE') +
+      ' als ' + g.format + ' gesendet/gespeichert und zurückgesetzt. Nicht angekommen?';
+  }
+}
+
 function zeigeUebernahme() {
-  const quelle = monat.zeilen.length === 0 ? letzterBefuellterMonatVor(speicher.daten, ym) : null;
+  const quelle = monat.zeilen.length === 0 && !monat.gesendet ? letzterBefuellterMonatVor(speicher.daten, ym) : null;
   $('uebernahme').hidden = !quelle;
   if (quelle) $('uebernahme-text').textContent = 'Noch keine Einträge. Personen aus ' + ymText(quelle) + ' übernehmen?';
   $('uebernahme').dataset.quelle = quelle || '';
@@ -105,6 +114,7 @@ function zeigeMonat() {
   monat = vorhanden || neuerMonat(new Date().toISOString());
   tabelle.zeige(monat);
   zeigeKopfzeile();
+  zeigeGesendet();
   zeigeUebernahme();
   zeigeProtokoll();
 }
@@ -122,20 +132,43 @@ function pdfBlob() {
   return new Blob([erzeugeBestellPdf(speicher.daten, ym, monat, new Date())], { type: 'application/pdf' });
 }
 
-/** @param {import('./teilen.js').TeilErgebnis} r @param {string} art */
-function meldeDownload(r, art) {
-  if (r === 'geteilt') toast(art + ' geteilt ✓', 'ok');
-  if (r === 'geladen') toast(art + ' gespeichert ✓', 'ok');
-  if (r === 'fehler') toast(art + ' konnte nicht gespeichert werden.', 'fehler');
+/**
+ * Setzt die Eingaben erst zurück, wenn Senden/Speichern nachweislich abgeschlossen ist. Bei unbestätigtem
+ * Browser-Download wird nachgefragt; bei Abbruch/Fehler bleibt alles erhalten.
+ * @param {import('./teilen.js').TeilErgebnis} r @param {import('./model.js').Format} format
+ * @param {import('./model.js').Monat} m @param {string} ymExport
+ */
+function nachExport(r, format, m, ymExport) {
+  const abschliessen = () => {
+    schliesseAb(m, format, new Date().toISOString());
+    speichern();
+    spiegel.markiere(ymExport);
+    if (ymExport === ym) zeigeMonat();
+    toast(format + (r === 'geteilt' ? ' geteilt' : ' gespeichert') + ' ✓ — Eingaben zurückgesetzt', 'ok');
+  };
+  if (r === 'geteilt' || r === 'gespeichert') { abschliessen(); return; }
+  if (r === 'abgebrochen') { toast('Abgebrochen — Eingaben bleiben erhalten', 'info'); return; }
+  if (r === 'fehler') { toast(format + ' konnte nicht gespeichert werden — Eingaben bleiben erhalten', 'fehler'); return; }
+  bestaetige({
+    titel: 'Download abgeschlossen?',
+    text: 'Wurde die ' + format + '-Datei gespeichert? Dann werden die Eingaben zurückgesetzt. Die Bestellung lässt sich danach über „Wiederherstellen“ zurückholen.',
+    ok: 'Ja, zurücksetzen', abbrechen: 'Nein, behalten'
+  }).then((ja) => { if (ja) abschliessen(); else toast('Eingaben bleiben erhalten', 'info'); });
 }
 
-$('btn-pdf').addEventListener('click', () => {
-  teileOderLade(pdfBlob(), dateiname(ym, 'pdf'), 'Bestellung Pflegehilfsmittel ' + ymText(ym)).then((r) => meldeDownload(r, 'PDF'));
-});
+/**
+ * @param {Blob|null} blob @param {import('./model.js').Format} format @param {boolean} teilen
+ */
+function exportiere(blob, format, teilen) {
+  if (!blob) return;
+  const m = monat, ymExport = ym;
+  const name = dateiname(ymExport, format === 'PDF' ? 'pdf' : 'jpg');
+  const vorgang = teilen ? teileOderLade(blob, name, 'Bestellung Pflegehilfsmittel ' + ymText(ymExport)) : herunterladen(blob, name);
+  vorgang.then((r) => nachExport(r, format, m, ymExport));
+}
 
-$('btn-pdf-laden').addEventListener('click', () => {
-  herunterladen(pdfBlob(), dateiname(ym, 'pdf')).then((r) => meldeDownload(r, 'PDF'));
-});
+$('btn-pdf').addEventListener('click', () => exportiere(pdfBlob(), 'PDF', true));
+$('btn-pdf-laden').addEventListener('click', () => exportiere(pdfBlob(), 'PDF', false));
 
 /** Erzeugt das JPG synchron (Teilen bleibt im Klick-Gesten-Kontext). @returns {Blob|null} */
 function jpgBlob() {
@@ -147,14 +180,15 @@ function jpgBlob() {
   }
 }
 
-$('btn-jpg').addEventListener('click', () => {
-  const jpg = jpgBlob();
-  if (jpg) teileOderLade(jpg, dateiname(ym, 'jpg'), 'Bestellung Pflegehilfsmittel ' + ymText(ym)).then((r) => meldeDownload(r, 'JPG'));
-});
+$('btn-jpg').addEventListener('click', () => exportiere(jpgBlob(), 'JPG', true));
+$('btn-jpg-laden').addEventListener('click', () => exportiere(jpgBlob(), 'JPG', false));
 
-$('btn-jpg-laden').addEventListener('click', () => {
-  const jpg = jpgBlob();
-  if (jpg) herunterladen(jpg, dateiname(ym, 'jpg')).then((r) => meldeDownload(r, 'JPG'));
+$('btn-wiederherstellen').addEventListener('click', () => {
+  if (!stelleGesendeteWiederHer(monat, new Date().toISOString())) return;
+  speichern();
+  spiegel.markiere(ym);
+  zeigeMonat();
+  toast('Bestellung wiederhergestellt ✓', 'ok');
 });
 
 $('btn-leeren').addEventListener('click', () => {

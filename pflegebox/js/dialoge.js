@@ -10,7 +10,7 @@ export function $(id) {
 
 /**
  * Bestätigungsdialog. Liefert true bei Bestätigung.
- * @param {{ titel: string, text: string, ok: string, gefahr?: boolean }} opt @returns {Promise<boolean>}
+ * @param {{ titel: string, text: string, ok: string, abbrechen?: string, gefahr?: boolean }} opt @returns {Promise<boolean>}
  */
 export function bestaetige(opt) {
   const dlg = /** @type {HTMLDialogElement} */ ($('dlg-bestaetigen'));
@@ -19,6 +19,7 @@ export function bestaetige(opt) {
   const ok = $('dlg-bestaetigen-ok');
   ok.textContent = opt.ok;
   ok.className = 'btn ' + (opt.gefahr ? 'btn-gefahr' : 'btn-primaer');
+  $('dlg-bestaetigen-abbrechen').textContent = opt.abbrechen || 'Abbrechen';
   dlg.returnValue = '';
   dlg.showModal();
   $('dlg-bestaetigen-abbrechen').focus();

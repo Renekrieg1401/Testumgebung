@@ -5,7 +5,8 @@
 // Plattform-Funktion „downloads“ genutzt (der Nutzer bestätigt das Speichern).
 
 /**
- * @typedef {'geteilt'|'geladen'|'abgebrochen'|'fehler'} TeilErgebnis
+ * 'gespeichert' = Speichern vom Nutzer bestätigt (Artifact); 'geladen' = Browser-Download angestoßen, Abschluss unbekannt.
+ * @typedef {'geteilt'|'gespeichert'|'geladen'|'abgebrochen'|'fehler'} TeilErgebnis
  * @typedef {{ save(req: { filename: string, data: Blob }): Promise<{ status: string }> }} DownloadDienst
  * @typedef {{ use(name: string): Promise<unknown> }} ClaudeLaufzeit
  */
@@ -49,7 +50,7 @@ export function herunterladen(blob, dateiname) {
     ankerDownload(blob, dateiname);
     return Promise.resolve('geladen');
   }
-  return dienst.save({ filename: dateiname, data: blob }).then(() => /** @type {TeilErgebnis} */ ('geladen'), saveFehler);
+  return dienst.save({ filename: dateiname, data: blob }).then(() => /** @type {TeilErgebnis} */ ('gespeichert'), saveFehler);
 }
 
 /**
