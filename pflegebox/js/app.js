@@ -79,7 +79,7 @@ const tabelle = erzeugeTabelle(/** @type {HTMLTableElement} */ ($('tabelle')), {
 function zeigeKopfzeile() {
   const befuellt = monat.zeilen.some((z) => !istLeer(z));
   $('monat-label').textContent = ymText(ym);
-  ['btn-pdf', 'btn-pdf-laden', 'btn-jpg-laden', 'btn-leeren'].forEach((id) => { /** @type {HTMLButtonElement} */ ($(id)).disabled = !befuellt; });
+  ['btn-pdf', 'btn-jpg', 'btn-pdf-laden', 'btn-jpg-laden', 'btn-leeren'].forEach((id) => { /** @type {HTMLButtonElement} */ ($(id)).disabled = !befuellt; });
 }
 
 function zeigeUebernahme() {
@@ -137,15 +137,24 @@ $('btn-pdf-laden').addEventListener('click', () => {
   herunterladen(pdfBlob(), dateiname(ym, 'pdf')).then((r) => meldeDownload(r, 'PDF'));
 });
 
-$('btn-jpg-laden').addEventListener('click', () => {
-  let jpg;
+/** Erzeugt das JPG synchron (Teilen bleibt im Klick-Gesten-Kontext). @returns {Blob|null} */
+function jpgBlob() {
   try {
-    jpg = new Blob([erzeugeBestellJpeg(speicher.daten, ym, monat, new Date())], { type: 'image/jpeg' });
+    return new Blob([erzeugeBestellJpeg(speicher.daten, ym, monat, new Date())], { type: 'image/jpeg' });
   } catch (err) {
     toast('JPG konnte nicht erstellt werden: ' + (err instanceof Error ? err.message : String(err)), 'fehler');
-    return;
+    return null;
   }
-  herunterladen(jpg, dateiname(ym, 'jpg')).then((r) => meldeDownload(r, 'JPG'));
+}
+
+$('btn-jpg').addEventListener('click', () => {
+  const jpg = jpgBlob();
+  if (jpg) teileOderLade(jpg, dateiname(ym, 'jpg'), 'Bestellung Pflegehilfsmittel ' + ymText(ym)).then((r) => meldeDownload(r, 'JPG'));
+});
+
+$('btn-jpg-laden').addEventListener('click', () => {
+  const jpg = jpgBlob();
+  if (jpg) herunterladen(jpg, dateiname(ym, 'jpg')).then((r) => meldeDownload(r, 'JPG'));
 });
 
 $('btn-leeren').addEventListener('click', () => {

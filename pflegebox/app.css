@@ -193,7 +193,7 @@ button, input, select { font: inherit; color: inherit; }
   .speicherstatus { margin-left: 0; width: 100%; }
   .aktionen { display: grid; grid-template-columns: repeat(6, 1fr); gap: .4rem; padding-left: 12px; padding-right: 12px; }
   .aktionen .btn { grid-column: span 2; min-height: 44px; padding: .35rem .4rem; font-size: .85rem; line-height: 1.2; }
-  .aktionen #btn-pdf { grid-column: 1 / -1; }
+  .aktionen #btn-pdf, .aktionen #btn-jpg { grid-column: span 3; }
   .toast { bottom: auto; top: calc(12px + env(safe-area-inset-top)); }
 }
 

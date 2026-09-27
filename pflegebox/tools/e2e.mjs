@@ -76,10 +76,13 @@ try {
   assert.equal(jpgBytes[0], 0xff);
   assert.equal(jpgBytes[1], 0xd8);
   assert.match(jpg.suggestedFilename(), /^Bestellung_\d{4}-\d{2}\.jpg$/);
+  const dlJpg2 = page.waitForEvent('download');
+  await page.click('#btn-jpg');
+  assert.match((await dlJpg2).suggestedFilename(), /\.jpg$/);
   const dlPdf2 = page.waitForEvent('download');
   await page.click('#btn-pdf-laden');
   assert.match((await dlPdf2).suggestedFilename(), /\.pdf$/);
-  schritt('PDF- und JPG-Download');
+  schritt('PDF und JPG: senden/teilen und herunterladen');
 
   // 5) Folgemonat: Übernahme aus Vormonat
   await page.click('#monat-vor');
